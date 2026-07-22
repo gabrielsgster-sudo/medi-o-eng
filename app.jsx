@@ -1967,12 +1967,9 @@ export default function MedicaoCanteiroPro() {
   );
 }
 
-// Montagem do App na página
+// Montagem da aplicação
 const container = document.getElementById('root');
-
-if (window.ReactDOM && window.ReactDOM.createRoot) {
-  const root = window.ReactDOM.createRoot(container);
+if (container) {
+  const root = ReactDOM.createRoot(container);
   root.render(<MedicaoCanteiroPro />);
-} else if (window.ReactDOM && window.ReactDOM.render) {
-  window.ReactDOM.render(<MedicaoCanteiroPro />, container);
 }
