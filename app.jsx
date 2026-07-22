@@ -1967,7 +1967,12 @@ export default function MedicaoCanteiroPro() {
   );
 }
 
-// Montagem do App na página (necessário para o build estático do Netlify)
+// Montagem do App na página
 const container = document.getElementById('root');
-const root = ReactDOM.createRoot(container);
-root.render(<MedicaoCanteiroPro />);
+
+if (window.ReactDOM && window.ReactDOM.createRoot) {
+  const root = window.ReactDOM.createRoot(container);
+  root.render(<MedicaoCanteiroPro />);
+} else if (window.ReactDOM && window.ReactDOM.render) {
+  window.ReactDOM.render(<MedicaoCanteiroPro />, container);
+}
