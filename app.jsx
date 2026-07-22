@@ -1,11 +1,10 @@
 const { useState, useEffect, useRef } = React;
 
-// Injeção segura dos ícones Lucide no navegador
+// Acesso seguro às globais do Lucide Icons
 const Lucide = window.LucideReact || window.lucideReact || window.lucide || {};
-
-// Função auxiliar para evitar undefined se algum ícone falhar
 const getIcon = (name) => Lucide[name] || Lucide[name + 'Icon'] || (() => null);
 
+// Ícones utilizados no app
 const Download = getIcon('Download');
 const Plus = getIcon('Plus');
 const Trash2 = getIcon('Trash2');
@@ -18,6 +17,7 @@ const Save = getIcon('Save');
 const Home = getIcon('Home');
 const BarChart3 = getIcon('BarChart3');
 const PieChart = getIcon('PieChart');
+
 
 function MedicaoCanteiroPro() {
   const [obras, setObras] = useState([]);
@@ -98,13 +98,19 @@ function MedicaoCanteiroPro() {
   // Câmera
   const [cameraAberta, setCameraAberta] = useState(null);
   const videoRef = useRef(null);
+  const streamRef = useRef(null);
   const canvasRef = useRef(null);
   const [fotoCapturada, setFotoCapturada] = useState(null);
+  const [enviandoFoto, setEnviandoFoto] = useState(false);
   const [telaAtiva, setTelaAtiva] = useState('obras');
   const [dataSelecionada, setDataSelecionada] = useState(new Date().toISOString().split('T')[0]);
   const [permissaoCameraModal, setPermissaoCameraModal] = useState(false);
   const [permissaoCameraStatus, setPermissaoCameraStatus] = useState('nao-verificada');
   const [tipoGrafico, setTipoGrafico] = useState('barras'); // 'barras', 'treemap', 'tabela'
+
+  // Status de sincronização com a nuvem (Firebase)
+  const [carregandoNuvem, setCarregandoNuvem] = useState(true);
+  const [statusNuvem, setStatusNuvem] = useState('conectando'); // 'conectando' | 'ok' | 'erro'
 
   // Dados para novo serviço
   const [servicoForm, setServicoForm] = useState({
@@ -165,19 +171,56 @@ function MedicaoCanteiroPro() {
     return { cor: '#9ca3af', label: 'Não iniciado', emoji: '⚪' };
   };
 
-  // Carregar dados
+  // Pequeno indicador de status de sincronização com a nuvem (Firebase)
+  const BadgeStatusNuvem = () => {
+    const config = {
+      conectando: { texto: '☁️ Conectando...', cor: '#9ca3af' },
+      salvando: { texto: '☁️ Salvando...', cor: '#f59e0b' },
+      ok: { texto: '☁️ Sincronizado', cor: '#22c55e' },
+      erro: { texto: '⚠️ Sem conexão com a nuvem', cor: '#ef4444' }
+    }[statusNuvem] || { texto: '☁️', cor: '#9ca3af' };
+
+    return (
+      <span
+        className="text-xs font-medium px-2 py-1 rounded-full inline-flex items-center gap-1"
+        style={{ backgroundColor: config.cor + '30', color: config.cor }}
+      >
+        {config.texto}
+      </span>
+    );
+  };
+
+  // Carregar dados (Firestore - em tempo real, sincroniza automaticamente entre dispositivos)
   useEffect(() => {
-    const saved = localStorage.getItem('medicaoCanteiroPro_v5');
-    if (saved) {
-      const data = JSON.parse(saved);
-      setObras(data.obras || []);
-      setCategorias(data.categorias || [
-        'Estrutura', 'Fundação', 'Alvenaria', 'Cobertura', 'Hidrossanitário',
-        'Elétrica', 'Gesso/Drywall', 'Esquadrias', 'Revestimentos', 'Pintura',
-        'Pavimentação', 'Urbanização', 'PPCI', 'Limpeza Final'
-      ]);
+    let unsubscribe = () => {};
+
+    if (window.db) {
+      unsubscribe = window.db.collection('medicaoCanteiroPro').doc('appData').onSnapshot(
+        (doc) => {
+          if (doc.exists) {
+            const data = doc.data();
+            setObras(data.obras || []);
+            setCategorias(data.categorias || [
+              'Estrutura', 'Fundação', 'Alvenaria', 'Cobertura', 'Hidrossanitário',
+              'Elétrica', 'Gesso/Drywall', 'Esquadrias', 'Revestimentos', 'Pintura',
+              'Pavimentação', 'Urbanização', 'PPCI', 'Limpeza Final'
+            ]);
+          }
+          setStatusNuvem('ok');
+          setCarregandoNuvem(false);
+        },
+        (err) => {
+          console.error('Erro ao carregar dados do Firestore:', err);
+          setStatusNuvem('erro');
+          setCarregandoNuvem(false);
+        }
+      );
+    } else {
+      console.warn('window.db não encontrado. Verifique se o Firebase foi inicializado no index.html.');
+      setStatusNuvem('erro');
+      setCarregandoNuvem(false);
     }
-    
+
     // Obter localização
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -193,6 +236,8 @@ function MedicaoCanteiroPro() {
 
     // Solicitar permissão de câmera uma única vez no carregamento
     solicitarPermissaoCameraUnicaVez();
+
+    return () => unsubscribe();
   }, []);
 
   // Solicitar permissão de câmera UMA ÚNICA VEZ
@@ -226,12 +271,26 @@ function MedicaoCanteiroPro() {
     }
   };
 
-  // Salvar dados
-  const salvarDados = (novasObras) => {
-    localStorage.setItem('medicaoCanteiroPro_v5', JSON.stringify({
+  // Salvar dados na nuvem (Firestore)
+  const salvarDados = (novasObras, categoriasParaSalvar) => {
+    const dadosParaSalvar = {
       obras: novasObras,
-      categorias
-    }));
+      categorias: categoriasParaSalvar !== undefined ? categoriasParaSalvar : categorias
+    };
+
+    if (!window.db) {
+      console.warn('window.db não encontrado. Dados não foram salvos na nuvem.');
+      setStatusNuvem('erro');
+      return;
+    }
+
+    setStatusNuvem('salvando');
+    window.db.collection('medicaoCanteiroPro').doc('appData').set(dadosParaSalvar)
+      .then(() => setStatusNuvem('ok'))
+      .catch((err) => {
+        console.error('Erro ao salvar dados no Firestore:', err);
+        setStatusNuvem('erro');
+      });
   };
 
   // Adicionar categoria
@@ -253,11 +312,8 @@ function MedicaoCanteiroPro() {
     setServicoForm({ ...servicoForm, categoria: novaCategoria });
     setNovaCategoria('');
     setCategoriaSimilar(null);
-    
-    localStorage.setItem('medicaoCanteiroPro_v5', JSON.stringify({
-      obras,
-      categorias: newCategorias
-    }));
+
+    salvarDados(obras, newCategorias);
 
     // Remover destaque após 3 segundos
     setTimeout(() => setCategoriaRecemCriada(null), 3000);
@@ -267,10 +323,7 @@ function MedicaoCanteiroPro() {
   const deletarCategoria = (cat) => {
     const newCategorias = categorias.filter(c => c !== cat);
     setCategorias(newCategorias);
-    localStorage.setItem('medicaoCanteiroPro_v5', JSON.stringify({
-      obras,
-      categorias: newCategorias
-    }));
+    salvarDados(obras, newCategorias);
   };
 
   // Criar nova obra
@@ -291,6 +344,20 @@ function MedicaoCanteiroPro() {
   };
 
   // Entrar em uma obra
+  // Auto-salvar na nuvem sempre que algo mudar dentro da obra ativa (evita perda de dados
+  // caso o usuário feche a aba sem clicar em "Voltar"). Debounced para não gravar a cada tecla.
+  useEffect(() => {
+    if (!obraAtiva) return;
+    const timeout = setTimeout(() => {
+      setObras(prevObras => {
+        const novasObras = prevObras.map(o => (o.id === obraAtiva ? { ...o, empreiteiros } : o));
+        salvarDados(novasObras);
+        return novasObras;
+      });
+    }, 800);
+    return () => clearTimeout(timeout);
+  }, [empreiteiros]);
+
   const entrarObra = (obraId) => {
     setObraAtiva(obraId);
     const obra = obras.find(o => o.id === obraId);
@@ -467,18 +534,30 @@ function MedicaoCanteiroPro() {
         video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
         audio: false
       });
-      
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.onloadedmetadata = () => {
-          videoRef.current.play();
-        };
-        setCameraAberta(servicoId);
-      }
+
+      // Guarda o stream numa ref e só então abre a tela da câmera.
+      // O <video> ainda NÃO existe no DOM neste momento (só é renderizado
+      // depois que cameraAberta mudar) — por isso o stream é conectado
+      // no useEffect abaixo, que roda após o React montar o elemento.
+      streamRef.current = stream;
+      setCameraAberta(servicoId);
     } catch (err) {
       alert('❌ Erro ao acessar câmera: ' + err.message);
     }
   };
+
+  // Conecta o stream da câmera ao <video> assim que ele é montado na tela
+  useEffect(() => {
+    if (cameraAberta && videoRef.current && streamRef.current) {
+      videoRef.current.srcObject = streamRef.current;
+      const playPromise = videoRef.current.play();
+      if (playPromise && typeof playPromise.catch === 'function') {
+        playPromise.catch((err) => {
+          console.error('Erro ao reproduzir vídeo da câmera:', err);
+        });
+      }
+    }
+  }, [cameraAberta]);
 
   // Capturar foto
   const capturarFoto = () => {
@@ -489,23 +568,60 @@ function MedicaoCanteiroPro() {
     }
   };
 
-  // Adicionar foto
-  const adicionarFotoMedicao = () => {
-    if (fotoCapturada) {
-      const agora = new Date();
-      const novaFoto = {
-        id: Date.now(),
-        imagem: fotoCapturada,
-        data: agora.toLocaleDateString('pt-BR'),
-        hora: agora.toLocaleTimeString('pt-BR'),
-        gps: localizacao
-      };
-      setMedicaoForm({
-        ...medicaoForm,
-        fotos: [...medicaoForm.fotos, novaFoto]
-      });
-      setFotoCapturada(null);
-      fecharCamera();
+  // Adicionar foto (envia para o Firebase Storage e guarda a URL da nuvem, não o base64)
+  const adicionarFotoMedicao = async () => {
+    if (!fotoCapturada) return;
+
+    const agora = new Date();
+    const idFoto = Date.now();
+    const imagemLocal = fotoCapturada;
+
+    // Adiciona imediatamente com preview local (otimista), marcado como "enviando"
+    const fotoTemp = {
+      id: idFoto,
+      imagem: imagemLocal,
+      data: agora.toLocaleDateString('pt-BR'),
+      hora: agora.toLocaleTimeString('pt-BR'),
+      gps: localizacao,
+      enviando: true
+    };
+
+    setMedicaoForm(prev => ({
+      ...prev,
+      fotos: [...prev.fotos, fotoTemp]
+    }));
+    setFotoCapturada(null);
+    fecharCamera();
+
+    // Envia para o Firebase Storage e substitui o preview local pela URL da nuvem
+    if (!window.storage) {
+      console.warn('window.storage não encontrado. Foto ficará apenas local (não foi enviada à nuvem).');
+      setMedicaoForm(prev => ({
+        ...prev,
+        fotos: prev.fotos.map(f => f.id === idFoto ? { ...f, enviando: false } : f)
+      }));
+      return;
+    }
+
+    try {
+      setEnviandoFoto(true);
+      const blob = await (await fetch(imagemLocal)).blob();
+      const caminho = `medicoes/${idFoto}.jpg`;
+      const snapshot = await window.storage.ref(caminho).put(blob);
+      const urlNuvem = await snapshot.ref.getDownloadURL();
+
+      setMedicaoForm(prev => ({
+        ...prev,
+        fotos: prev.fotos.map(f => f.id === idFoto ? { ...f, imagem: urlNuvem, enviando: false } : f)
+      }));
+    } catch (err) {
+      console.error('Erro ao enviar foto para o Firebase Storage:', err);
+      setMedicaoForm(prev => ({
+        ...prev,
+        fotos: prev.fotos.map(f => f.id === idFoto ? { ...f, enviando: false, erroUpload: true } : f)
+      }));
+    } finally {
+      setEnviandoFoto(false);
     }
   };
 
@@ -513,6 +629,10 @@ function MedicaoCanteiroPro() {
   const fecharCamera = () => {
     if (videoRef.current && videoRef.current.srcObject) {
       videoRef.current.srcObject.getTracks().forEach(track => track.stop());
+    }
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
     }
     setCameraAberta(null);
   };
@@ -544,6 +664,12 @@ function MedicaoCanteiroPro() {
     const emp = empreiteiros.find(e => e.id === empreiteiroId);
     const servico = emp?.servicos.find(s => s.id === servicoId);
     if (!servico) return false;
+
+    // Impede salvar enquanto alguma foto ainda está sendo enviada à nuvem
+    if (medicaoForm.fotos.some(f => f.enviando)) {
+      alert('☁️ Aguarde a foto terminar de enviar para a nuvem antes de salvar a medição.');
+      return false;
+    }
 
     const valorInformado = parseFloat(medicaoForm.valor);
     const { extrapola, excedente } = verificarExtrapolacao(servico, valorInformado);
@@ -852,7 +978,10 @@ function MedicaoCanteiroPro() {
             <h1 className="text-2xl font-bold flex items-center gap-2">
               <BarChart3 size={28} /> Gestor de Obras
             </h1>
-            <p className="text-sm opacity-80 mt-1">Acompanhe múltiplas obras simultaneamente</p>
+            <div className="flex items-center justify-between mt-1">
+              <p className="text-sm opacity-80">Acompanhe múltiplas obras simultaneamente</p>
+              <BadgeStatusNuvem />
+            </div>
           </div>
 
           {/* Abas */}
@@ -1142,7 +1271,10 @@ function MedicaoCanteiroPro() {
           <div className="flex justify-between items-start mb-3">
             <div>
               <h1 className="text-2xl font-bold mb-1">📏 {obraAtualObj.nome}</h1>
-              <p className="text-sm opacity-80">{empreiteiros.length} empreiteiro{empreiteiros.length !== 1 ? 's' : ''}</p>
+              <div className="flex items-center gap-2">
+                <p className="text-sm opacity-80">{empreiteiros.length} empreiteiro{empreiteiros.length !== 1 ? 's' : ''}</p>
+                <BadgeStatusNuvem />
+              </div>
             </div>
             <div className="flex gap-2">
               <button
@@ -1785,6 +1917,7 @@ function MedicaoCanteiroPro() {
                                           ref={videoRef}
                                           autoPlay
                                           playsInline
+                                          muted
                                           className="w-full rounded-lg mb-2 max-h-60"
                                           style={{ transform: 'scaleX(-1)' }}
                                         />
@@ -1851,6 +1984,16 @@ function MedicaoCanteiroPro() {
                                         {medicaoForm.fotos.map(foto => (
                                           <div key={foto.id} className="relative group">
                                             <img src={foto.imagem} alt="Foto" className="w-full h-20 rounded object-cover" />
+                                            {foto.enviando && (
+                                              <div className="absolute inset-0 bg-black bg-opacity-60 rounded flex items-center justify-center">
+                                                <span className="text-white text-xs font-bold">☁️ Enviando...</span>
+                                              </div>
+                                            )}
+                                            {foto.erroUpload && (
+                                              <div className="absolute top-1 right-1 bg-red-600 text-white text-xs px-1.5 py-0.5 rounded-full font-bold" title="Falha ao enviar para a nuvem, foto ficou só local">
+                                                ⚠️
+                                              </div>
+                                            )}
                                             <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition rounded flex items-center justify-center">
                                               <button
                                                 onClick={() => removerFoto(foto.id)}
@@ -1984,7 +2127,7 @@ function MedicaoCanteiroPro() {
   );
 }
 
-// Montagem da aplicação
+// Renderização final sem export default
 const container = document.getElementById('root');
 if (container) {
   const root = ReactDOM.createRoot(container);
