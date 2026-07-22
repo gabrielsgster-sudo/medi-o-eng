@@ -1,24 +1,26 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gestor de Obras - Medição de Canteiro</title>
-  <meta name="description" content="App de medição e gestão de canteiro de obra com múltiplas obras, empreiteiros, categorias, aditivos e controle de extrapolação." />
+  <meta name="description" content="App de medição e gestão de canteiro de obra" />
 
   <!-- Permissões necessárias para câmera/GPS funcionarem corretamente -->
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
 
-  <!-- Tailwind CSS (utilitário usado em todo o app) -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Babel Standalone: transforma o JSX diretamente no navegador -->
   <!-- React e React DOM -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+  <!-- Babel Standalone -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <!-- Mapeamento de módulos para resolver os "import" do JSX -->
+
+  <!-- Import Map -->
   <script type="importmap">
     {
       "imports": {
@@ -42,18 +44,7 @@
 <body>
   <div id="root"></div>
 
-  <!-- Import map: resolve os pacotes usados no app.jsx via CDN (esm.sh) -->
-  <script type="importmap">
-  {
-    "imports": {
-      "react": "https://esm.sh/react@18.3.1",
-      "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
-      "lucide-react": "https://esm.sh/lucide-react@0.383.0?external=react"
-    }
-  }
-  </script>
-
-  <!-- App principal: mesmo código/funcionalidade do arquivo original, sem alterações -->
-  <script type="text/babel" data-presets="react" data-type="module" src="./app.jsx"></script>
+  <!-- App principal -->
+  <script type="text/babel" data-plugins="transform-modules-umd" data-type="module" src="./app.jsx"></script>
 </body>
 </html>
