@@ -13,20 +13,16 @@
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- React 18 e ReactDOM Client (UMD) -->
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-
-  <!-- Babel Standalone -->
+  <!-- Babel Standalone (Para processar JSX diretamente no navegador) -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <!-- Importmap para dependências Módulos -->
+  <!-- Import Map (Carrega React, ReactDOM e Ícones sem duplicar) -->
   <script type="importmap">
     {
       "imports": {
-        "react": "https://esm.sh/react@18",
-        "react-dom": "https://esm.sh/react-dom@18",
-        "react-dom/client": "https://esm.sh/react-dom@18/client",
+        "react": "https://esm.sh/react@18.2.0?dev",
+        "react-dom": "https://esm.sh/react-dom@18.2.0?dev",
+        "react-dom/client": "https://esm.sh/react-dom@18.2.0/client?dev",
         "lucide-react": "https://esm.sh/lucide-react"
       }
     }
@@ -44,7 +40,7 @@
 <body>
   <div id="root"></div>
 
-  <!-- Script Principal da Aplicação -->
+  <!-- Carrega a sua aplicação processada pelo Babel como Módulo -->
   <script type="text/babel" data-type="module" src="./app.jsx"></script>
 </body>
 </html>
