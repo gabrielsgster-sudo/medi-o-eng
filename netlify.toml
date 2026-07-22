@@ -1,0 +1,13 @@
+[build]
+  publish = "."
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Necessário para permissão de Câmera funcionar corretamente no site publicado
+    Permissions-Policy = "camera=(self), geolocation=(self)"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
