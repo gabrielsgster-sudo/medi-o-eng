@@ -8,30 +8,30 @@
   <!-- 1. Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- 2. React e ReactDOM (Mantenha a versão 18) -->
+  <!-- 2. React e ReactDOM -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
 
-  <!-- 3. Lucide Icons (Precisa vir DEPOIS do React) -->
+  <!-- 3. Lucide Icons (Versão Standalone sem conflito no React) -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://unpkg.com/lucide-react@latest"></script>
 
-  <!-- 4. Babel Standalone (Para interpretar o app.jsx) -->
+  <!-- 4. Babel Standalone -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <!-- 5. Firebase v8 CDN (Compatível com db.collection) -->
+  <!-- 5. Firebase v8 CDN -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
   <script>
-    // Configuração do seu projeto no Firebase
+    // Suas credenciais do Firebase
     const firebaseConfig = {
-      apiKey: "SUA_API_KEY_AQUI",
-      authDomain: "SEU_PROJETO.firebaseapp.com",
-      projectId: "SEU_PROJETO_ID",
-      storageBucket: "SEU_PROJETO.appspot.com",
-      messagingSenderId: "SEU_MESSAGING_ID",
-      appId: "SEU_APP_ID"
+      apiKey: "AIzaSyDE6EoGpq-xj7QyGoG2oV90dwGXu0uIw9E",
+      authDomain: "medi-o-eng.firebaseapp.com",
+      projectId: "medi-o-eng",
+      storageBucket: "medi-o-eng.firebasestorage.app",
+      messagingSenderId: "995319040470",
+      appId: "1:995319040470:web:0fbc80b1e4b702046ebc77",
+      measurementId: "G-W9HYGF6SMC"
     };
 
     // Inicialização do Firebase
@@ -39,17 +39,23 @@
       firebase.initializeApp(firebaseConfig);
     }
     
-    // Instância global do Firestore no window.db
     window.db = firebase.firestore();
   </script>
 </head>
 <body class="bg-slate-100 min-h-screen">
 
-  <!-- Elemento Raiz onde o React renderiza -->
   <div id="root"></div>
 
-  <!-- Carregamento do seu aplicativo React -->
+  <!-- Carrega o aplicativo em React -->
   <script type="text/babel" src="app.jsx"></script>
 
+  <script>
+    // Inicializa a renderização de ícones na tela
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+    });
+  </script>
 </body>
 </html>
