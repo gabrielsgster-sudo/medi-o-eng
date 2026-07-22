@@ -1,49 +1,55 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <!-- Módulos do Firebase via CDN -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyDE6EoGpq-xj7QyGoG2oV9OdwGXuOuIw9E",
-    authDomain: "medi-o-eng.firebaseapp.com",
-    projectId: "medi-o-eng",
-    storageBucket: "medi-o-eng.firebasestorage.app",
-    messagingSenderId: "995319040470",
-    appId: "1:995319040470:web:0fbc80b1e4b702046ebc77",
-    measurementId: "G-W9HYGF6SMC"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  window.db = getFirestore(app);
-</script>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gestor de Obras - Medição de Canteiro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Medi-o Eng - Canteiro Pro</title>
 
   <!-- 1. Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- 2. React 18 e ReactDOM (DEV para mensagens de erro melhores, UMD Global) -->
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <!-- 2. React e ReactDOM (Mantenha a versão 18) -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
 
-  <!-- 3. Babel Standalone (Para interpretar o JSX no navegador) -->
+  <!-- 3. Lucide Icons (Precisa vir DEPOIS do React) -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://unpkg.com/lucide-react@latest"></script>
+
+  <!-- 4. Babel Standalone (Para interpretar o app.jsx) -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <!-- 4. Lucide Icons (UMD Global - Carregado DEPOIS do React) -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://unpkg.com/lucide-react@0.263.1/dist/umd/lucide-react.js"></script>
-</head>
-<body class="bg-gray-100 min-h-screen text-gray-800">
+  <!-- 5. Firebase v8 CDN (Compatível com db.collection) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
-  <!-- Elemento Raiz da aplicação -->
+  <script>
+    // Configuração do seu projeto no Firebase
+    const firebaseConfig = {
+      apiKey: "SUA_API_KEY_AQUI",
+      authDomain: "SEU_PROJETO.firebaseapp.com",
+      projectId: "SEU_PROJETO_ID",
+      storageBucket: "SEU_PROJETO.appspot.com",
+      messagingSenderId: "SEU_MESSAGING_ID",
+      appId: "SEU_APP_ID"
+    };
+
+    // Inicialização do Firebase
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    
+    // Instância global do Firestore no window.db
+    window.db = firebase.firestore();
+  </script>
+</head>
+<body class="bg-slate-100 min-h-screen">
+
+  <!-- Elemento Raiz onde o React renderiza -->
   <div id="root"></div>
 
-  <!-- Script da aplicação React -->
-  <script type="text/babel" src="./app.jsx"></script>
+  <!-- Carregamento do seu aplicativo React -->
+  <script type="text/babel" src="app.jsx"></script>
 
 </body>
 </html>
