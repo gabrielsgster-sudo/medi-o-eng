@@ -1971,5 +1971,6 @@ export default function MedicaoCanteiroPro() {
 // Montagem da aplicação
 const container = document.getElementById('root');
 if (container) {
-  const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<MedicaoCanteiroPro />);
+  const root = ReactDOM.createRoot(container);
+  root.render(<MedicaoCanteiroPro />);
+}
