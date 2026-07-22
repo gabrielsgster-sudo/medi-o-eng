@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import ReactDOM from 'react-dom/client';
-import { Download, Plus, Trash2, Users, MapPin, Camera, X, Edit2, Save, Home, BarChart3, PieChart } from 'lucide-react';
+// ✅ COLOQUE ISTO NO TOPO DO APP.JSX:
+const { useState, useEffect, useRef } = React;
+const LucideIcons = window.lucideReact || window.lucide || {};
+const { Download, Plus, Trash2, Users, MapPin, Camera, X, Edit2, Save, Home, BarChart3, PieChart } = LucideIcons;
 
 export default function MedicaoCanteiroPro() {
   const [obras, setObras] = useState([]);
@@ -1970,6 +1971,5 @@ export default function MedicaoCanteiroPro() {
 // Montagem da aplicação
 const container = document.getElementById('root');
 if (container) {
-  const root = ReactDOM.createRoot(container);
-  root.render(<MedicaoCanteiroPro />);
-}
+  const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<MedicaoCanteiroPro />);
