@@ -12,18 +12,18 @@
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
 
-  <!-- 3. Lucide Icons (Versão Standalone sem conflito no React) -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-
-  <!-- 4. Babel Standalone -->
+  <!-- 3. Babel Standalone -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- 4. Lucide Icons (Versão Standalone) -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 
   <!-- 5. Firebase v8 CDN -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
   <script>
-    // Suas credenciais do Firebase
+    // Configuração do Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyDE6EoGpq-xj7QyGoG2oV90dwGXu0uIw9E",
       authDomain: "medi-o-eng.firebaseapp.com",
@@ -38,24 +38,38 @@
     if (!firebase.apps.length) {
       firebase.initializeApp(firebaseConfig);
     }
-    
     window.db = firebase.firestore();
+
+    // Mapeador seguro para evitar o Erro #130 do React com ícones
+    window.LucideIcons = new Proxy({}, {
+      get: (target, name) => {
+        return (props) => {
+          const iconName = name.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+          return React.createElement('i', { 
+            'data-lucide': iconName, 
+            className: props.className || '', 
+            style: props.style 
+          });
+        };
+      }
+    });
   </script>
 </head>
 <body class="bg-slate-100 min-h-screen">
 
   <div id="root"></div>
 
-  <!-- Carrega o aplicativo em React -->
+  <!-- Carrega a aplicação React -->
   <script type="text/babel" src="app.jsx"></script>
 
   <script>
-    // Inicializa a renderização de ícones na tela
-    window.addEventListener('DOMContentLoaded', () => {
+    // Ativa a renderização dos ícones assim que o React desenhar a tela
+    const observer = new MutationObserver(() => {
       if (window.lucide) {
         lucide.createIcons();
       }
     });
+    observer.observe(document.body, { childList: true, subtree: true });
   </script>
 </body>
 </html>
