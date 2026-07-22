@@ -1,7 +1,23 @@
-// ✅ COLOQUE ISTO NO TOPO DO APP.JSX:
 const { useState, useEffect, useRef } = React;
-const LucideIcons = window.lucideReact || window.lucide || {};
-const { Download, Plus, Trash2, Users, MapPin, Camera, X, Edit2, Save, Home, BarChart3, PieChart } = LucideIcons;
+
+// Injeção segura dos ícones Lucide no navegador
+const Lucide = window.LucideReact || window.lucideReact || window.lucide || {};
+
+// Função auxiliar para evitar undefined se algum ícone falhar
+const getIcon = (name) => Lucide[name] || Lucide[name + 'Icon'] || (() => null);
+
+const Download = getIcon('Download');
+const Plus = getIcon('Plus');
+const Trash2 = getIcon('Trash2');
+const Users = getIcon('Users');
+const MapPin = getIcon('MapPin');
+const Camera = getIcon('Camera');
+const X = getIcon('X');
+const Edit2 = getIcon('Edit2');
+const Save = getIcon('Save');
+const Home = getIcon('Home');
+const BarChart3 = getIcon('BarChart3');
+const PieChart = getIcon('PieChart');
 
 function MedicaoCanteiroPro() {
   const [obras, setObras] = useState([]);
