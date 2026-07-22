@@ -3,7 +3,7 @@ const { useState, useEffect, useRef } = React;
 const LucideIcons = window.lucideReact || window.lucide || {};
 const { Download, Plus, Trash2, Users, MapPin, Camera, X, Edit2, Save, Home, BarChart3, PieChart } = LucideIcons;
 
-export default function MedicaoCanteiroPro() {
+function MedicaoCanteiroPro() {
   const [obras, setObras] = useState([]);
   const [obraAtiva, setObraAtiva] = useState(null);
   const [novoNomeObra, setNovoNomeObra] = useState('');
