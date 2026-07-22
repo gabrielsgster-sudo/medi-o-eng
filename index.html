@@ -5,26 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gestor de Obras - Medição de Canteiro</title>
 
-  <!-- Tailwind CSS -->
+  <!-- 1. Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- React 18 e ReactDOM (UMD Global) -->
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <!-- 2. React 18 e ReactDOM (DEV para mensagens de erro melhores, UMD Global) -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 
-  <!-- Babel Standalone para transformar JSX no navegador -->
+  <!-- 3. Babel Standalone (Para interpretar o JSX no navegador) -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <!-- Lucide Icons (UMD Global para compatibilidade) -->
+  <!-- 4. Lucide Icons (UMD Global - Carregado DEPOIS do React) -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://unpkg.com/lucide-react@0.263.1/dist/umd/lucide-react.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen text-gray-800">
 
-  <!-- Elemento Raiz onde a aplicação React é injetada -->
+  <!-- Elemento Raiz da aplicação -->
   <div id="root"></div>
 
-  <!-- Carregamento do código principal com Babel -->
+  <!-- Script da aplicação React -->
   <script type="text/babel" src="./app.jsx"></script>
 
 </body>
