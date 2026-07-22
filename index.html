@@ -15,6 +15,17 @@
 
   <!-- Babel Standalone: transforma o JSX diretamente no navegador -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- Mapeamento de módulos para resolver os "import" do JSX -->
+  <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@18",
+        "react-dom/client": "https://esm.sh/react-dom@18/client",
+        "react/jsx-runtime": "https://esm.sh/react@18/jsx-runtime",
+        "lucide-react": "https://esm.sh/lucide-react"
+      }
+    }
+  </script>
 
   <style>
     html, body, #root {
