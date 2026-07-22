@@ -6,27 +6,27 @@
   <title>Gestor de Obras - Medição de Canteiro</title>
   <meta name="description" content="App de medição e gestão de canteiro de obra" />
 
-  <!-- Permissões necessárias para câmera/GPS funcionarem corretamente -->
+  <!-- Permissões de Câmera e GPS -->
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- React e React DOM -->
+  <!-- React 18 e ReactDOM Client (UMD) -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 
   <!-- Babel Standalone -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <!-- Import Map -->
+  <!-- Importmap para dependências Módulos -->
   <script type="importmap">
     {
       "imports": {
         "react": "https://esm.sh/react@18",
+        "react-dom": "https://esm.sh/react-dom@18",
         "react-dom/client": "https://esm.sh/react-dom@18/client",
-        "react/jsx-runtime": "https://esm.sh/react@18/jsx-runtime",
         "lucide-react": "https://esm.sh/lucide-react"
       }
     }
@@ -44,7 +44,7 @@
 <body>
   <div id="root"></div>
 
-  <!-- App principal -->
-  <script type="text/babel" data-plugins="transform-modules-umd" data-type="module" src="./app.jsx"></script>
+  <!-- Script Principal da Aplicação -->
+  <script type="text/babel" data-presets="react" src="./app.jsx"></script>
 </body>
 </html>
