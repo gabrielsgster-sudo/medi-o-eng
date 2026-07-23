@@ -5,24 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Medi-o Eng - Canteiro Pro</title>
 
-  <!-- React 18 (build de produção, mais leve/rápido que a build de desenvolvimento) -->
+  <!-- React 18 (build de produção) -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 
-  <!-- Babel Standalone: transforma o JSX direto no navegador (arquivo único, sem build) -->
+  <!-- Babel Standalone: transforma JSX direto no navegador -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
   <!-- Firebase SDKs (v8) -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
-  <!--
-    CSS puro (sem cdn.tailwindcss.com de propósito).
-    O Tailwind via CDN roda um MutationObserver que reprocessa classes a cada
-    mudança no DOM — em telas com navegação frequente isso é um forte candidato
-    a causar o travamento que vocês relataram no celular. CSS estático elimina
-    esse custo por completo.
-  -->
+  <!-- CSS puro (elimina o MutationObserver do Tailwind CDN que travava o mobile) -->
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     html, body { height: 100%; }
@@ -60,7 +54,6 @@
       text-align: left; display: flex; align-items: center; gap: 6px;
     }
     .btn-full { width: 100%; margin-top: 8px; }
-    .btn-danger { background: #fee2e2; color: #b91c1c; }
     .project-item {
       padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 8px;
       cursor: pointer; -webkit-tap-highlight-color: transparent;
@@ -93,15 +86,15 @@
     const { useState, useEffect, useRef, useCallback, memo } = React;
 
     // ---------------------------------------------------------------------
-    // CONFIGURAÇÃO DO FIREBASE (v8) — placeholders, substitua pelos reais
+    // CONFIGURAÇÃO DO FIREBASE (v8)
     // ---------------------------------------------------------------------
     const firebaseConfig = {
-      apiKey: "SUA_API_KEY_AQUI",
-      authDomain: "seu-projeto.firebaseapp.com",
-      projectId: "seu-projeto",
-      storageBucket: "seu-projeto.appspot.com",
-      messagingSenderId: "000000000000",
-      appId: "1:000000000000:web:xxxxxxxxxxxxxxxx"
+      apiKey: "SUA_API_KEY_REAL",
+      authDomain: "medi-o-eng.firebaseapp.com",
+      projectId: "medi-o-eng",
+      storageBucket: "medi-o-eng.appspot.com",
+      messagingSenderId: "9953190404",
+      appId: "1:9953190404:web:ZDA1Zjc4M"
     };
 
     if (!firebase.apps.length) {
@@ -111,8 +104,6 @@
 
     // ---------------------------------------------------------------------
     // BADGE DE STATUS DA NUVEM
-    // Componente isolado e memoizado: só re-renderiza quando o status muda,
-    // não a cada snapshot recebido (que pode ser frequente).
     // ---------------------------------------------------------------------
     const BadgeStatus = memo(function BadgeStatus({ status }) {
       const config = {
@@ -127,9 +118,6 @@
 
     // ---------------------------------------------------------------------
     // FORMULÁRIO DE NOVO PROJETO
-    // Estado do input isolado AQUI dentro. Digitar no campo só re-renderiza
-    // este componente pequeno — a lista de projetos (que pode ser grande)
-    // não é afetada e não re-renderiza a cada tecla digitada.
     // ---------------------------------------------------------------------
     const NovoProjetoForm = memo(function NovoProjetoForm({ onCriar }) {
       const [nome, setNome] = useState('');
@@ -171,9 +159,6 @@
 
     // ---------------------------------------------------------------------
     // ITEM DA LISTA DE PROJETOS
-    // React.memo evita que TODOS os itens re-renderizem quando apenas um
-    // documento muda no Firestore (o React só atualiza o item cujos dados
-    // realmente mudaram, graças à key estável = project.id).
     // ---------------------------------------------------------------------
     const ProjectItem = memo(function ProjectItem({ project, onSelect }) {
       return (
@@ -186,8 +171,6 @@
 
     // ---------------------------------------------------------------------
     // TELA 1: LISTA DE PROJETOS
-    // Recebe a lista já pronta via props (o listener do Firestore fica no
-    // componente App, uma única vez). Este componente só cuida de exibir.
     // ---------------------------------------------------------------------
     const ListaProjetos = memo(function ListaProjetos({ projects, carregando, onSelect, onCriar }) {
       return (
@@ -211,24 +194,18 @@
     });
 
     // ---------------------------------------------------------------------
-    // FORMULÁRIO DE NOVA MEDIÇÃO (dentro da tela de detalhe)
-    // Também isolado em componente próprio pelo mesmo motivo do formulário
-    // de novo projeto: digitar aqui não deve re-renderizar a lista de
-    // medições nem a tela toda.
+    // FORMULÁRIO DE NOVA MEDIÇÃO
     // ---------------------------------------------------------------------
     const NovaMedicaoForm = memo(function NovaMedicaoForm({ onCriar }) {
       const [descricao, setDescricao] = useState('');
       const [quantidade, setQuantidade] = useState('');
-      const [foto, setFoto] = useState(null); // preview local (File -> object URL)
+      const [foto, setFoto] = useState(null);
       const [salvando, setSalvando] = useState(false);
       const fileInputRef = useRef(null);
 
       const handleFoto = (e) => {
         const file = e.target.files && e.target.files[0];
         if (!file) return;
-        // Apenas preview local por enquanto. Para persistir de verdade,
-        // suba o arquivo pro Firebase Storage e guarde a URL retornada
-        // no lugar do object URL abaixo.
         setFoto({ file, previewUrl: URL.createObjectURL(file) });
       };
 
@@ -312,10 +289,6 @@
 
     // ---------------------------------------------------------------------
     // TELA 2: DETALHES DO PROJETO
-    // Tem seu PRÓPRIO listener do Firestore (subcoleção de medições),
-    // criado apenas quando esta tela está montada e destruído (cleanup) ao
-    // sair — assim ele nunca fica "vazando" rodando em segundo plano
-    // enquanto o usuário navega por outras telas.
     // ---------------------------------------------------------------------
     const DetalheProjeto = memo(function DetalheProjeto({ project, onVoltar }) {
       const [medicoes, setMedicoes] = useState([]);
@@ -340,8 +313,6 @@
             }
           );
 
-        // Cleanup: encerra o listener assim que o usuário sai desta tela
-        // (troca de projeto ou volta pra lista). Evita listeners acumulando.
         return () => unsubscribe();
       }, [project.id]);
 
@@ -381,22 +352,14 @@
 
     // ---------------------------------------------------------------------
     // APP PRINCIPAL
-    // - Guarda apenas: view atual, id do projeto selecionado e a lista de
-    //   projetos (vinda de UM ÚNICO listener, montado uma vez no mount).
-    // - Navegação é feita por RENDERIZAÇÃO CONDICIONAL: a tela que não está
-    //   ativa é desmontada de verdade (não só escondida com CSS), então o
-    //   DetalheProjeto e seu listener de medições só existem quando
-    //   realmente necessário.
     // ---------------------------------------------------------------------
     function App() {
-      const [view, setView] = useState('list'); // 'list' | 'detail'
+      const [view, setView] = useState('list');
       const [selectedProjectId, setSelectedProjectId] = useState(null);
       const [projects, setProjects] = useState([]);
       const [carregandoProjetos, setCarregandoProjetos] = useState(true);
       const [statusNuvem, setStatusNuvem] = useState('conectando');
 
-      // Único listener da coleção 'projects', anexado uma vez (dependências
-      // vazias) e limpo corretamente no cleanup do useEffect.
       useEffect(() => {
         const unsubscribe = db.collection('projects').onSnapshot(
           (snapshot) => {
@@ -475,7 +438,7 @@
       );
     }
 
-    // Renderização (React 18 — createRoot)
+    // Renderização no DOM
     const container = document.getElementById('root');
     const root = ReactDOM.createRoot(container);
     root.render(<App />);
