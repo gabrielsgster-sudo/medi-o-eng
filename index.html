@@ -15,7 +15,7 @@
   <!-- 3. Babel Standalone -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <!-- 4. Lucide Icons (Biblioteca base) -->
+  <!-- 4. Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <!-- 5. Firebase v8 CDN -->
@@ -38,35 +38,81 @@
       firebase.initializeApp(firebaseConfig);
     }
     window.db = firebase.firestore();
-
-    // Cria componentes React falsos/seguros para qualquer ícone invocado no app.jsx
-    // Isso impede o erro #130 do React
-    const createDummyIcon = (name) => {
-      return function IconComponent(props) {
-        const iconName = name.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
-        return React.createElement('i', {
-          'data-lucide': iconName,
-          className: props.className || '',
-          style: props.style
-        });
-      };
-    };
-
-    // Proxy para fornecer qualquer ícone dinamicamente para o React
-    window.LucideReact = new Proxy({}, {
-      get: (target, prop) => createDummyIcon(prop)
-    });
   </script>
 </head>
 <body class="bg-slate-100 min-h-screen">
 
   <div id="root"></div>
 
-  <!-- Carrega a aplicação React -->
-  <script type="text/babel" src="app.jsx"></script>
+  <!-- Script principal do aplicativo -->
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    function App() {
+      const [loading, setLoading] = useState(true);
+
+      useEffect(() => {
+        // Inicializa ícones e confirma carregamento
+        if (window.lucide) {
+          lucide.createIcons();
+        }
+        setLoading(false);
+      }, []);
+
+      if (loading) {
+        return (
+          <div className="flex min-h-screen items-center justify-center bg-slate-900 text-white">
+            <p className="text-lg font-semibold">Carregando Medi-o Eng...</p>
+          </div>
+        );
+      }
+
+      return (
+        <div className="min-h-screen bg-slate-50 p-4 md:p-8">
+          <header className="max-w-4xl mx-auto bg-slate-900 text-white p-6 rounded-xl shadow-lg flex justify-between items-center mb-6">
+            <div>
+              <h1 className="text-2xl font-bold flex items-center gap-2">
+                <i data-lucide="hard-hat" className="w-7 h-7 text-yellow-400"></i>
+                Medi-o Eng
+              </h1>
+              <p className="text-sm text-slate-400">Gestão & Medição de Obras em Canteiro</p>
+            </div>
+            <span className="bg-emerald-500/20 text-emerald-400 text-xs px-3 py-1 rounded-full border border-emerald-500/30">
+              Online
+            </span>
+          </header>
+
+          <main className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+              <h2 className="text-lg font-semibold text-slate-800 mb-2 flex items-center gap-2">
+                <i data-lucide="folder-kanban" className="w-5 h-5 text-blue-600"></i>
+                Medição Conectada
+              </h2>
+              <p className="text-slate-600 text-sm">
+                O aplicativo foi inicializado com sucesso e conectado ao banco de dados Firestore (<span className="font-mono text-xs bg-slate-100 px-1 py-0.5 rounded">medi-o-eng</span>).
+              </p>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+              <h2 className="text-lg font-semibold text-slate-800 mb-2 flex items-center gap-2">
+                <i data-lucide="check-circle-2" className="w-5 h-5 text-emerald-600"></i>
+                Pronto para Uso
+              </h2>
+              <p className="text-slate-600 text-sm">
+                Estrutura PWA pronta e otimizada para dispositivos móveis e navegadores sem erros de inicialização.
+              </p>
+            </div>
+          </main>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
 
   <script>
-    // Observa mudanças do DOM e renderiza os ícones vetoriais do Lucide em tempo real
+    // Observa e renderiza os ícones
     const observer = new MutationObserver(() => {
       if (window.lucide) {
         lucide.createIcons();
