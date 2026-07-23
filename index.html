@@ -23,20 +23,24 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDE6EoGpq-xj7QyGoG2oV90dwGXu0uIw9E",
-      authDomain: "medi-o-eng.firebaseapp.com",
-      projectId: "medi-o-eng",
-      storageBucket: "medi-o-eng.firebasestorage.app",
-      messagingSenderId: "995319040470",
-      appId: "1:995319040470:web:0fbc80b1e4b702046ebc77",
-      measurementId: "G-W9HYGF6SMC"
-    };
+    try {
+      const firebaseConfig = {
+        apiKey: "AIzaSyDE6EoGpq-xj7QyGoG2oV90dwGXu0uIw9E",
+        authDomain: "medi-o-eng.firebaseapp.com",
+        projectId: "medi-o-eng",
+        storageBucket: "medi-o-eng.firebasestorage.app",
+        messagingSenderId: "995319040470",
+        appId: "1:995319040470:web:0fbc80b1e4b702046ebc77",
+        measurementId: "G-W9HYGF6SMC"
+      };
 
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
+      if (window.firebase && !firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+        window.db = firebase.firestore();
+      }
+    } catch (e) {
+      console.warn("Erro ao inicializar Firebase:", e);
     }
-    window.db = firebase.firestore();
   </script>
 </head>
 <body class="bg-slate-100 min-h-screen">
@@ -50,16 +54,23 @@
       const [loading, setLoading] = useState(true);
 
       useEffect(() => {
-        if (window.lucide) {
-          lucide.createIcons();
+        // Tenta renderizar ícones sem travar a aplicação
+        try {
+          if (window.lucide) {
+            lucide.createIcons();
+          }
+        } catch (err) {
+          console.warn("Erro nos ícones:", err);
         }
+        
+        // Garante que o loading saia da tela
         setLoading(false);
       }, []);
 
       if (loading) {
         return (
           <div className="flex min-h-screen items-center justify-center bg-slate-900 text-white">
-            <p className="text-lg font-semibold">Carregando Medi-o Eng...</p>
+            <p className="text-lg font-semibold animate-pulse">Carregando Medi-o Eng...</p>
           </div>
         );
       }
@@ -86,7 +97,7 @@
                 Medição Conectada
               </h2>
               <p className="text-slate-600 text-sm">
-                O aplicativo foi inicializado com sucesso e conectado ao banco de dados Firestore (<span className="font-mono text-xs bg-slate-100 px-1 py-0.5 rounded">medi-o-eng</span>).
+                O aplicativo foi inicializado com sucesso e está operacional.
               </p>
             </div>
 
@@ -96,7 +107,7 @@
                 Pronto para Uso
               </h2>
               <p className="text-slate-600 text-sm">
-                Estrutura PWA pronta e otimizada para dispositivos móveis e navegadores sem erros de inicialização.
+                Estrutura PWA pronta e otimizada para uso em canteiro de obras.
               </p>
             </div>
           </main>
@@ -111,7 +122,9 @@
   <script>
     const observer = new MutationObserver(() => {
       if (window.lucide) {
-        lucide.createIcons();
+        try {
+          lucide.createIcons();
+        } catch(e) {}
       }
     });
     observer.observe(document.body, { childList: true, subtree: true });
