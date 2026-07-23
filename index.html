@@ -1,137 +1,165 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Medi-o Eng - Canteiro Pro</title>
   
-  <!-- Estilos CSS embutidos (Substitui o Tailwind CDN sem dar erro de produção) -->
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-    body { background-color: #f1f5f9; color: #1e293b; padding: 16px; }
-    .container { max-width: 500px; margin: 0 auto; }
-    .card { background: #ffffff; padding: 16px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 16px; }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .title { font-size: 1.25rem; font-weight: bold; color: #4f46e5; }
-    .subtitle { font-size: 0.75rem; color: #64748b; }
-    .badge { font-size: 0.75rem; padding: 4px 8px; border-radius: 20px; font-weight: 600; background: #e2e8f0; color: #334155; }
-    .badge-ok { background: #d1fae5; color: #047857; }
-    .form-group { display: flex; gap: 8px; margin-top: 8px; }
-    input[type="text"] { flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.875rem; outline: none; }
-    button { background: #4f46e5; color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.875rem; }
-    button:hover { background: #4338ca; }
-    .project-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #f1f5f9; }
-    .project-item:last-child { border-bottom: none; }
-  </style>
-
-  <!-- React & React DOM CDN -->
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-
-  <!-- Firebase v8 Compat -->
+  <!-- React & ReactDOM -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  
+  <!-- Firebase SDKs (v8) -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: #f1f5f9; color: #1e293b; padding: 16px; }
+    .container { max-width: 500px; margin: 0 auto; }
+    .card { background: #ffffff; border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .header { display: flex; justify-content: space-between; align-items: center; }
+    .title { font-size: 20px; font-weight: bold; color: #4338ca; }
+    .subtitle { font-size: 12px; color: #64748b; }
+    .badge { padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+    .online { background: #dcfce7; color: #15803d; }
+    .offline { background: #fef3c7; color: #b45309; }
+    .input-group { display: flex; gap: 8px; margin-top: 12px; }
+    input { flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; }
+    button { background: #4f46e5; color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+    button:active { opacity: 0.8; }
+    .btn-secondary { background: #e2e8f0; color: #334155; margin-bottom: 12px; }
+    .project-card { cursor: pointer; transition: transform 0.1s; border: 1px solid #e2e8f0; }
+    .project-card:active { transform: scale(0.98); background: #f8fafc; }
+  </style>
 </head>
 <body>
+
   <div id="root"></div>
 
-  <!-- JavaScript Puro (Sem dependência de Babel) -->
   <script>
-    window.addEventListener('load', () => {
-      // 1. Inicialização do Firebase
-      try {
-        if (typeof firebase !== 'undefined' && !firebase.apps.length) {
-          firebase.initializeApp({
-            apiKey: "AIzaSyDE6EoGpq-xj7QyGoG2oV90dwSXu0uIw9E",
-            authDomain: "medi-o-eng.firebaseapp.com",
-            projectId: "medi-o-eng",
-            storageBucket: "medi-o-eng.firebasestorage.app",
-            messagingSenderId: "995319040470",
-            appId: "1:995319040470:web:0fbc80b1e4b702046ebc77",
-            measurementId: "G-W9HYGF6SMC"
+    // Configurações do Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-placeholder",
+      authDomain: "medi-o-eng.firebaseapp.com",
+      projectId: "medi-o-eng",
+      storageBucket: "medi-o-eng.appspot.com",
+      messagingSenderId: "9953190404",
+      appId: "1:9953190404:web:ZDA1Zjc4M"
+    };
+
+    let db = null;
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    db = firebase.firestore();
+
+    const { useState, useEffect, createElement: h } = React;
+
+    function App() {
+      const [isOnline, setIsOnline] = useState(false);
+      const [projects, setProjects] = useState([]);
+      const [newProjectName, setNewProjectName] = useState('');
+      const [selectedProject, setSelectedProject] = useState(null);
+
+      useEffect(() => {
+        // Monitorar conexão com Firestore
+        const unsubscribe = db.collection('projects').onSnapshot(
+          (snapshot) => {
+            setIsOnline(true);
+            const docs = snapshot.docs.map(doc => ({
+              id: doc.id,
+              ...doc.data()
+            }));
+            setProjects(docs);
+          },
+          (error) => {
+            console.error("Erro na conexão:", error);
+            setIsOnline(false);
+          }
+        );
+
+        return () => unsubscribe();
+      }, []);
+
+      const createProject = async () => {
+        if (!newProjectName.trim()) return;
+        try {
+          await db.collection('projects').add({
+            name: newProjectName,
+            createdAt: new Date().toLocaleDateString('pt-BR')
           });
-          window.db = firebase.firestore();
+          setNewProjectName('');
+        } catch (e) {
+          alert('Erro ao criar projeto!');
         }
-      } catch (e) {
-        console.error("Erro ao conectar Firebase:", e);
-      }
+      };
 
-      const e = React.createElement;
-      const { useState, useEffect } = React;
-
-      // 2. Componente Principal
-      function App() {
-        const [obras, setObras] = useState([]);
-        const [novoNomeObra, setNovoNomeObra] = useState('');
-        const [status, setStatus] = useState('Conectando...');
-
-        useEffect(() => {
-          if (window.db) {
-            return window.db.collection('medicaoCanteiroPro').doc('appData').onSnapshot(
-              doc => {
-                if (doc.exists) setObras(doc.data().obras || []);
-                setStatus('☁️ Online');
-              },
-              err => {
-                console.error(err);
-                setStatus('⚡ Offline');
-              }
-            );
-          } else {
-            setStatus('⚡ Modo Local');
-          }
-        }, []);
-
-        const criarObra = () => {
-          if (!novoNomeObra.trim()) return;
-          const nova = { id: Date.now(), nome: novoNomeObra, dataCriacao: new Date().toLocaleDateString('pt-BR') };
-          const novasObras = [...obras, nova];
-          setObras(novasObras);
-
-          if (window.db) {
-            window.db.collection('medicaoCanteiroPro').doc('appData').set({ obras: novasObras });
-          }
-          setNovoNomeObra('');
-        };
-
-        return e('div', { className: 'container' },
-          e('div', { className: 'card header' },
-            e('div', null,
-              e('h1', { className: 'title' }, 'Medi-o Eng'),
-              e('p', { className: 'subtitle' }, 'Gestão e Medição de Canteiro')
-            ),
-            e('span', { className: `badge ${status.includes('Online') ? 'badge-ok' : ''}` }, status)
-          ),
-          e('div', { className: 'card' },
-            e('h3', { style: { fontSize: '0.9rem', color: '#475569' } }, 'Novo Projeto'),
-            e('div', { className: 'form-group' },
-              e('input', {
-                type: 'text',
-                placeholder: 'Nome do Projeto (Ex: Residencial Solar)',
-                value: novoNomeObra,
-                onChange: (ev) => setNovoNomeObra(ev.target.value)
-              }),
-              e('button', { onClick: criarObra }, 'Criar')
-            )
-          ),
-          e('div', { className: 'card' },
-            e('h3', { style: { fontSize: '0.9rem', color: '#475569', marginBottom: '12px' } }, 'Seus Projetos'),
-            obras.length === 0 ? e('p', { className: 'subtitle' }, 'Nenhum projeto cadastrado ainda.') : null,
-            obras.map(o => 
-              e('div', { key: o.id, className: 'project-item' },
-                e('div', null,
-                  e('strong', { style: { display: 'block', fontSize: '0.95rem' } }, o.nome),
-                  e('span', { className: 'subtitle' }, 'Criado em: ' + o.dataCriacao)
-                )
-              )
-            )
+      // Tela de Detalhes do Projeto
+      if (selectedProject) {
+        return h('div', { className: 'container' },
+          h('button', { 
+            className: 'btn-secondary', 
+            onClick: () => setSelectedProject(null) 
+          }, '← Voltar aos Projetos'),
+          
+          h('div', { className: 'card' },
+            h('h2', { className: 'title' }, selectedProject.name),
+            h('p', { className: 'subtitle' }, `Criado em: ${selectedProject.createdAt}`),
+            h('hr', { style: { margin: '16px 0', borderColor: '#e2e8f0' } }),
+            h('h3', { style: { fontSize: '16px', marginBottom: '8px' } }, 'Medições / Canteiro'),
+            h('p', { style: { fontSize: '14px', color: '#64748b' } }, 'Nenhuma medição registrada ainda.')
           )
         );
       }
 
-      // Renderiza a aplicação
+      // Tela Principal (Lista de Projetos)
+      return h('div', { className: 'container' },
+        h('div', { className: 'card' },
+          h('div', { className: 'header' },
+            h('div', null,
+              h('div', { className: 'title' }, 'Medi-o Eng'),
+              h('div', { className: 'subtitle' }, 'Gestão e Medição de Canteiro')
+            ),
+            h('span', { className: `badge ${isOnline ? 'online' : 'offline'}` },
+              isOnline ? '☁️ Online' : '⚡ Offline'
+            )
+          )
+        ),
+
+        h('div', { className: 'card' },
+          h('h3', { style: { fontSize: '14px', marginBottom: '8px' } }, 'Novo Projeto'),
+          h('div', { className: 'input-group' },
+            h('input', {
+              placeholder: 'Nome do Projeto (Ex: Residencial Solar)',
+              value: newProjectName,
+              onChange: (e) => setNewProjectName(e.target.value)
+            }),
+            h('button', { onClick: createProject }, 'Criar')
+          )
+        ),
+
+        h('div', { className: 'card' },
+          h('h3', { style: { fontSize: '14px', marginBottom: '12px' } }, 'Seus Projetos'),
+          projects.length === 0 
+            ? h('p', { style: { color: '#94a3b8', fontSize: '14px' } }, 'Nenhum projeto encontrado.')
+            : projects.map(p => 
+                h('div', { 
+                  key: p.id, 
+                  className: 'card project-card',
+                  onClick: () => setSelectedProject(p)
+                },
+                  h('strong', { style: { display: 'block', fontSize: '16px' } }, p.name),
+                  h('span', { className: 'subtitle' }, `Criado em: ${p.createdAt}`)
+                )
+              )
+        )
+      );
+    }
+
+    window.addEventListener('load', () => {
       const root = ReactDOM.createRoot(document.getElementById('root'));
-      root.render(e(App));
+      root.render(React.createElement(App));
     });
   </script>
 </body>
