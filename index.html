@@ -2,92 +2,214 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Medi-o Eng - Canteiro Pro</title>
-
-  <!-- Tailwind CSS -->
+  
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- React & React DOM CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide-react@0.263.1/dist/umd/lucide-react.js"></script>
 
-  <!-- React & ReactDOM -->
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-
-  <!-- Firebase v8 CDN -->
+  <!-- Firebase v8 Compat CDN -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
-  <script>
-    try {
-      const firebaseConfig = {
-        apiKey: "AIzaSyDE6EoGpq-xj7QyGoG2oV90dwGXu0uIw9E",
-        authDomain: "medi-o-eng.firebaseapp.com",
-        projectId: "medi-o-eng",
-        storageBucket: "medi-o-eng.firebasestorage.app",
-        messagingSenderId: "995319040470",
-        appId: "1:995319040470:web:0fbc80b1e4b702046ebc77",
-        measurementId: "G-W9HYGF6SMC"
-      };
-
-      if (window.firebase && !firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-        window.db = firebase.firestore();
-      }
-    } catch (e) {
-      console.warn("Erro no Firebase:", e);
-    }
-  </script>
 </head>
 <body class="bg-slate-100 min-h-screen">
-
   <div id="root"></div>
 
   <script>
-    const e = React.createElement;
+    // 1. Inicialização do Firebase (seus dados)
+    if (!firebase.apps.length) {
+      firebase.initializeApp({
+        apiKey: "AIzaSy...", // Suas chaves Firebase configuradas anteriormente
+        authDomain: "medi-o-eng.firebaseapp.com",
+        projectId: "medi-o-eng",
+        storageBucket: "medi-o-eng.appspot.com",
+        messagingSenderId: "123456789",
+        appId: "1:123456789:web:123456"
+      });
+    }
+    window.db = firebase.firestore();
 
-    function App() {
-      React.useEffect(() => {
-        if (window.lucide) {
-          try { lucide.createIcons(); } catch(err){}
+    // 2. Atalhos do React
+    const e = React.createElement;
+    const { useState, useEffect, useRef } = React;
+
+    // Ícones Lucide
+    const Lucide = window.LucideReact || window.lucideReact || window.lucide || {};
+    const getIcon = (name) => Lucide[name] || Lucide[name + 'Icon'] || (() => null);
+
+    const Download = getIcon('Download');
+    const Plus = getIcon('Plus');
+    const Trash2 = getIcon('Trash2');
+    const Camera = getIcon('Camera');
+    const X = getIcon('X');
+    const Home = getIcon('Home');
+
+    // 3. Função para comprimir foto
+    function comprimirFotoParaBase64(dataUrl, larguraMaxima = 1024, qualidade = 0.7) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.src = dataUrl;
+        img.onload = () => {
+          let largura = img.width;
+          let altura = img.height;
+          if (largura > larguraMaxima) {
+            altura = Math.round((altura * larguraMaxima) / largura);
+            largura = larguraMaxima;
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = largura;
+          canvas.height = altura;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, largura, altura);
+          resolve(canvas.toDataURL("image/jpeg", qualidade));
+        };
+        img.onerror = (err) => reject(err);
+      });
+    }
+
+    // 4. Componente Principal
+    function MedicaoCanteiroPro() {
+      const [obras, setObras] = useState([]);
+      const [obraAtiva, setObraAtiva] = useState(null);
+      const [novoNomeObra, setNovoNomeObra] = useState('');
+      const [empreiteiros, setEmpreiteiros] = useState([]);
+      const [novoEmpreiteiro, setNovoEmpreiteiro] = useState('');
+      const [categorias, setCategorias] = useState([
+        'Estrutura', 'Fundação', 'Alvenaria', 'Cobertura', 'Hidrossanitário',
+        'Elétrica', 'Gesso/Drywall', 'Esquadrias', 'Revestimentos', 'Pintura'
+      ]);
+      const [statusNuvem, setStatusNuvem] = useState('conectando');
+      const [cameraAberta, setCameraAberta] = useState(null);
+      const [medicaoForm, setMedicaoForm] = useState({ servicoId: '', valor: '', fotos: [] });
+      const [servicoForm, setServicoForm] = useState({ nome: '', categoria: 'Estrutura', metaValor: '', unidade: 'm²' });
+
+      const videoRef = useRef(null);
+      const canvasRef = useRef(null);
+      const streamRef = useRef(null);
+
+      // Sincronização Firestore
+      useEffect(() => {
+        if (window.db) {
+          return window.db.collection('medicaoCanteiroPro').doc('appData').onSnapshot(doc => {
+            if (doc.exists) {
+              const data = doc.data();
+              setObras(data.obras || []);
+            }
+            setStatusNuvem('ok');
+          }, () => setStatusNuvem('erro'));
         }
       }, []);
 
-      return e('div', { className: 'min-h-screen bg-slate-50 p-4 md:p-8' },
-        // Header
-        e('header', { className: 'max-w-4xl mx-auto bg-slate-900 text-white p-6 rounded-xl shadow-lg flex justify-between items-center mb-6' },
+      const salvarDados = (novasObras) => {
+        if (!window.db) return;
+        setStatusNuvem('salvando');
+        window.db.collection('medicaoCanteiroPro').doc('appData').set({ obras: novasObras, categorias })
+          .then(() => setStatusNuvem('ok'))
+          .catch(() => setStatusNuvem('erro'));
+      };
+
+      const criarObra = () => {
+        if (!novoNomeObra.trim()) return;
+        const nova = { id: Date.now(), nome: novoNomeObra, dataCriacao: new Date().toLocaleDateString('pt-BR'), empreiteiros: [] };
+        const novasObras = [...obras, nova];
+        setObras(novasObras);
+        salvarDados(novasObras);
+        setNovoNomeObra('');
+      };
+
+      const entrarObra = (id) => {
+        setObraAtiva(id);
+        const o = obras.find(item => item.id === id);
+        if (o) setEmpreiteiros(o.empreiteiros || []);
+      };
+
+      const adicionarEmpreiteiro = () => {
+        if (!novoEmpreiteiro.trim()) return;
+        const novEmp = { id: Date.now(), nome: novoEmpreiteiro, servicos: [] };
+        const atualizados = [...empreiteiros, novEmp];
+        setEmpreiteiros(atualizados);
+        setNovoEmpreiteiro('');
+        
+        const novasObras = obras.map(o => o.id === obraAtiva ? { ...o, empreiteiros: atualizados } : o);
+        setObras(novasObras);
+        salvarDados(novasObras);
+      };
+
+      // Elementos visuais nativos (sem transpilação Babel)
+      return e('div', { className: 'p-4 max-w-xl mx-auto font-sans' },
+        e('header', { className: 'flex justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-sm' },
           e('div', null,
-            e('h1', { className: 'text-2xl font-bold flex items-center gap-2' },
-              e('i', { 'data-lucide': 'hard-hat', className: 'w-7 h-7 text-yellow-400' }),
-              'Medi-o Eng'
+            e('h1', { className: 'text-xl font-bold flex items-center gap-2 text-slate-800' }, 
+              e(Home, { className: 'w-5 h-5 text-indigo-600' }), 'Medi-o Eng'
             ),
-            e('p', { className: 'text-sm text-slate-400' }, 'Gestão & Medição de Obras em Canteiro')
+            e('p', { className: 'text-xs text-slate-500' }, 'Gestão e Medição de Canteiro')
           ),
-          e('span', { className: 'bg-emerald-500/20 text-emerald-400 text-xs px-3 py-1 rounded-full border border-emerald-500/30' }, 'Online')
-        ),
-        // Cards
-        e('main', { className: 'max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6' },
-          e('div', { className: 'bg-white p-6 rounded-xl shadow-sm border border-slate-200' },
-            e('h2', { className: 'text-lg font-semibold text-slate-800 mb-2 flex items-center gap-2' },
-              e('i', { 'data-lucide': 'folder-kanban', className: 'w-5 h-5 text-blue-600' }),
-              'Medição Conectada'
-            ),
-            e('p', { className: 'text-slate-600 text-sm' }, 'O aplicativo foi inicializado com sucesso e o banco Firestore está ativo.')
-          ),
-          e('div', { className: 'bg-white p-6 rounded-xl shadow-sm border border-slate-200' },
-            e('h2', { className: 'text-lg font-semibold text-slate-800 mb-2 flex items-center gap-2' },
-              e('i', { 'data-lucide': 'check-circle-2', className: 'w-5 h-5 text-emerald-600' }),
-              'Pronto para Uso'
-            ),
-            e('p', { className: 'text-slate-600 text-sm' }, 'PWA rodando sem dependência de transpilação em tempo de execução.')
+          e('span', { className: 'text-xs px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 font-medium' }, 
+            statusNuvem === 'ok' ? '☁️ Conectado' : '☁️ Sincronizando...'
           )
-        )
+        ),
+
+        !obraAtiva ? 
+          e('div', { className: 'space-y-4' },
+            e('div', { className: 'bg-white p-4 rounded-xl shadow-sm space-y-3' },
+              e('h2', { className: 'font-semibold text-slate-700 text-sm' }, 'Novo Projeto'),
+              e('div', { className: 'flex gap-2' },
+                e('input', {
+                  type: 'text',
+                  placeholder: 'Nome do Projeto (Ex: Residencial Solar)',
+                  value: novoNomeObra,
+                  onChange: (ev) => setNovoNomeObra(ev.target.value),
+                  className: 'flex-1 p-2 border rounded-lg text-sm outline-none'
+                }),
+                e('button', { onClick: criarObra, className: 'bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-1' },
+                  e(Plus, { className: 'w-4 h-4' }), 'Criar'
+                )
+              )
+            ),
+            e('div', { className: 'space-y-2' },
+              e('h2', { className: 'font-semibold text-slate-700 text-sm' }, 'Seus Projetos'),
+              obras.map(o => e('div', { key: o.id, className: 'bg-white p-4 rounded-xl shadow-sm flex justify-between items-center' },
+                e('div', null,
+                  e('h3', { className: 'font-bold text-slate-800' }, o.nome),
+                  e('span', { className: 'text-xs text-slate-400' }, 'Criado em: ' + o.dataCriacao)
+                ),
+                e('button', { onClick: () => entrarObra(o.id), className: 'bg-slate-800 text-white px-3 py-1.5 rounded-lg text-xs font-medium' }, 'Abrir')
+              ))
+            )
+          )
+        :
+          e('div', { className: 'space-y-4' },
+            e('button', { onClick: () => setObraAtiva(null), className: 'text-xs bg-slate-200 px-3 py-1.5 rounded-lg font-medium' }, '← Voltar aos Projetos'),
+            e('div', { className: 'bg-white p-4 rounded-xl shadow-sm space-y-3' },
+              e('h2', { className: 'font-semibold text-slate-700 text-sm' }, 'Cadastrar Empreiteiro / Equipe'),
+              e('div', { className: 'flex gap-2' },
+                e('input', {
+                  type: 'text',
+                  placeholder: 'Nome da Equipe ou Empreiteiro',
+                  value: novoEmpreiteiro,
+                  onChange: (ev) => setNovoEmpreiteiro(ev.target.value),
+                  className: 'flex-1 p-2 border rounded-lg text-sm outline-none'
+                }),
+                e('button', { onClick: adicionarEmpreiteiro, className: 'bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium' }, 'Adicionar')
+              )
+            ),
+            empreiteiros.map(emp => e('div', { key: emp.id, className: 'bg-white p-4 rounded-xl shadow-sm border-l-4 border-indigo-500' },
+              e('h3', { className: 'font-bold text-slate-800' }, emp.nome)
+            ))
+          )
       );
     }
 
+    // 5. Renderizar na Tela
     const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(e(App));
+    root.render(e(MedicaoCanteiroPro));
   </script>
 </body>
 </html>
