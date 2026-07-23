@@ -5,20 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Medi-o Eng - Canteiro Pro</title>
 
-  <!-- 1. Tailwind CSS -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- 2. React e ReactDOM -->
+  <!-- React & ReactDOM -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
 
-  <!-- 3. Babel Standalone -->
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-  <!-- 4. Lucide Icons -->
+  <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- 5. Firebase v8 CDN -->
+  <!-- Firebase v8 CDN -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
@@ -39,7 +36,7 @@
         window.db = firebase.firestore();
       }
     } catch (e) {
-      console.warn("Erro ao inicializar Firebase:", e);
+      console.warn("Erro no Firebase:", e);
     }
   </script>
 </head>
@@ -47,87 +44,50 @@
 
   <div id="root"></div>
 
-  <script type="text/babel">
-    const { useState, useEffect } = React;
+  <script>
+    const e = React.createElement;
 
     function App() {
-      const [loading, setLoading] = useState(true);
-
-      useEffect(() => {
-        // Tenta renderizar ícones sem travar a aplicação
-        try {
-          if (window.lucide) {
-            lucide.createIcons();
-          }
-        } catch (err) {
-          console.warn("Erro nos ícones:", err);
+      React.useEffect(() => {
+        if (window.lucide) {
+          try { lucide.createIcons(); } catch(err){}
         }
-        
-        // Garante que o loading saia da tela
-        setLoading(false);
       }, []);
 
-      if (loading) {
-        return (
-          <div className="flex min-h-screen items-center justify-center bg-slate-900 text-white">
-            <p className="text-lg font-semibold animate-pulse">Carregando Medi-o Eng...</p>
-          </div>
-        );
-      }
-
-      return (
-        <div className="min-h-screen bg-slate-50 p-4 md:p-8">
-          <header className="max-w-4xl mx-auto bg-slate-900 text-white p-6 rounded-xl shadow-lg flex justify-between items-center mb-6">
-            <div>
-              <h1 className="text-2xl font-bold flex items-center gap-2">
-                <i data-lucide="hard-hat" className="w-7 h-7 text-yellow-400"></i>
-                Medi-o Eng
-              </h1>
-              <p className="text-sm text-slate-400">Gestão & Medição de Obras em Canteiro</p>
-            </div>
-            <span className="bg-emerald-500/20 text-emerald-400 text-xs px-3 py-1 rounded-full border border-emerald-500/30">
-              Online
-            </span>
-          </header>
-
-          <main className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-              <h2 className="text-lg font-semibold text-slate-800 mb-2 flex items-center gap-2">
-                <i data-lucide="folder-kanban" className="w-5 h-5 text-blue-600"></i>
-                Medição Conectada
-              </h2>
-              <p className="text-slate-600 text-sm">
-                O aplicativo foi inicializado com sucesso e está operacional.
-              </p>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-              <h2 className="text-lg font-semibold text-slate-800 mb-2 flex items-center gap-2">
-                <i data-lucide="check-circle-2" className="w-5 h-5 text-emerald-600"></i>
-                Pronto para Uso
-              </h2>
-              <p className="text-slate-600 text-sm">
-                Estrutura PWA pronta e otimizada para uso em canteiro de obras.
-              </p>
-            </div>
-          </main>
-        </div>
+      return e('div', { className: 'min-h-screen bg-slate-50 p-4 md:p-8' },
+        // Header
+        e('header', { className: 'max-w-4xl mx-auto bg-slate-900 text-white p-6 rounded-xl shadow-lg flex justify-between items-center mb-6' },
+          e('div', null,
+            e('h1', { className: 'text-2xl font-bold flex items-center gap-2' },
+              e('i', { 'data-lucide': 'hard-hat', className: 'w-7 h-7 text-yellow-400' }),
+              'Medi-o Eng'
+            ),
+            e('p', { className: 'text-sm text-slate-400' }, 'Gestão & Medição de Obras em Canteiro')
+          ),
+          e('span', { className: 'bg-emerald-500/20 text-emerald-400 text-xs px-3 py-1 rounded-full border border-emerald-500/30' }, 'Online')
+        ),
+        // Cards
+        e('main', { className: 'max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6' },
+          e('div', { className: 'bg-white p-6 rounded-xl shadow-sm border border-slate-200' },
+            e('h2', { className: 'text-lg font-semibold text-slate-800 mb-2 flex items-center gap-2' },
+              e('i', { 'data-lucide': 'folder-kanban', className: 'w-5 h-5 text-blue-600' }),
+              'Medição Conectada'
+            ),
+            e('p', { className: 'text-slate-600 text-sm' }, 'O aplicativo foi inicializado com sucesso e o banco Firestore está ativo.')
+          ),
+          e('div', { className: 'bg-white p-6 rounded-xl shadow-sm border border-slate-200' },
+            e('h2', { className: 'text-lg font-semibold text-slate-800 mb-2 flex items-center gap-2' },
+              e('i', { 'data-lucide': 'check-circle-2', className: 'w-5 h-5 text-emerald-600' }),
+              'Pronto para Uso'
+            ),
+            e('p', { className: 'text-slate-600 text-sm' }, 'PWA rodando sem dependência de transpilação em tempo de execução.')
+          )
+        )
       );
     }
 
     const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
-  </script>
-
-  <script>
-    const observer = new MutationObserver(() => {
-      if (window.lucide) {
-        try {
-          lucide.createIcons();
-        } catch(e) {}
-      }
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
+    root.render(e(App));
   </script>
 </body>
 </html>
