@@ -5,81 +5,84 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Medi-o Eng - Canteiro Pro</title>
   
-  <!-- Tailwind CSS CDN -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- React & React DOM CDN -->
+  <!-- React & React DOM -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   
-  <!-- Lucide Icons CDN -->
+  <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide-react@0.263.1/dist/umd/lucide-react.js"></script>
 
-  <!-- Firebase v8 Compat CDN -->
+  <!-- Firebase v8 Compat -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 </head>
 <body class="bg-slate-100 min-h-screen">
   <div id="root"></div>
 
-  <!-- JavaScript Nativo (Sem tipo="text/babel") -->
   <script>
-    // 1. Inicialização do Firebase
-    if (!firebase.apps.length) {
-      firebase.initializeApp({
-        apiKey: "AIzaSy...", 
-        authDomain: "medi-o-eng.firebaseapp.com",
-        projectId: "medi-o-eng",
-        storageBucket: "medi-o-eng.appspot.com",
-        messagingSenderId: "123456789",
-        appId: "1:123456789:web:123456"
-      });
+    // Inicialização com as suas credenciais reais
+    try {
+      if (!firebase.apps.length) {
+        firebase.initializeApp({
+          apiKey: "AIzaSyDE6EoGpq-xj7QyGoG2oV90dwSXu0uIw9E",
+          authDomain: "medi-o-eng.firebaseapp.com",
+          projectId: "medi-o-eng",
+          storageBucket: "medi-o-eng.firebasestorage.app",
+          messagingSenderId: "995319040470",
+          appId: "1:995319040470:web:0fbc80b1e4b702046ebc77",
+          measurementId: "G-W9HYGF6SMC"
+        });
+      }
+      window.db = firebase.firestore();
+    } catch (err) {
+      console.error("Erro na inicialização do Firebase:", err);
     }
-    window.db = firebase.firestore();
 
-    // 2. Elementos React Nativo
     const e = React.createElement;
-    const { useState, useEffect, useRef } = React;
+    const { useState, useEffect } = React;
 
-    // Ícones
-    const Lucide = window.LucideReact || window.lucideReact || window.lucide || {};
-    const getIcon = (name) => Lucide[name] || Lucide[name + 'Icon'] || (() => null);
+    const getIcon = (name) => {
+      const Lucide = window.LucideReact || window.lucide || {};
+      return Lucide[name] || Lucide[name + 'Icon'] || (() => null);
+    };
 
     const Plus = getIcon('Plus');
     const Home = getIcon('Home');
 
-    // 3. Componente Principal
     function MedicaoCanteiroPro() {
       const [obras, setObras] = useState([]);
-      const [obraAtiva, setObraAtiva] = useState(null);
       const [novoNomeObra, setNovoNomeObra] = useState('');
       const [statusNuvem, setStatusNuvem] = useState('conectando');
 
       useEffect(() => {
         if (window.db) {
-          return window.db.collection('medicaoCanteiroPro').doc('appData').onSnapshot(doc => {
-            if (doc.exists) {
-              setObras(doc.data().obras || []);
+          window.db.collection('medicaoCanteiroPro').doc('appData').onSnapshot(
+            doc => {
+              if (doc.exists) setObras(doc.data().obras || []);
+              setStatusNuvem('ok');
+            },
+            err => {
+              console.error("Erro ao carregar dados:", err);
+              setStatusNuvem('erro');
             }
-            setStatusNuvem('ok');
-          }, () => setStatusNuvem('erro'));
+          );
+        } else {
+          setStatusNuvem('off');
         }
       }, []);
-
-      const salvarDados = (novasObras) => {
-        if (!window.db) return;
-        setStatusNuvem('salvando');
-        window.db.collection('medicaoCanteiroPro').doc('appData').set({ obras: novasObras })
-          .then(() => setStatusNuvem('ok'))
-          .catch(() => setStatusNuvem('erro'));
-      };
 
       const criarObra = () => {
         if (!novoNomeObra.trim()) return;
         const nova = { id: Date.now(), nome: novoNomeObra, dataCriacao: new Date().toLocaleDateString('pt-BR') };
         const novasObras = [...obras, nova];
         setObras(novasObras);
-        salvarDados(novasObras);
+        
+        if (window.db) {
+          window.db.collection('medicaoCanteiroPro').doc('appData').set({ obras: novasObras });
+        }
         setNovoNomeObra('');
       };
 
@@ -91,8 +94,8 @@
             ),
             e('p', { className: 'text-xs text-slate-500' }, 'Gestão e Medição de Canteiro')
           ),
-          e('span', { className: 'text-xs px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 font-medium' }, 
-            statusNuvem === 'ok' ? '☁️ Conectado' : '☁️ Sincronizando...'
+          e('span', { className: `text-xs px-2.5 py-1 rounded-full font-medium ${statusNuvem === 'ok' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}` }, 
+            statusNuvem === 'ok' ? '☁️ Conectado' : '⚡ Conectando/Offline'
           )
         ),
         e('div', { className: 'space-y-4' },
@@ -101,32 +104,30 @@
             e('div', { className: 'flex gap-2' },
               e('input', {
                 type: 'text',
-                placeholder: 'Nome do Projeto',
+                placeholder: 'Nome do Projeto (Ex: Residencial Solar)',
                 value: novoNomeObra,
                 onChange: (ev) => setNovoNomeObra(ev.target.value),
                 className: 'flex-1 p-2 border rounded-lg text-sm outline-none'
               }),
-              e('button', { onClick: criarObra, className: 'bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-1' },
-                e(Plus, { className: 'w-4 h-4' }), 'Criar'
-              )
+              e('button', { onClick: criarObra, className: 'bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors' }, 'Criar')
             )
           ),
           e('div', { className: 'space-y-2' },
             e('h2', { className: 'font-semibold text-slate-700 text-sm' }, 'Seus Projetos'),
+            obras.length === 0 ? e('p', { className: 'text-xs text-slate-400 p-2' }, 'Nenhum projeto cadastrado ainda.') : null,
             obras.map(o => e('div', { key: o.id, className: 'bg-white p-4 rounded-xl shadow-sm flex justify-between items-center' },
               e('div', null,
                 e('h3', { className: 'font-bold text-slate-800' }, o.nome),
                 e('span', { className: 'text-xs text-slate-400' }, 'Criado em: ' + o.dataCriacao)
-              ),
-              e('button', { onClick: () => setObraAtiva(o.id), className: 'bg-slate-800 text-white px-3 py-1.5 rounded-lg text-xs font-medium' }, 'Abrir')
+              )
             ))
           )
         )
       );
     }
 
-    // Renderização
-    const root = ReactDOM.createRoot(document.getElementById('root'));
+    const container = document.getElementById('root');
+    const root = ReactDOM.createRoot(container);
     root.render(e(MedicaoCanteiroPro));
   </script>
 </body>
