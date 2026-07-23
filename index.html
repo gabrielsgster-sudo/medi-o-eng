@@ -5,10 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Medi-o Eng - Canteiro Pro</title>
   
-  <!-- React & ReactDOM -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-  
   <!-- Firebase SDKs (v8) -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
@@ -25,17 +21,59 @@
     .online { background: #dcfce7; color: #15803d; }
     .offline { background: #fef3c7; color: #b45309; }
     .input-group { display: flex; gap: 8px; margin-top: 12px; }
-    input { flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; }
+    input { flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; font-size: 14px; }
     button { background: #4f46e5; color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; }
     button:active { opacity: 0.8; }
-    .btn-secondary { background: #e2e8f0; color: #334155; margin-bottom: 12px; }
-    .project-card { cursor: pointer; transition: transform 0.1s; border: 1px solid #e2e8f0; }
-    .project-card:active { transform: scale(0.98); background: #f8fafc; }
+    .btn-secondary { background: #e2e8f0; color: #334155; margin-bottom: 12px; width: 100%; text-align: left; }
+    .project-item { padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 8px; cursor: pointer; transition: background 0.2s; }
+    .project-item:active { background: #f1f5f9; }
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
-  <div id="root"></div>
+  <div class="container">
+    <!-- CAVEÇALHO PRINCIPAL -->
+    <div class="card">
+      <div class="header">
+        <div>
+          <div class="title">Medi-o Eng</div>
+          <div class="subtitle">Gestão e Medição de Canteiro</div>
+        </div>
+        <span id="status-badge" class="badge offline">⚡ Offline</span>
+      </div>
+    </div>
+
+    <!-- TELA 1: LISTA DE PROJETOS -->
+    <div id="view-list">
+      <div class="card">
+        <h3 style="font-size: 14px; margin-bottom: 8px;">Novo Projeto</h3>
+        <div class="input-group">
+          <input type="text" id="project-input" placeholder="Nome do Projeto (Ex: Residencial Solar)">
+          <button id="btn-create">Criar</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="font-size: 14px; margin-bottom: 8px;">Seus Projetos</h3>
+        <div id="projects-container">
+          <p style="color: #94a3b8; font-size: 14px;">Carregando projetos...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TELA 2: DETALHES DO PROJETO SELECIONADO -->
+    <div id="view-detail" class="hidden">
+      <button id="btn-back" class="btn-secondary">← Voltar aos Projetos</button>
+      <div class="card">
+        <h2 id="detail-title" class="title">---</h2>
+        <p id="detail-date" class="subtitle">---</p>
+        <hr style="margin: 16px 0; border: none; border-top: 1px solid #e2e8f0;">
+        <h3 style="font-size: 16px; margin-bottom: 8px;">Medições / Canteiro</h3>
+        <p style="font-size: 14px; color: #64748b;">Nenhuma medição registrada ainda.</p>
+      </div>
+    </div>
+  </div>
 
   <script>
     // Configurações do Firebase
@@ -48,118 +86,76 @@
       appId: "1:9953190404:web:ZDA1Zjc4M"
     };
 
-    let db = null;
     if (!firebase.apps.length) {
       firebase.initializeApp(firebaseConfig);
     }
-    db = firebase.firestore();
+    const db = firebase.firestore();
 
-    const { useState, useEffect, createElement: h } = React;
+    // Elementos DOM
+    const statusBadge = document.getElementById('status-badge');
+    const viewList = document.getElementById('view-list');
+    const viewDetail = document.getElementById('view-detail');
+    const projectsContainer = document.getElementById('projects-container');
+    const projectInput = document.getElementById('project-input');
+    const btnCreate = document.getElementById('btn-create');
+    const btnBack = document.getElementById('btn-back');
+    const detailTitle = document.getElementById('detail-title');
+    const detailDate = document.getElementById('detail-date');
 
-    function App() {
-      const [isOnline, setIsOnline] = useState(false);
-      const [projects, setProjects] = useState([]);
-      const [newProjectName, setNewProjectName] = useState('');
-      const [selectedProject, setSelectedProject] = useState(null);
-
-      useEffect(() => {
-        // Monitorar conexão com Firestore
-        const unsubscribe = db.collection('projects').onSnapshot(
-          (snapshot) => {
-            setIsOnline(true);
-            const docs = snapshot.docs.map(doc => ({
-              id: doc.id,
-              ...doc.data()
-            }));
-            setProjects(docs);
-          },
-          (error) => {
-            console.error("Erro na conexão:", error);
-            setIsOnline(false);
-          }
-        );
-
-        return () => unsubscribe();
-      }, []);
-
-      const createProject = async () => {
-        if (!newProjectName.trim()) return;
-        try {
-          await db.collection('projects').add({
-            name: newProjectName,
-            createdAt: new Date().toLocaleDateString('pt-BR')
-          });
-          setNewProjectName('');
-        } catch (e) {
-          alert('Erro ao criar projeto!');
-        }
-      };
-
-      // Tela de Detalhes do Projeto
-      if (selectedProject) {
-        return h('div', { className: 'container' },
-          h('button', { 
-            className: 'btn-secondary', 
-            onClick: () => setSelectedProject(null) 
-          }, '← Voltar aos Projetos'),
-          
-          h('div', { className: 'card' },
-            h('h2', { className: 'title' }, selectedProject.name),
-            h('p', { className: 'subtitle' }, `Criado em: ${selectedProject.createdAt}`),
-            h('hr', { style: { margin: '16px 0', borderColor: '#e2e8f0' } }),
-            h('h3', { style: { fontSize: '16px', marginBottom: '8px' } }, 'Medições / Canteiro'),
-            h('p', { style: { fontSize: '14px', color: '#64748b' } }, 'Nenhuma medição registrada ainda.')
-          )
-        );
-      }
-
-      // Tela Principal (Lista de Projetos)
-      return h('div', { className: 'container' },
-        h('div', { className: 'card' },
-          h('div', { className: 'header' },
-            h('div', null,
-              h('div', { className: 'title' }, 'Medi-o Eng'),
-              h('div', { className: 'subtitle' }, 'Gestão e Medição de Canteiro')
-            ),
-            h('span', { className: `badge ${isOnline ? 'online' : 'offline'}` },
-              isOnline ? '☁️ Online' : '⚡ Offline'
-            )
-          )
-        ),
-
-        h('div', { className: 'card' },
-          h('h3', { style: { fontSize: '14px', marginBottom: '8px' } }, 'Novo Projeto'),
-          h('div', { className: 'input-group' },
-            h('input', {
-              placeholder: 'Nome do Projeto (Ex: Residencial Solar)',
-              value: newProjectName,
-              onChange: (e) => setNewProjectName(e.target.value)
-            }),
-            h('button', { onClick: createProject }, 'Criar')
-          )
-        ),
-
-        h('div', { className: 'card' },
-          h('h3', { style: { fontSize: '14px', marginBottom: '12px' } }, 'Seus Projetos'),
-          projects.length === 0 
-            ? h('p', { style: { color: '#94a3b8', fontSize: '14px' } }, 'Nenhum projeto encontrado.')
-            : projects.map(p => 
-                h('div', { 
-                  key: p.id, 
-                  className: 'card project-card',
-                  onClick: () => setSelectedProject(p)
-                },
-                  h('strong', { style: { display: 'block', fontSize: '16px' } }, p.name),
-                  h('span', { className: 'subtitle' }, `Criado em: ${p.createdAt}`)
-                )
-              )
-        )
-      );
+    // Navegação entre telas
+    function openProject(name, date) {
+      detailTitle.innerText = name;
+      detailDate.innerText = 'Criado em: ' + date;
+      viewList.classList.add('hidden');
+      viewDetail.classList.remove('hidden');
     }
 
-    window.addEventListener('load', () => {
-      const root = ReactDOM.createRoot(document.getElementById('root'));
-      root.render(React.createElement(App));
+    btnBack.addEventListener('click', () => {
+      viewDetail.classList.add('hidden');
+      viewList.classList.remove('hidden');
+    });
+
+    // Criar projeto
+    btnCreate.addEventListener('click', async () => {
+      const name = projectInput.value.trim();
+      if (!name) return;
+      try {
+        await db.collection('projects').add({
+          name: name,
+          createdAt: new Date().toLocaleDateString('pt-BR')
+        });
+        projectInput.value = '';
+      } catch (e) {
+        alert('Erro ao salvar projeto no banco!');
+      }
+    });
+
+    // Monitorar Firestore em tempo real
+    db.collection('projects').onSnapshot(snapshot => {
+      statusBadge.innerText = '☁️ Online';
+      statusBadge.className = 'badge online';
+
+      if (snapshot.empty) {
+        projectsContainer.innerHTML = '<p style="color: #94a3b8; font-size: 14px;">Nenhum projeto encontrado.</p>';
+        return;
+      }
+
+      projectsContainer.innerHTML = '';
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const item = document.createElement('div');
+        item.className = 'project-item';
+        item.innerHTML = `
+          <strong>${data.name}</strong><br>
+          <span class="subtitle">Criado em: ${data.createdAt || 'N/A'}</span>
+        `;
+        item.addEventListener('click', () => openProject(data.name, data.createdAt || 'N/A'));
+        projectsContainer.appendChild(item);
+      });
+    }, error => {
+      console.error(error);
+      statusBadge.innerText = '⚡ Offline';
+      statusBadge.className = 'badge offline';
     });
   </script>
 </body>
