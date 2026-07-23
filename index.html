@@ -8,7 +8,7 @@
   <!-- 1. Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- 2. React e ReactDOM (v18) -->
+  <!-- 2. React e ReactDOM -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
 
@@ -23,7 +23,6 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
   <script>
-    // Configuração do Firebase com suas credenciais do projeto medi-o-eng
     const firebaseConfig = {
       apiKey: "AIzaSyDE6EoGpq-xj7QyGoG2oV90dwGXu0uIw9E",
       authDomain: "medi-o-eng.firebaseapp.com",
@@ -44,7 +43,6 @@
 
   <div id="root"></div>
 
-  <!-- Script principal do aplicativo -->
   <script type="text/babel">
     const { useState, useEffect } = React;
 
@@ -52,7 +50,6 @@
       const [loading, setLoading] = useState(true);
 
       useEffect(() => {
-        // Inicializa ícones e confirma carregamento
         if (window.lucide) {
           lucide.createIcons();
         }
@@ -112,7 +109,6 @@
   </script>
 
   <script>
-    // Observa e renderiza os ícones
     const observer = new MutationObserver(() => {
       if (window.lucide) {
         lucide.createIcons();
