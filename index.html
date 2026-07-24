@@ -5,17 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Medi-o Eng - Canteiro Pro</title>
 
-  <!-- React 18 -->
-  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <!-- React 18 & ReactDOM via cdnjs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin></script>
 
-  <!-- Babel Standalone para JSX -->
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- Babel Standalone via cdnjs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
 
-  <!-- Firebase SDKs (v8) -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+  <!-- Firebase SDKs (v8) via cdnjs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-app.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-firestore.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-storage.min.js"></script>
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -89,7 +89,6 @@
 
   <div id="root"></div>
 
-  <!-- Alterado de type="module" para type="text/babel" simples -->
   <script type="text/babel">
     const { useState, useEffect, useRef, useCallback, memo } = React;
 
