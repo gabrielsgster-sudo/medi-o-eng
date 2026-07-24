@@ -5,19 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Medi-o Eng - Canteiro Pro</title>
 
-  <!-- React 18 (UMD Estável) -->
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-
-  <!-- Babel Standalone (Para interpretar o JSX direto no navegador) -->
-  <script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
-
   <!-- Firebase SDKs (v8 Compatível) -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 
-  <!-- CSS do App -->
+  <!-- Estilos CSS Puro (Ultra Leve) -->
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     html, body { height: 100%; }
@@ -26,7 +19,7 @@
       background-color: #f5f1e8;
       color: #1e293b;
     }
-    #root { min-height: 100%; }
+    #app { min-height: 100%; }
     .container { max-width: 640px; margin: 0 auto; padding: 16px; }
     .card { background: #ffffff; border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
     .header-bar { background: #2c2c2c; color: #fff; position: sticky; top: 0; z-index: 10; }
@@ -35,7 +28,7 @@
     .title-lg { font-size: 22px; font-weight: 700; }
     .subtitle { font-size: 12px; opacity: 0.8; }
     .section-title { font-size: 14px; font-weight: 600; margin-bottom: 8px; color: #334155; }
-    .badge { padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; }
+    .badge { padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; }
     .badge.online { background: #dcfce7; color: #15803d; }
     .badge.offline { background: #fef3c7; color: #b45309; }
     .badge.saving { background: #dbeafe; color: #1d4ed8; }
@@ -47,8 +40,7 @@
     input:focus, select:focus, textarea:focus { border-color: #d97757; }
     button {
       background: #d97757; color: #fff; border: none; padding: 10px 16px;
-      border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer;
-      -webkit-user-select: none; user-select: none; white-space: nowrap;
+      border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; white-space: nowrap;
     }
     button:active { opacity: 0.75; }
     button:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -56,12 +48,10 @@
     .btn-secondary { background: #e2e8f0; color: #334155; }
     .btn-danger { background: #fee2e2; color: #b91c1c; }
     .btn-full { width: 100%; }
-    .btn-outline { background: transparent; border: 1px solid currentColor; }
-    .tabs { display: flex; gap: 0; border-top: 1px solid rgba(255,255,255,0.15); }
+    .tabs { display: flex; border-top: 1px solid rgba(255,255,255,0.15); margin-top: 10px; }
     .tab-btn { flex: 1; background: transparent; border-radius: 0; padding: 10px; font-size: 13px; opacity: 0.65; border-bottom: 2px solid transparent; }
     .tab-btn.active { opacity: 1; border-bottom-color: #d97757; }
-    .project-item { padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 8px; cursor: pointer; border-left: 4px solid #d97757; }
-    .project-item:active { background: #f8fafc; }
+    .project-item { padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 8px; cursor: pointer; border-left: 4px solid #d97757; display: flex; justify-content: space-between; align-items: center; }
     .project-name { font-weight: 700; font-size: 15px; }
     .empty-state { color: #94a3b8; font-size: 14px; padding: 8px 0; }
     .progress-bar-bg { width: 100%; background: #e2e8f0; border-radius: 999px; height: 10px; overflow: hidden; }
@@ -72,18 +62,10 @@
     .servico-row { padding: 12px; border-top: 1px solid #f1f5f9; }
     .medicao-row { padding: 8px; border-radius: 8px; background: #f8fafc; font-size: 13px; margin-top: 6px; }
     .medicao-row.extrapolou { background: #fef2f2; border: 1px solid #fca5a5; }
-    .warn-box { background: #fef2f2; border: 2px solid #f87171; border-radius: 8px; padding: 10px; margin-top: 8px; }
+    .warn-box { background: #fef2f2; border: 2px solid #f87171; border-radius: 8px; padding: 10px; margin-top: 8px; font-size: 13px; }
     .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #cbd5e1; border-top-color: #d97757; border-radius: 50%; animation: girar 0.6s linear infinite; vertical-align: middle; }
     @keyframes girar { to { transform: rotate(360deg); } }
     .cat-tag { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; color: #fff; margin: 3px; }
-    .thumb { width: 64px; height: 64px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0; margin-top: 6px; margin-right: 6px; position: relative; }
-    .thumb-wrap { position: relative; display: inline-block; }
-    .thumb-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.6); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 10px; font-weight: 700; }
-    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .grid3 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-    @media (min-width: 480px) { .grid3 { grid-template-columns: repeat(3, 1fr); } }
-    hr { border: none; border-top: 1px solid #e2e8f0; margin: 14px 0; }
-    video.camera-preview { width: 100%; border-radius: 8px; margin-bottom: 8px; max-height: 240px; transform: scaleX(-1); background: #000; }
     table { width: 100%; border-collapse: collapse; }
     th, td { padding: 8px; text-align: left; font-size: 13px; }
     thead { background: #f5f1e8; }
@@ -92,13 +74,11 @@
 </head>
 <body>
 
-  <div id="root"></div>
+  <div id="app"></div>
 
-  <script type="text/babel" data-presets="react">
-    const { useState, useEffect, useRef, useCallback, memo } = React;
-
+  <script>
     // =====================================================================
-    // FIREBASE (v8) — Configurações do Projeto Medi-o Eng
+    // CONFIGURAÇÃO FIREBASE (v8)
     // =====================================================================
     const firebaseConfig = {
       apiKey: "AIzaSyDE6EogPq-xj7QyGoG2oV90dwGXuOuIw9E",
@@ -109,1005 +89,368 @@
       appId: "1:995319040470:web:0fbc80b1e4b702046ebc77",
       measurementId: "G-W9HYGF6SMC"
     };
+    
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const storage = firebase.storage();
 
-    const CATEGORIAS_PADRAO = [
-      'Estrutura', 'Fundação', 'Alvenaria', 'Cobertura', 'Hidrossanitário',
-      'Elétrica', 'Gesso/Drywall', 'Esquadrias', 'Revestimentos', 'Pintura',
-      'Pavimentação', 'Urbanização', 'PPCI', 'Limpeza Final'
-    ];
+    // =====================================================================
+    // ESTADO GLOBAL DO APLICATIVO
+    // =====================================================================
+    const state = {
+      view: 'list', // 'list' | 'detail'
+      selectedProjectId: null,
+      projects: [],
+      categorias: ['Estrutura', 'Fundação', 'Alvenaria', 'Cobertura', 'Hidrossanitário', 'Elétrica', 'Pintura', 'Limpeza Final'],
+      empreiteiros: [],
+      statusNuvem: 'conectando',
+      abaAtiva: 'lista' // 'lista' | 'dashboard'
+    };
 
     const CORES_CATEGORIA = {
       'Estrutura': '#8b5cf6', 'Fundação': '#6366f1', 'Alvenaria': '#f97316',
       'Cobertura': '#0ea5e9', 'Hidrossanitário': '#06b6d4', 'Elétrica': '#eab308',
-      'Gesso/Drywall': '#a8a29e', 'Esquadrias': '#78716c', 'Revestimentos': '#ec4899',
-      'Pintura': '#d946ef', 'Pavimentação': '#64748b', 'Urbanização': '#16a34a',
-      'PPCI': '#dc2626', 'Limpeza Final': '#14b8a6'
+      'Pintura': '#d946ef', 'Limpeza Final': '#14b8a6'
     };
-    const PALETA_FALLBACK = ['#d97757', '#7b68a6', '#4a90a4', '#6b9b6e', '#c9a36b', '#a86d4f', '#0ea5e9', '#ec4899'];
-    const CORES_EMPREITEIRO = ['#d97757', '#c9a36b', '#7b68a6', '#4a90a4', '#6b9b6e', '#a86d4f'];
 
-    function getCorCategoria(categoria) {
-      if (CORES_CATEGORIA[categoria]) return CORES_CATEGORIA[categoria];
-      let hash = 0;
-      for (let i = 0; i < categoria.length; i++) hash = categoria.charCodeAt(i) + ((hash << 5) - hash);
-      return PALETA_FALLBACK[Math.abs(hash) % PALETA_FALLBACK.length];
+    function getCorCategoria(cat) {
+      return CORES_CATEGORIA[cat] || '#d97757';
     }
 
-    function getStatusProgresso(percentual) {
-      if (percentual >= 100) return { cor: '#22c55e', label: 'Completo', emoji: '🟢' };
-      if (percentual >= 70) return { cor: '#3b82f6', label: 'Avançado', emoji: '🔵' };
-      if (percentual >= 40) return { cor: '#f59e0b', label: 'Em andamento', emoji: '🟡' };
-      if (percentual > 0) return { cor: '#ef4444', label: 'Iniciando', emoji: '🔴' };
-      return { cor: '#9ca3af', label: 'Não iniciado', emoji: '⚪' };
-    }
-
-    function detectarSimilaridade(t1, t2) {
-      const a = t1.toLowerCase().trim(), b = t2.toLowerCase().trim();
-      if (a === b) return 100;
-      if (a.includes(b) || b.includes(a)) return 85;
-      const palavrasA = a.split(/\s+/), palavrasB = b.split(/\s+/);
-      const comuns = palavrasA.filter(p => palavrasB.includes(p)).length;
-      if (comuns > 0) return 70 + comuns * 10;
-      return 0;
-    }
-
-    function calcularProgressoServico(servico) {
-      const medido = servico.medicoes.reduce((s, m) => s + m.valor, 0);
-      const percentual = servico.metaValor > 0 ? Math.min(100, Math.round((medido / servico.metaValor) * 100)) : 0;
-      return { medido, faltam: Math.max(0, servico.metaValor - medido), percentual, completo: medido >= servico.metaValor };
-    }
-
-    function calcularProgressoEmpreiteiro(emp) {
-      let meta = 0, medido = 0, completos = 0;
-      emp.servicos.forEach(s => {
-        meta += s.metaValor;
-        const m = s.medicoes.reduce((sum, x) => sum + x.valor, 0);
-        medido += m;
-        if (m >= s.metaValor) completos++;
+    // =====================================================================
+    // LISTENERS E BANCO DE DADOS
+    // =====================================================================
+    function initApp() {
+      // Listener de Projetos
+      db.collection('projects').onSnapshot(snapshot => {
+        state.projects = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        state.statusNuvem = 'ok';
+        render();
+      }, err => {
+        console.error('Erro Firebase:', err);
+        state.statusNuvem = 'erro';
+        render();
       });
-      return { percentual: meta > 0 ? Math.round((medido / meta) * 100) : 0, completos, total: emp.servicos.length };
-    }
 
-    function calcularProgressoTotal(empreiteiros) {
-      let meta = 0, medido = 0, completos = 0, total = 0;
-      empreiteiros.forEach(emp => emp.servicos.forEach(s => {
-        meta += s.metaValor;
-        const m = s.medicoes.reduce((sum, x) => sum + x.valor, 0);
-        medido += m; total++;
-        if (m >= s.metaValor) completos++;
-      }));
-      return { percentual: meta > 0 ? Math.round((medido / meta) * 100) : 0, completos, total };
-    }
-
-    function calcularResumoPorCategoria(empreiteiros) {
-      const resumo = {};
-      empreiteiros.forEach(emp => emp.servicos.forEach(s => {
-        if (!resumo[s.categoria]) resumo[s.categoria] = { meta: 0, medido: 0, qtd: 0, unidade: s.unidade };
-        const m = s.medicoes.reduce((sum, x) => sum + x.valor, 0);
-        resumo[s.categoria].meta += s.metaValor;
-        resumo[s.categoria].medido += m;
-        resumo[s.categoria].qtd += 1;
-      }));
-      Object.keys(resumo).forEach(cat => {
-        resumo[cat].percentual = resumo[cat].meta > 0 ? Math.round((resumo[cat].medido / resumo[cat].meta) * 100) : 0;
+      // Listener de Categorias
+      db.collection('config').doc('categorias').onSnapshot(doc => {
+        if (doc.exists && doc.data().lista) {
+          state.categorias = doc.data().lista;
+          render();
+        }
       });
-      return resumo;
     }
 
-    // =====================================================================
-    // COMPONENTES PEQUENOS / MEMOIZADOS
-    // =====================================================================
-    const BadgeStatusNuvem = memo(function BadgeStatusNuvem({ status }) {
-      const cfg = {
-        conectando: { t: '⚡ Conectando...', c: 'offline' },
-        ok: { t: '☁️ Online', c: 'online' },
-        salvando: { t: '☁️ Salvando...', c: 'saving' },
-        erro: { t: '⚠️ Sem conexão', c: 'offline' }
-      }[status] || { t: '⚡', c: 'offline' };
-      return <span className={`badge ${cfg.c}`}>{cfg.t}</span>;
-    });
+    function escutarProjetoSelecionado(projectId) {
+      db.collection('projectsData').doc(projectId).onSnapshot(doc => {
+        state.empreiteiros = (doc.exists && doc.data().empreiteiros) ? doc.data().empreiteiros : [];
+        render();
+      });
+    }
 
-    const NovoProjetoForm = memo(function NovoProjetoForm({ onCriar }) {
-      const [nome, setNome] = useState('');
-      const [salvando, setSalvando] = useState(false);
-      const criar = useCallback(async () => {
-        const n = nome.trim();
-        if (!n || salvando) return;
-        setSalvando(true);
-        try { await onCriar(n); setNome(''); }
-        catch (e) { alert('Erro ao criar projeto: ' + e.message); }
-        finally { setSalvando(false); }
-      }, [nome, salvando, onCriar]);
-
-      return (
-        <div className="card">
-          <h3 className="section-title">Nova Obra</h3>
-          <div className="input-group">
-            <input
-              type="text" value={nome} placeholder="Nome da obra (Ex: Residencial Solar)"
-              onChange={(e) => setNome(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') criar(); }}
-            />
-            <button onClick={criar} disabled={salvando}>{salvando ? <span className="spinner" /> : 'Criar'}</button>
-          </div>
-        </div>
-      );
-    });
-
-    const ProjectItem = memo(function ProjectItem({ project, onSelect, onDelete }) {
-      return (
-        <div className="project-item" onClick={() => onSelect(project.id)}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
-              <div className="project-name">{project.name}</div>
-              <div className="subtitle">Criado em: {project.createdAt || 'N/A'}</div>
-            </div>
-            <button
-              className="btn-danger"
-              onClick={(e) => { e.stopPropagation(); onDelete(project.id); }}
-            >🗑️</button>
-          </div>
-        </div>
-      );
-    });
-
-    const ListaProjetos = memo(function ListaProjetos({ projects, carregando, onSelect, onCriar, onDelete }) {
-      return (
-        <div className="container">
-          <NovoProjetoForm onCriar={onCriar} />
-          <div className="card">
-            <h3 className="section-title">Suas Obras</h3>
-            {carregando ? (
-              <p className="empty-state"><span className="spinner" /> Carregando...</p>
-            ) : projects.length === 0 ? (
-              <p className="empty-state">Nenhuma obra criada ainda.</p>
-            ) : (
-              projects.map((p) => <ProjectItem key={p.id} project={p} onSelect={onSelect} onDelete={onDelete} />)
-            )}
-          </div>
-        </div>
-      );
-    });
-
-    // ---------- Gerenciador de Categorias ----------
-    const GerenciadorCategorias = memo(function GerenciadorCategorias({ categorias, onAdicionar, onDeletar }) {
-      const [novaCategoria, setNovaCategoria] = useState('');
-      const [similar, setSimilar] = useState(null);
-      const [aberto, setAberto] = useState(false);
-
-      const verificar = (texto) => {
-        setNovaCategoria(texto);
-        if (!texto.trim()) { setSimilar(null); return; }
-        const encontrados = categorias
-          .map(c => ({ categoria: c, sim: detectarSimilaridade(texto, c) }))
-          .filter(x => x.sim > 0)
-          .sort((a, b) => b.sim - a.sim);
-        setSimilar(encontrados[0] || null);
-      };
-
-      const criar = () => {
-        const n = novaCategoria.trim();
-        if (!n) return;
-        if (categorias.some(c => c.toLowerCase() === n.toLowerCase())) {
-          alert('❌ Essa categoria já existe!');
-          return;
-        }
-        onAdicionar(n);
-        setNovaCategoria(''); setSimilar(null);
-      };
-
-      return (
-        <div className="card">
-          <button className="btn-secondary btn-full" onClick={() => setAberto(!aberto)} style={{ textAlign: 'left' }}>
-            📂 Categorias ({categorias.length}) {aberto ? '−' : '+'}
-          </button>
-          {aberto && (
-            <div style={{ marginTop: 12 }}>
-              <div className="input-group">
-                <input
-                  type="text" value={novaCategoria} placeholder="Nova categoria (Ex: Pintura)"
-                  onChange={(e) => verificar(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter') criar(); }}
-                />
-                <button onClick={criar}>Criar</button>
-              </div>
-              {similar && (
-                <div className="warn-box">
-                  ⚠️ Parecido com "<strong>{similar.categoria}</strong>" ({similar.sim}% similar). Ainda pode criar se quiser.
-                </div>
-              )}
-              <div style={{ marginTop: 10 }}>
-                {categorias.map(cat => (
-                  <span key={cat} className="cat-tag" style={{ backgroundColor: getCorCategoria(cat) }}>
-                    {cat}
-                    <span onClick={() => { if (confirm(`Deletar categoria "${cat}"?`)) onDeletar(cat); }} style={{ cursor: 'pointer' }}>✕</span>
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      );
-    });
-
-    // ---------- Formulário: novo empreiteiro ----------
-    const NovoEmpreiteiroForm = memo(function NovoEmpreiteiroForm({ onCriar }) {
-      const [nome, setNome] = useState('');
-      const [aberto, setAberto] = useState(false);
-      const criar = () => {
-        const n = nome.trim();
-        if (!n) return;
-        onCriar(n);
-        setNome(''); setAberto(false);
-      };
-      return (
-        <div className="card">
-          <button className="btn-secondary btn-full" onClick={() => setAberto(!aberto)} style={{ textAlign: 'left' }}>
-            👷 Adicionar Empreiteiro {aberto ? '−' : '+'}
-          </button>
-          {aberto && (
-            <div className="input-group">
-              <input
-                type="text" value={nome} placeholder="Nome do empreiteiro/grupo"
-                onChange={(e) => setNome(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') criar(); }}
-              />
-              <button onClick={criar}>Adicionar</button>
-            </div>
-          )}
-        </div>
-      );
-    });
-
-    // ---------- Formulário: novo serviço ----------
-    const NovoServicoForm = memo(function NovoServicoForm({ categorias, onCriar }) {
-      const [nome, setNome] = useState('');
-      const [categoria, setCategoria] = useState(categorias[0] || '');
-      const [metaTipo, setMetaTipo] = useState('area');
-      const [metaValor, setMetaValor] = useState('');
-
-      const unidades = { area: 'm²', volume: 'm³', linear: 'm', contagem: 'unid.' };
-
-      const criar = () => {
-        if (!nome.trim() || !metaValor) return;
-        onCriar({ nome: nome.trim(), categoria: categoria || categorias[0], metaTipo, metaValor: parseFloat(metaValor), unidade: unidades[metaTipo] });
-        setNome(''); setMetaValor('');
-      };
-
-      return (
-        <div style={{ background: '#f8fafc', padding: 10, borderRadius: 8, marginTop: 8 }}>
-          <input type="text" placeholder="Nome do serviço" value={nome} onChange={(e) => setNome(e.target.value)} style={{ marginBottom: 8 }} />
-          <select value={categoria} onChange={(e) => setCategoria(e.target.value)} style={{ marginBottom: 8 }}>
-            {categorias.map(c => <option key={c} value={c}>{c}</option>)}
-          </select>
-          <div className="input-group" style={{ marginTop: 0 }}>
-            <select value={metaTipo} onChange={(e) => setMetaTipo(e.target.value)}>
-              <option value="area">Área (m²)</option>
-              <option value="volume">Volume (m³)</option>
-              <option value="linear">Linear (m)</option>
-              <option value="contagem">Contagem</option>
-            </select>
-            <input type="number" step="0.1" placeholder="Meta total" value={metaValor} onChange={(e) => setMetaValor(e.target.value)} />
-          </div>
-          <button className="btn-full" style={{ marginTop: 8 }} onClick={criar}>Salvar Serviço</button>
-        </div>
-      );
-    });
-
-    // ---------- Formulário de medição (com câmera, GPS, extrapolação) ----------
-    const NovaMedicaoForm = memo(function NovaMedicaoForm({ servico, localizacao, permissaoCamera, onSolicitarPermissao, onCriar }) {
-      const [valor, setValor] = useState('');
-      const [data, setData] = useState(new Date().toISOString().split('T')[0]);
-      const [funcionarios, setFuncionarios] = useState('');
-      const [observacao, setObservacao] = useState('');
-      const [justificativa, setJustificativa] = useState('');
-      const [fotos, setFotos] = useState([]);
-      const [cameraAberta, setCameraAberta] = useState(false);
-      const [fotoCapturada, setFotoCapturada] = useState(null);
-      const [salvando, setSalvando] = useState(false);
-      const videoRef = useRef(null);
-      const canvasRef = useRef(null);
-      const streamRef = useRef(null);
-
-      const valorNum = parseFloat(valor) || 0;
-      const medido = servico.medicoes.reduce((s, m) => s + m.valor, 0);
-      const faltam = servico.metaValor - medido;
-      const excedente = valorNum - faltam;
-      const extrapola = valor !== '' && excedente > 0;
-
-      const iniciarCamera = async () => {
-        if (permissaoCamera !== 'concedida') {
-          const ok = await onSolicitarPermissao();
-          if (!ok) return;
-        }
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
-            audio: false
-          });
-          streamRef.current = stream;
-          setCameraAberta(true);
-        } catch (err) {
-          alert('❌ Erro ao acessar câmera: ' + err.message);
-        }
-      };
-
-      useEffect(() => {
-        if (cameraAberta && videoRef.current && streamRef.current) {
-          videoRef.current.srcObject = streamRef.current;
-          const p = videoRef.current.play();
-          if (p && p.catch) p.catch(() => {});
-        }
-      }, [cameraAberta]);
-
-      const fecharCamera = () => {
-        if (streamRef.current) { streamRef.current.getTracks().forEach(t => t.stop()); streamRef.current = null; }
-        setCameraAberta(false);
-        setFotoCapturada(null);
-      };
-
-      const capturar = () => {
-        if (videoRef.current && canvasRef.current) {
-          const ctx = canvasRef.current.getContext('2d');
-          ctx.drawImage(videoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
-          setFotoCapturada(canvasRef.current.toDataURL('image/jpeg', 0.85));
-        }
-      };
-
-      const adicionarFoto = async () => {
-        if (!fotoCapturada) return;
-        const id = Date.now();
-        const agora = new Date();
-        const fotoTemp = { id, imagem: fotoCapturada, data: agora.toLocaleDateString('pt-BR'), hora: agora.toLocaleTimeString('pt-BR'), gps: localizacao, enviando: true };
-        setFotos(prev => [...prev, fotoTemp]);
-        fecharCamera();
-        try {
-          const blob = await (await fetch(fotoTemp.imagem)).blob();
-          const ref = storage.ref(`medicoes/${id}.jpg`);
-          const snap = await ref.put(blob);
-          const url = await snap.ref.getDownloadURL();
-          setFotos(prev => prev.map(f => f.id === id ? { ...f, imagem: url, enviando: false } : f));
-        } catch (err) {
-          console.error('Erro upload foto:', err);
-          setFotos(prev => prev.map(f => f.id === id ? { ...f, enviando: false, erro: true } : f));
-        }
-      };
-
-      const removerFoto = (id) => setFotos(prev => prev.filter(f => f.id !== id));
-
-      const salvar = async () => {
-        if (!valor || salvando) return;
-        if (extrapola && !justificativa.trim()) {
-          alert(`⚠️ Esta medição extrapola a meta em ${excedente.toFixed(2)} ${servico.unidade}.\n\nÉ obrigatório justificar antes de salvar.`);
-          return;
-        }
-        if (fotos.some(f => f.enviando)) {
-          alert('☁️ Aguarde a foto terminar de enviar antes de salvar.');
-          return;
-        }
-        setSalvando(true);
-        try {
-          await onCriar({
-            valor: valorNum, data, funcionarios: funcionarios ? parseInt(funcionarios) : 0,
-            observacao, fotos, extrapolou: extrapola, justificativaExtrapolacao: extrapola ? justificativa : ''
-          });
-        } finally {
-          setSalvando(false);
-        }
-      };
-
-      return (
-        <div style={{ background: '#f8fafc', padding: 10, borderRadius: 8, marginTop: 8 }}>
-          <input
-            type="number" step="0.1" placeholder={`Quantidade (${servico.unidade})`} value={valor}
-            onChange={(e) => setValor(e.target.value)}
-            style={{ marginBottom: 8, borderColor: extrapola ? '#ef4444' : undefined, borderWidth: extrapola ? 2 : 1 }}
-          />
-
-          {extrapola && (
-            <div className="warn-box">
-              🚨 <strong>Extrapola a meta</strong> em {excedente.toFixed(2)} {servico.unidade}. Justifique para poder salvar:
-              <textarea rows="2" value={justificativa} onChange={(e) => setJustificativa(e.target.value)} placeholder="Justificativa (obrigatória)" style={{ marginTop: 6 }} />
-            </div>
-          )}
-
-          <div className="grid2" style={{ marginTop: 8 }}>
-            <input type="date" value={data} onChange={(e) => setData(e.target.value)} />
-            <input type="number" placeholder="Nº funcionários" min="0" value={funcionarios} onChange={(e) => setFuncionarios(e.target.value)} />
-          </div>
-          <textarea rows="2" placeholder="Observação" value={observacao} onChange={(e) => setObservacao(e.target.value)} style={{ marginTop: 8 }} />
-
-          <div style={{ marginTop: 8 }}>
-            {!cameraAberta ? (
-              <button className="btn-secondary btn-full" onClick={iniciarCamera}>
-                📷 {permissaoCamera === 'concedida' ? 'Tirar Foto' : 'Permitir Câmera'}
-              </button>
-            ) : (
-              <div>
-                <video ref={videoRef} autoPlay playsInline muted className="camera-preview" />
-                <canvas ref={canvasRef} width="640" height="480" style={{ display: 'none' }} />
-                {!fotoCapturada ? (
-                  <div className="input-group">
-                    <button onClick={capturar}>📸 Capturar</button>
-                    <button className="btn-secondary" onClick={fecharCamera}>Fechar</button>
-                  </div>
-                ) : (
-                  <div>
-                    <img src={fotoCapturada} alt="Prévia" style={{ width: '100%', borderRadius: 8, maxHeight: 240 }} />
-                    <div className="input-group">
-                      <button onClick={adicionarFoto}>✓ Adicionar</button>
-                      <button className="btn-secondary" onClick={() => setFotoCapturada(null)}>Nova</button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {fotos.length > 0 && (
-            <div style={{ marginTop: 8 }}>
-              {fotos.map(f => (
-                <div key={f.id} className="thumb-wrap">
-                  <img src={f.imagem} alt="Foto" className="thumb" onClick={() => removerFoto(f.id)} />
-                  {f.enviando && <div className="thumb-overlay">☁️ Enviando</div>}
-                  {f.erro && <div className="thumb-overlay" style={{ background: 'rgba(220,38,38,0.75)' }}>⚠️ Falhou</div>}
-                </div>
-              ))}
-            </div>
-          )}
-
-          <button className="btn-full" style={{ marginTop: 10 }} onClick={salvar} disabled={salvando}>
-            {salvando ? <span className="spinner" /> : 'Salvar Medição'}
-          </button>
-        </div>
-      );
-    });
-
-    // ---------- Item de Serviço ----------
-    const ServicoItem = memo(function ServicoItem({ servico, localizacao, permissaoCamera, onSolicitarPermissao, onEditarMeta, onAdicionarMedicao, onDeletarMedicao, onDeletarServico }) {
-      const [medicaoAberta, setMedicaoAberta] = useState(false);
-      const [editandoMeta, setEditandoMeta] = useState(false);
-      const [novaMeta, setNovaMeta] = useState(servico.metaValor);
-
-      const prog = calcularProgressoServico(servico);
-      const status = getStatusProgresso(prog.percentual);
-      const corCat = getCorCategoria(servico.categoria);
-      const temAditivo = servico.aditivos && servico.aditivos.length > 0;
-      const ultimoAditivo = temAditivo ? servico.aditivos[servico.aditivos.length - 1] : null;
-
-      return (
-        <div className="servico-row">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: 700 }}>{servico.nome}</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginTop: 4 }}>
-                <span className="cat-pill" style={{ backgroundColor: corCat }}>{servico.categoria}</span>
-                {!editandoMeta ? (
-                  <span style={{ fontSize: 12, color: '#64748b' }}>
-                    Meta: {servico.metaValor} {servico.unidade}{' '}
-                    <span style={{ color: '#94a3b8', cursor: 'pointer' }} onClick={() => { setEditandoMeta(true); setNovaMeta(servico.metaValor); }}>✏️</span>
-                  </span>
-                ) : (
-                  <span style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-                    <input type="number" step="0.1" value={novaMeta} onChange={(e) => setNovaMeta(e.target.value)} style={{ width: 80, padding: 4, fontSize: 12 }} />
-                    <button style={{ padding: '4px 8px', fontSize: 12 }} onClick={() => { onEditarMeta(parseFloat(novaMeta)); setEditandoMeta(false); }}>✓</button>
-                    <button className="btn-secondary" style={{ padding: '4px 8px', fontSize: 12 }} onClick={() => setEditandoMeta(false)}>✕</button>
-                  </span>
-                )}
-              </div>
-              {temAditivo && (
-                <div style={{ marginTop: 4, fontSize: 11 }}>
-                  <span style={{ background: ultimoAditivo.diferenca > 0 ? '#dbeafe' : '#fee2e2', color: ultimoAditivo.diferenca > 0 ? '#1d4ed8' : '#b91c1c', padding: '2px 8px', borderRadius: 999, fontWeight: 700 }}>
-                    📈 Aditivo: {ultimoAditivo.diferenca > 0 ? '+' : ''}{ultimoAditivo.diferenca.toFixed(2)} {servico.unidade}
-                  </span>
-                  <span style={{ color: '#94a3b8', marginLeft: 4 }}>(original: {servico.metaOriginal} {servico.unidade})</span>
-                </div>
-              )}
-            </div>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontWeight: 700 }}>{prog.medido.toFixed(2)} {servico.unidade}</div>
-              <div style={{ fontWeight: 700, fontSize: 13, color: status.cor }}>{status.emoji} {prog.percentual}%</div>
-            </div>
-          </div>
-
-          <div className="progress-bar-bg" style={{ marginTop: 8 }}>
-            <div className="progress-bar-fill" style={{ width: `${prog.percentual}%`, backgroundColor: status.cor }} />
-          </div>
-
-          <button className="btn-secondary btn-full" style={{ marginTop: 8 }} onClick={() => setMedicaoAberta(!medicaoAberta)}>
-            + Registrar Medição
-          </button>
-
-          {medicaoAberta && (
-            <NovaMedicaoForm
-              servico={servico}
-              localizacao={localizacao}
-              permissaoCamera={permissaoCamera}
-              onSolicitarPermissao={onSolicitarPermissao}
-              onCriar={async (dados) => { await onAdicionarMedicao(dados); setMedicaoAberta(false); }}
-            />
-          )}
-
-          {servico.medicoes.length > 0 && (
-            <div style={{ marginTop: 8 }}>
-              {servico.medicoes.map(m => (
-                <div key={m.id} className={`medicao-row ${m.extrapolou ? 'extrapolou' : ''}`}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <div>
-                      <strong>+{m.valor} {servico.unidade}</strong>{' '}
-                      {m.extrapolou && <span style={{ color: '#b91c1c', fontWeight: 700 }}>🚨 Extrapolou</span>}
-                      <div style={{ color: '#64748b', fontSize: 11 }}>{m.data}</div>
-                      {m.extrapolou && m.justificativaExtrapolacao && (
-                        <div style={{ color: '#b91c1c', fontSize: 11, fontStyle: 'italic' }}>"{m.justificativaExtrapolacao}"</div>
-                      )}
-                      {m.fotos && m.fotos.length > 0 && <span style={{ fontSize: 11, color: '#1d4ed8' }}>📸 {m.fotos.length}</span>}
-                    </div>
-                    <span style={{ color: '#ef4444', cursor: 'pointer', fontWeight: 700 }} onClick={() => onDeletarMedicao(m.id)}>✕</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          <div style={{ textAlign: 'right', marginTop: 6 }}>
-            <span style={{ fontSize: 11, color: '#94a3b8', cursor: 'pointer' }} onClick={onDeletarServico}>Remover serviço</span>
-          </div>
-        </div>
-      );
-    });
-
-    // ---------- Item de Empreiteiro ----------
-    const EmpreiteiroItem = memo(function EmpreiteiroItem({ emp, categorias, localizacao, permissaoCamera, onSolicitarPermissao, onAdicionarServico, onEditarMeta, onAdicionarMedicao, onDeletarMedicao, onDeletarServico, onDeletar }) {
-      const [expandido, setExpandido] = useState(false);
-      const [novoServicoAberto, setNovoServicoAberto] = useState(false);
-      const prog = calcularProgressoEmpreiteiro(emp);
-      const status = getStatusProgresso(prog.percentual);
-
-      return (
-        <div className="emp-card" style={{ borderColor: emp.cor }}>
-          <button className="emp-header" onClick={() => setExpandido(!expandido)}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: emp.cor, display: 'inline-block' }} />
-              <div>
-                <div style={{ fontWeight: 700 }}>{emp.nome}</div>
-                <div style={{ fontSize: 12, color: status.cor }}>{status.emoji} {prog.percentual}% <span style={{ color: '#94a3b8' }}>• {prog.completos}/{prog.total} serviços</span></div>
-              </div>
-            </div>
-            <span>{expandido ? '−' : '+'}</span>
-          </button>
-
-          {expandido && (
-            <div>
-              {prog.total > 0 && (
-                <div style={{ padding: '0 14px 14px' }}>
-                  <div className="progress-bar-bg"><div className="progress-bar-fill" style={{ width: `${prog.percentual}%`, backgroundColor: status.cor }} /></div>
-                </div>
-              )}
-
-              <div style={{ padding: '0 14px 14px' }}>
-                <button className="btn-secondary btn-full" onClick={() => setNovoServicoAberto(!novoServicoAberto)}>+ Novo Serviço</button>
-                {novoServicoAberto && (
-                  <NovoServicoForm categorias={categorias} onCriar={(dados) => { onAdicionarServico(dados); setNovoServicoAberto(false); }} />
-                )}
-              </div>
-
-              {emp.servicos.length === 0 ? (
-                <p className="empty-state" style={{ padding: '0 14px 14px' }}>Nenhum serviço ainda.</p>
-              ) : (
-                emp.servicos.map(s => (
-                  <ServicoItem
-                    key={s.id}
-                    servico={s}
-                    localizacao={localizacao}
-                    permissaoCamera={permissaoCamera}
-                    onSolicitarPermissao={onSolicitarPermissao}
-                    onEditarMeta={(novoValor) => onEditarMeta(s.id, novoValor)}
-                    onAdicionarMedicao={(dados) => onAdicionarMedicao(s.id, dados)}
-                    onDeletarMedicao={(medId) => onDeletarMedicao(s.id, medId)}
-                    onDeletarServico={() => onDeletarServico(s.id)}
-                  />
-                ))
-              )}
-
-              <div style={{ padding: 14, textAlign: 'center' }}>
-                <span style={{ fontSize: 12, color: emp.cor, cursor: 'pointer' }} onClick={onDeletar}>🗑️ Remover empreiteiro</span>
-              </div>
-            </div>
-          )}
-        </div>
-      );
-    });
-
-    // ---------- Dashboard Analítico ----------
-    const DashboardAnalitico = memo(function DashboardAnalitico({ empreiteiros }) {
-      const [aba, setAba] = useState('barras');
-      const resumo = calcularResumoPorCategoria(empreiteiros);
-      const categoriasComDados = Object.keys(resumo);
-
-      if (categoriasComDados.length === 0) {
-        return <div className="card"><p className="empty-state">Adicione serviços para ver o dashboard.</p></div>;
-      }
-
-      return (
-        <div className="card">
-          <div className="input-group" style={{ marginTop: 0 }}>
-            <button className={aba === 'barras' ? '' : 'btn-secondary'} onClick={() => setAba('barras')}>📊 Barras</button>
-            <button className={aba === 'treemap' ? '' : 'btn-secondary'} onClick={() => setAba('treemap')}>🔲 Blocos</button>
-            <button className={aba === 'tabela' ? '' : 'btn-secondary'} onClick={() => setAba('tabela')}>📋 Tabela</button>
-          </div>
-
-          {aba === 'barras' && (
-            <div style={{ marginTop: 14 }}>
-              {categoriasComDados.map(cat => {
-                const d = resumo[cat];
-                const status = getStatusProgresso(d.percentual);
-                return (
-                  <div key={cat} style={{ marginBottom: 12 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                      <span className="cat-pill" style={{ backgroundColor: getCorCategoria(cat) }}>{cat}</span>
-                      <span style={{ fontSize: 12, color: '#64748b' }}>{status.emoji} {d.medido.toFixed(1)} / {d.meta.toFixed(1)}</span>
-                    </div>
-                    <div className="progress-bar-bg" style={{ height: 18 }}>
-                      <div className="progress-bar-fill" style={{ width: `${d.percentual}%`, backgroundColor: status.cor }} />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          {aba === 'treemap' && (
-            <div className="grid3" style={{ marginTop: 14 }}>
-              {categoriasComDados.map(cat => {
-                const d = resumo[cat];
-                const status = getStatusProgresso(d.percentual);
-                return (
-                  <div key={cat} style={{ backgroundColor: getCorCategoria(cat), borderRadius: 10, padding: 12, color: '#fff', textAlign: 'center', minHeight: 90, border: d.percentual === 100 ? '3px solid #22c55e' : 'none' }}>
-                    <div style={{ fontSize: 20, fontWeight: 700 }}>{d.percentual}%</div>
-                    <div style={{ fontSize: 12, fontWeight: 700 }}>{cat}</div>
-                    <div style={{ fontSize: 11, opacity: 0.9 }}>{status.emoji}</div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          {aba === 'tabela' && (
-            <table style={{ marginTop: 14 }}>
-              <thead><tr><th>Categoria</th><th>Meta</th><th>Medido</th><th>%</th></tr></thead>
-              <tbody>
-                {categoriasComDados.map(cat => {
-                  const d = resumo[cat];
-                  const status = getStatusProgresso(d.percentual);
-                  return (
-                    <tr key={cat}>
-                      <td><span className="cat-pill" style={{ backgroundColor: getCorCategoria(cat) }}>{cat}</span></td>
-                      <td>{d.meta.toFixed(1)}</td>
-                      <td>{d.medido.toFixed(1)}</td>
-                      <td style={{ color: status.cor, fontWeight: 700 }}>{status.emoji} {d.percentual}%</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          )}
-        </div>
-      );
-    });
-
-    // =====================================================================
-    // TELA DE DETALHE (com listener próprio para cada obra)
-    // =====================================================================
-    const DetalheProjeto = memo(function DetalheProjeto({ project, categorias, onVoltar, onAdicionarCategoria, onDeletarCategoria }) {
-      const [empreiteiros, setEmpreiteiros] = useState([]);
-      const [carregando, setCarregando] = useState(true);
-      const [statusSalvar, setStatusSalvar] = useState('ok');
-      const [aba, setAba] = useState('lista'); // 'lista' | 'dashboard'
-      const [localizacao, setLocalizacao] = useState(null);
-      const [permissaoCamera, setPermissaoCamera] = useState('nao-verificada');
-      const primeiraCarga = useRef(true);
-
-      // Listener dos dados PESADOS deste projeto
-      useEffect(() => {
-        primeiraCarga.current = true;
-        const unsubscribe = db.collection('projectsData').doc(project.id).onSnapshot(
-          (doc) => {
-            const data = doc.exists ? doc.data() : {};
-            setEmpreiteiros(data.empreiteiros || []);
-            setCarregando(false);
-          },
-          (err) => { console.error('Erro ao carregar dados do projeto:', err); setCarregando(false); }
-        );
-        return () => unsubscribe();
-      }, [project.id]);
-
-      // GPS + permissão de câmera
-      useEffect(() => {
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            (pos) => setLocalizacao({ latitude: pos.coords.latitude.toFixed(6), longitude: pos.coords.longitude.toFixed(6) }),
-            () => {}
-          );
-        }
-      }, []);
-
-      const solicitarPermissaoCamera = useCallback(async () => {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
-          stream.getTracks().forEach(t => t.stop());
-          setPermissaoCamera('concedida');
-          return true;
-        } catch (err) {
-          setPermissaoCamera('negada');
-          alert('❌ Permissão de câmera negada.');
-          return false;
-        }
-      }, []);
-
-      // Auto-save (debounced)
-      useEffect(() => {
-        if (primeiraCarga.current) { primeiraCarga.current = false; return; }
-        setStatusSalvar('salvando');
-        const timeout = setTimeout(() => {
-          db.collection('projectsData').doc(project.id).set({ empreiteiros })
-            .then(() => setStatusSalvar('ok'))
-            .catch((err) => { console.error('Erro ao salvar:', err); setStatusSalvar('erro'); });
-        }, 700);
-        return () => clearTimeout(timeout);
-      }, [empreiteiros, project.id]);
-
-      const adicionarEmpreiteiro = useCallback((nome) => {
-        setEmpreiteiros(prev => [...prev, { id: Date.now(), nome, cor: CORES_EMPREITEIRO[prev.length % CORES_EMPREITEIRO.length], servicos: [] }]);
-      }, []);
-
-      const deletarEmpreiteiro = useCallback((empId) => {
-        setEmpreiteiros(prev => prev.filter(e => e.id !== empId));
-      }, []);
-
-      const adicionarServico = useCallback((empId, dados) => {
-        setEmpreiteiros(prev => prev.map(e => e.id === empId ? { ...e, servicos: [...e.servicos, { id: Date.now(), ...dados, medicoes: [] }] } : e));
-      }, []);
-
-      const deletarServico = useCallback((empId, servId) => {
-        setEmpreiteiros(prev => prev.map(e => e.id === empId ? { ...e, servicos: e.servicos.filter(s => s.id !== servId) } : e));
-      }, []);
-
-      const editarMeta = useCallback((empId, servId, novoValor) => {
-        if (isNaN(novoValor)) return;
-        setEmpreiteiros(prev => prev.map(e => {
-          if (e.id !== empId) return e;
-          return {
-            ...e, servicos: e.servicos.map(s => {
-              if (s.id !== servId) return s;
-              const diferenca = novoValor - s.metaValor;
-              if (diferenca === 0) return s;
-              const metaOriginal = s.metaOriginal !== undefined ? s.metaOriginal : s.metaValor;
-              const aditivo = { id: Date.now(), valorAnterior: s.metaValor, valorNovo: novoValor, diferenca, data: new Date().toLocaleDateString('pt-BR') };
-              return { ...s, metaValor: novoValor, metaOriginal, aditivos: [...(s.aditivos || []), aditivo] };
-            })
-          };
-        }));
-      }, []);
-
-      const adicionarMedicao = useCallback(async (empId, servId, dados) => {
-        setEmpreiteiros(prev => prev.map(e => {
-          if (e.id !== empId) return e;
-          return {
-            ...e, servicos: e.servicos.map(s => s.id === servId ? { ...s, medicoes: [...s.medicoes, { id: Date.now(), ...dados }] } : s)
-          };
-        }));
-      }, []);
-
-      const deletarMedicao = useCallback((empId, servId, medId) => {
-        setEmpreiteiros(prev => prev.map(e => {
-          if (e.id !== empId) return e;
-          return { ...e, servicos: e.servicos.map(s => s.id === servId ? { ...s, medicoes: s.medicoes.filter(m => m.id !== medId) } : s) };
-        }));
-      }, []);
-
-      const progTotal = calcularProgressoTotal(empreiteiros);
-      const statusTotal = getStatusProgresso(progTotal.percentual);
-
-      const exportarCSV = () => {
-        let csv = `RELATÓRIO DE MEDIÇÕES\nProjeto: ${project.name}\nData: ${new Date().toLocaleDateString('pt-BR')}\n\n`;
-        csv += `PROGRESSO TOTAL: ${progTotal.percentual}%\n\n`;
-        empreiteiros.forEach(emp => {
-          csv += `\n=== EMPREITEIRO: ${emp.nome} ===\n`;
-          csv += 'Serviço,Categoria,Meta,Unidade,Medido,Progresso\n';
-          emp.servicos.forEach(s => {
-            const p = calcularProgressoServico(s);
-            csv += `"${s.nome}","${s.categoria}",${s.metaValor},"${s.unidade}",${p.medido},${p.percentual}%\n`;
-          });
+    function salvarDadosProjeto() {
+      if (!state.selectedProjectId) return;
+      state.statusNuvem = 'salvando';
+      renderHeaderStatus();
+      
+      db.collection('projectsData').doc(state.selectedProjectId).set({ empreiteiros: state.empreiteiros })
+        .then(() => {
+          state.statusNuvem = 'ok';
+          renderHeaderStatus();
+        })
+        .catch(() => {
+          state.statusNuvem = 'erro';
+          renderHeaderStatus();
         });
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `relatorio_${project.name}.csv`;
-        link.click();
-      };
-
-      return (
-        <div>
-          <div className="header-bar">
-            <div className="header-inner">
-              <button className="btn-back" onClick={onVoltar}>← Voltar às Obras</button>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <div className="title-lg">📏 {project.name}</div>
-                  <div className="subtitle">{empreiteiros.length} empreiteiro(s)</div>
-                </div>
-                <BadgeStatusNuvem status={statusSalvar} />
-              </div>
-              {progTotal.total > 0 && (
-                <div style={{ marginTop: 10 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
-                    <span>{statusTotal.emoji} Progresso Total</span>
-                    <span style={{ fontWeight: 700, color: statusTotal.cor }}>{progTotal.percentual}%</span>
-                  </div>
-                  <div className="progress-bar-bg"><div className="progress-bar-fill" style={{ width: `${progTotal.percentual}%`, backgroundColor: statusTotal.cor }} /></div>
-                </div>
-              )}
-              <div className="tabs">
-                <button className={`tab-btn ${aba === 'lista' ? 'active' : ''}`} onClick={() => setAba('lista')}>👷 Empreiteiros</button>
-                <button className={`tab-btn ${aba === 'dashboard' ? 'active' : ''}`} onClick={() => setAba('dashboard')}>📊 Dashboard</button>
-              </div>
-            </div>
-          </div>
-
-          <div className="container">
-            {carregando ? (
-              <p className="empty-state"><span className="spinner" /> Carregando dados da obra...</p>
-            ) : aba === 'dashboard' ? (
-              <DashboardAnalitico empreiteiros={empreiteiros} />
-            ) : (
-              <React.Fragment>
-                <GerenciadorCategorias categorias={categorias} onAdicionar={onAdicionarCategoria} onDeletar={onDeletarCategoria} />
-                <NovoEmpreiteiroForm onCriar={adicionarEmpreiteiro} />
-                {empreiteiros.length === 0 ? (
-                  <div className="card"><p className="empty-state">Nenhum empreiteiro ainda.</p></div>
-                ) : (
-                  empreiteiros.map(emp => (
-                    <EmpreiteiroItem
-                      key={emp.id}
-                      emp={emp}
-                      categorias={categorias}
-                      localizacao={localizacao}
-                      permissaoCamera={permissaoCamera}
-                      onSolicitarPermissao={solicitarPermissaoCamera}
-                      onAdicionarServico={(dados) => adicionarServico(emp.id, dados)}
-                      onEditarMeta={(servId, novoValor) => editarMeta(emp.id, servId, novoValor)}
-                      onAdicionarMedicao={(servId, dados) => adicionarMedicao(emp.id, servId, dados)}
-                      onDeletarMedicao={(servId, medId) => deletarMedicao(emp.id, servId, medId)}
-                      onDeletarServico={(servId) => deletarServico(emp.id, servId)}
-                      onDeletar={() => deletarEmpreiteiro(emp.id)}
-                    />
-                  ))
-                )}
-                {empreiteiros.some(e => e.servicos.length > 0) && (
-                  <button className="btn-full btn-secondary" onClick={exportarCSV}>⬇️ Exportar Relatório CSV</button>
-                )}
-              </React.Fragment>
-            )}
-          </div>
-        </div>
-      );
-    });
-
-    // =====================================================================
-    // APP PRINCIPAL
-    // =====================================================================
-    function App() {
-      const [view, setView] = useState('list');
-      const [selectedProjectId, setSelectedProjectId] = useState(null);
-      const [projects, setProjects] = useState([]);
-      const [carregandoProjetos, setCarregandoProjetos] = useState(true);
-      const [categorias, setCategorias] = useState(CATEGORIAS_PADRAO);
-      const [statusNuvem, setStatusNuvem] = useState('conectando');
-
-      // Listener LEVE: só nome/data de cada obra
-      useEffect(() => {
-        const unsubscribe = db.collection('projects').onSnapshot(
-          (snapshot) => {
-            setProjects(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
-            setCarregandoProjetos(false);
-            setStatusNuvem('ok');
-          },
-          (err) => { console.error('Erro no listener de projetos:', err); setCarregandoProjetos(false); setStatusNuvem('erro'); }
-        );
-        return () => unsubscribe();
-      }, []);
-
-      // Listener das categorias
-      useEffect(() => {
-        const unsubscribe = db.collection('config').doc('categorias').onSnapshot(
-          (doc) => {
-            if (doc.exists && doc.data().lista) setCategorias(doc.data().lista);
-            else db.collection('config').doc('categorias').set({ lista: CATEGORIAS_PADRAO }).catch(() => {});
-          },
-          (err) => console.error('Erro ao carregar categorias:', err)
-        );
-        return () => unsubscribe();
-      }, []);
-
-      const handleCriarProjeto = useCallback(async (nome) => {
-        const novoDoc = await db.collection('projects').add({ name: nome, createdAt: new Date().toLocaleDateString('pt-BR') });
-        await db.collection('projectsData').doc(novoDoc.id).set({ empreiteiros: [] });
-      }, []);
-
-      const handleDeletarProjeto = useCallback(async (projectId) => {
-        if (!confirm('Deletar esta obra? Essa ação não pode ser desfeita.')) return;
-        await db.collection('projects').doc(projectId).delete();
-        await db.collection('projectsData').doc(projectId).delete();
-      }, []);
-
-      const handleAdicionarCategoria = useCallback(async (nome) => {
-        const nova = [...categorias, nome];
-        setCategorias(nova);
-        await db.collection('config').doc('categorias').set({ lista: nova });
-      }, [categorias]);
-
-      const handleDeletarCategoria = useCallback(async (nome) => {
-        const nova = categorias.filter(c => c !== nome);
-        setCategorias(nova);
-        await db.collection('config').doc('categorias').set({ lista: nova });
-      }, [categorias]);
-
-      const handleSelecionar = useCallback((id) => { setSelectedProjectId(id); setView('detail'); }, []);
-      const handleVoltar = useCallback(() => { setView('list'); setSelectedProjectId(null); }, []);
-
-      const projetoSelecionado = view === 'detail' ? projects.find(p => p.id === selectedProjectId) : null;
-
-      return (
-        <React.Fragment>
-          {view === 'list' && (
-            <div>
-              <div className="header-bar">
-                <div className="header-inner">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <div className="title">📐 Medi-o Eng</div>
-                      <div className="subtitle">Gestão e Medição de Canteiro</div>
-                    </div>
-                    <BadgeStatusNuvem status={statusNuvem} />
-                  </div>
-                </div>
-              </div>
-              <ListaProjetos
-                projects={projects}
-                carregando={carregandoProjetos}
-                onSelect={handleSelecionar}
-                onCriar={handleCriarProjeto}
-                onDelete={handleDeletarProjeto}
-              />
-            </div>
-          )}
-
-          {view === 'detail' && projetoSelecionado && (
-            <DetalheProjeto
-              project={projetoSelecionado}
-              categorias={categorias}
-              onVoltar={handleVoltar}
-              onAdicionarCategoria={handleAdicionarCategoria}
-              onDeletarCategoria={handleDeletarCategoria}
-            />
-          )}
-
-          {view === 'detail' && !projetoSelecionado && !carregandoProjetos && (
-            <div className="container">
-              <p className="empty-state">Obra não encontrada.</p>
-              <button className="btn-full" onClick={handleVoltar}>Voltar</button>
-            </div>
-          )}
-        </React.Fragment>
-      );
     }
 
-    const container = document.getElementById('root');
-    const root = ReactDOM.createRoot(container);
-    root.render(<App />);
+    // =====================================================================
+    // AÇÕES DO USUÁRIO
+    // =====================================================================
+    function criarProjeto() {
+      const input = document.getElementById('nome-projeto-input');
+      const nome = input ? input.value.trim() : '';
+      if (!nome) return;
+
+      db.collection('projects').add({
+        name: nome,
+        createdAt: new Date().toLocaleDateString('pt-BR')
+      }).then(doc => {
+        db.collection('projectsData').doc(doc.id).set({ empreiteiros: [] });
+      });
+    }
+
+    function deletarProjeto(id) {
+      if (!confirm('Deseja realmente excluir esta obra?')) return;
+      db.collection('projects').doc(id).delete();
+      db.collection('projectsData').doc(id).delete();
+    }
+
+    function selecionarProjeto(id) {
+      state.selectedProjectId = id;
+      state.view = 'detail';
+      escutarProjetoSelecionado(id);
+      render();
+    }
+
+    function voltarLista() {
+      state.view = 'list';
+      state.selectedProjectId = null;
+      render();
+    }
+
+    function adicionarEmpreiteiro() {
+      const input = document.getElementById('nome-emp-input');
+      const nome = input ? input.value.trim() : '';
+      if (!nome) return;
+
+      state.empreiteiros.push({
+        id: Date.now(),
+        nome: nome,
+        cor: '#d97757',
+        servicos: []
+      });
+      salvarDadosProjeto();
+    }
+
+    function deletarEmpreiteiro(empId) {
+      if (!confirm('Excluir este empreiteiro?')) return;
+      state.empreiteiros = state.empreiteiros.filter(e => e.id !== empId);
+      salvarDadosProjeto();
+    }
+
+    function adicionarServico(empId) {
+      const nome = document.getElementById(`serv-nome-${empId}`).value.trim();
+      const cat = document.getElementById(`serv-cat-${empId}`).value;
+      const meta = parseFloat(document.getElementById(`serv-meta-${empId}`).value);
+      const uni = document.getElementById(`serv-uni-${empId}`).value;
+
+      if (!nome || isNaN(meta)) return;
+
+      const emp = state.empreiteiros.find(e => e.id === empId);
+      if (emp) {
+        emp.servicos.push({
+          id: Date.now(),
+          nome, categoria: cat, metaValor: meta, unidade: uni, medicoes: []
+        });
+        salvarDadosProjeto();
+      }
+    }
+
+    function adicionarMedicao(empId, servId) {
+      const valor = parseFloat(document.getElementById(`med-val-${servId}`).value);
+      const data = document.getElementById(`med-data-${servId}`).value || new Date().toISOString().split('T')[0];
+
+      if (isNaN(valor)) return;
+
+      const emp = state.empreiteiros.find(e => e.id === empId);
+      const serv = emp ? emp.servicos.find(s => s.id === servId) : null;
+
+      if (serv) {
+        serv.medicoes.push({
+          id: Date.now(),
+          valor: valor,
+          data: data
+        });
+        salvarDadosProjeto();
+      }
+    }
+
+    function deletarMedicao(empId, servId, medId) {
+      const emp = state.empreiteiros.find(e => e.id === empId);
+      const serv = emp ? emp.servicos.find(s => s.id === servId) : null;
+      if (serv) {
+        serv.medicoes = serv.medicoes.filter(m => m.id !== medId);
+        salvarDadosProjeto();
+      }
+    }
+
+    // =====================================================================
+    // RENDERIZAÇÃO DA INTERFACE (VANILLA JS)
+    // =====================================================================
+    function renderHeaderStatus() {
+      const el = document.getElementById('status-badge-container');
+      if (!el) return;
+      const statusMap = {
+        conectando: '<span class="badge offline">⚡ Conectando...</span>',
+        ok: '<span class="badge online">☁️ Online</span>',
+        salvando: '<span class="badge saving">☁️ Salvando...</span>',
+        erro: '<span class="badge offline">⚠️ Off-line</span>'
+      };
+      el.innerHTML = statusMap[state.statusNuvem] || '';
+    }
+
+    function render() {
+      const app = document.getElementById('app');
+
+      if (state.view === 'list') {
+        app.innerHTML = `
+          <div class="header-bar">
+            <div class="header-inner" style="display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <div class="title">📐 Medi-o Eng</div>
+                <div class="subtitle">Gestão e Medição de Canteiro</div>
+              </div>
+              <div id="status-badge-container"></div>
+            </div>
+          </div>
+          <div class="container">
+            <div class="card">
+              <h3 class="section-title">Nova Obra</h3>
+              <div class="input-group">
+                <input type="text" id="nome-projeto-input" placeholder="Nome da obra (Ex: Residencial Solar)" />
+                <button onclick="criarProjeto()">Criar</button>
+              </div>
+            </div>
+            <div class="card">
+              <h3 class="section-title">Suas Obras</h3>
+              ${state.projects.length === 0 ? '<p class="empty-state">Nenhuma obra cadastrada.</p>' : ''}
+              ${state.projects.map(p => `
+                <div class="project-item" onclick="selecionarProjeto('${p.id}')">
+                  <div>
+                    <div class="project-name">${p.name}</div>
+                    <div class="subtitle">Criado em: ${p.createdAt || 'N/A'}</div>
+                  </div>
+                  <button class="btn-danger" onclick="event.stopPropagation(); deletarProjeto('${p.id}')">🗑️</button>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      } else {
+        const proj = state.projects.find(p => p.id === state.selectedProjectId);
+        app.innerHTML = `
+          <div class="header-bar">
+            <div class="header-inner">
+              <button class="btn-back" onclick="voltarLista()">← Voltar às Obras</button>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                  <div class="title-lg">📏 ${proj ? proj.name : 'Obra'}</div>
+                  <div class="subtitle">${state.empreiteiros.length} empreiteiro(s)</div>
+                </div>
+                <div id="status-badge-container"></div>
+              </div>
+              <div class="tabs">
+                <button class="tab-btn ${state.abaAtiva === 'lista' ? 'active' : ''}" onclick="state.abaAtiva='lista'; render();">👷 Empreiteiros</button>
+                <button class="tab-btn ${state.abaAtiva === 'dashboard' ? 'active' : ''}" onclick="state.abaAtiva='dashboard'; render();">📊 Dashboard</button>
+              </div>
+            </div>
+          </div>
+          <div class="container">
+            ${state.abaAtiva === 'lista' ? renderListaEmpreiteiros() : renderDashboard()}
+          </div>
+        `;
+      }
+      renderHeaderStatus();
+    }
+
+    function renderListaEmpreiteiros() {
+      return `
+        <div class="card">
+          <h3 class="section-title">Adicionar Empreiteiro</h3>
+          <div class="input-group">
+            <input type="text" id="nome-emp-input" placeholder="Nome do empreiteiro/grupo" />
+            <button onclick="adicionarEmpreiteiro()">Adicionar</button>
+          </div>
+        </div>
+
+        ${state.empreiteiros.length === 0 ? '<div class="card"><p class="empty-state">Nenhum empreiteiro cadastrado.</p></div>' : ''}
+
+        ${state.empreiteiros.map(emp => `
+          <div class="emp-card">
+            <div class="emp-header">
+              <strong>👷 ${emp.nome}</strong>
+              <button class="btn-danger" style="padding: 4px 8px;" onclick="deletarEmpreiteiro(${emp.id})">🗑️</button>
+            </div>
+            
+            <div style="padding: 14px;">
+              <div style="background:#f8fafc; padding:10px; border-radius:8px; margin-bottom:12px;">
+                <h4 style="font-size:12px; color:#475569; margin-bottom:6px;">Novo Serviço</h4>
+                <input type="text" id="serv-nome-${emp.id}" placeholder="Nome do serviço" style="margin-bottom:6px;" />
+                <div class="input-group" style="margin-top:0; margin-bottom:6px;">
+                  <select id="serv-cat-${emp.id}">
+                    ${state.categorias.map(c => `<option value="${c}">${c}</option>`).join('')}
+                  </select>
+                  <select id="serv-uni-${emp.id}">
+                    <option value="m²">m²</option>
+                    <option value="m³">m³</option>
+                    <option value="m">m</option>
+                    <option value="unid.">unid.</option>
+                  </select>
+                </div>
+                <div class="input-group" style="margin-top:0;">
+                  <input type="number" step="0.1" id="serv-meta-${emp.id}" placeholder="Meta Total" />
+                  <button onclick="adicionarServico(${emp.id})">Salvar</button>
+                </div>
+              </div>
+
+              ${emp.servicos.map(s => {
+                const totalMedido = s.medicoes.reduce((acc, m) => acc + m.valor, 0);
+                const pct = s.metaValor > 0 ? Math.min(100, Math.round((totalMedido / s.metaValor) * 100)) : 0;
+                return `
+                  <div class="servico-row">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                      <div>
+                        <strong>${s.nome}</strong>
+                        <div><span class="cat-pill" style="background:${getCorCategoria(s.categoria)}">${s.categoria}</span></div>
+                      </div>
+                      <div style="text-align:right;">
+                        <div style="font-weight:700;">${totalMedido.toFixed(2)} / ${s.metaValor} ${s.unidade}</div>
+                        <div style="font-size:12px; font-weight:700; color:#d97757;">${pct}%</div>
+                      </div>
+                    </div>
+                    <div class="progress-bar-bg" style="margin-top:6px;">
+                      <div class="progress-bar-fill" style="width:${pct}%; background:${pct >= 100 ? '#22c55e' : '#d97757'};"></div>
+                    </div>
+
+                    <div class="input-group" style="margin-top:8px;">
+                      <input type="number" step="0.1" id="med-val-${s.id}" placeholder="Qtd medido (${s.unidade})" />
+                      <input type="date" id="med-data-${s.id}" value="${new Date().toISOString().split('T')[0]}" />
+                      <button onclick="adicionarMedicao(${emp.id}, ${s.id})">+ Medição</button>
+                    </div>
+
+                    ${s.medicoes.length > 0 ? `
+                      <div style="margin-top:8px;">
+                        ${s.medicoes.map(m => `
+                          <div class="medicao-row" style="display:flex; justify-content:space-between;">
+                            <span><strong>+${m.valor} ${s.unidade}</strong> <small style="color:#64748b;">(${m.data})</small></span>
+                            <span style="color:#ef4444; cursor:pointer;" onclick="deletarMedicao(${emp.id}, ${s.id}, ${m.id})">✕</span>
+                          </div>
+                        `).join('')}
+                      </div>
+                    ` : ''}
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `).join('')}
+      `;
+    }
+
+    function renderDashboard() {
+      return `
+        <div class="card">
+          <h3 class="section-title">Resumo por Empreiteiro</h3>
+          <table>
+            <thead>
+              <tr><th>Empreiteiro</th><th>Serviços</th></tr>
+            </thead>
+            <tbody>
+              ${state.empreiteiros.map(e => `
+                <tr>
+                  <td><strong>${e.nome}</strong></td>
+                  <td>${e.servicos.length} serviço(s)</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    // Inicialização da aplicação
+    window.onload = initApp;
   </script>
 </body>
 </html>
