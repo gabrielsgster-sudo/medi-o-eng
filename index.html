@@ -98,15 +98,16 @@
     const { useState, useEffect, useRef, useCallback, memo } = React;
 
     // =====================================================================
-    // FIREBASE (v8) — troque pelos valores reais do seu projeto
+    // FIREBASE (v8) — Configurações do Projeto Medi-o Eng
     // =====================================================================
     const firebaseConfig = {
-      apiKey: "SUA_API_KEY_AQUI",
-      authDomain: "seu-projeto.firebaseapp.com",
-      projectId: "seu-projeto",
-      storageBucket: "seu-projeto.appspot.com",
-      messagingSenderId: "000000000000",
-      appId: "1:000000000000:web:xxxxxxxxxxxxxxxx"
+      apiKey: "AIzaSyDE6EogPq-xj7QyGoG2oV90dwGXuOuIw9E",
+      authDomain: "medi-o-eng.firebaseapp.com",
+      projectId: "medi-o-eng",
+      storageBucket: "medi-o-eng.firebasestorage.app",
+      messagingSenderId: "995319040470",
+      appId: "1:995319040470:web:0fbc80b1e4b702046ebc77",
+      measurementId: "G-W9HYGF6SMC"
     };
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
@@ -798,7 +799,7 @@
     });
 
     // =====================================================================
-    // TELA DE DETALHE (tem seu próprio listener, montado/desmontado com a tela)
+    // TELA DE DETALHE (com listener próprio para cada obra)
     // =====================================================================
     const DetalheProjeto = memo(function DetalheProjeto({ project, categorias, onVoltar, onAdicionarCategoria, onDeletarCategoria }) {
       const [empreiteiros, setEmpreiteiros] = useState([]);
@@ -809,7 +810,7 @@
       const [permissaoCamera, setPermissaoCamera] = useState('nao-verificada');
       const primeiraCarga = useRef(true);
 
-      // Listener dos dados PESADOS deste projeto (só existe enquanto a tela está aberta)
+      // Listener dos dados PESADOS deste projeto
       useEffect(() => {
         primeiraCarga.current = true;
         const unsubscribe = db.collection('projectsData').doc(project.id).onSnapshot(
@@ -823,7 +824,7 @@
         return () => unsubscribe();
       }, [project.id]);
 
-      // GPS + permissão de câmera (uma vez)
+      // GPS + permissão de câmera
       useEffect(() => {
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
@@ -846,7 +847,7 @@
         }
       }, []);
 
-      // Auto-save (debounced) — ignora a primeira carga vinda do próprio Firestore
+      // Auto-save (debounced)
       useEffect(() => {
         if (primeiraCarga.current) { primeiraCarga.current = false; return; }
         setStatusSalvar('salvando');
@@ -1006,7 +1007,7 @@
       const [categorias, setCategorias] = useState(CATEGORIAS_PADRAO);
       const [statusNuvem, setStatusNuvem] = useState('conectando');
 
-      // Listener LEVE: só nome/data de cada obra (não traz empreiteiros/serviços)
+      // Listener LEVE: só nome/data de cada obra
       useEffect(() => {
         const unsubscribe = db.collection('projects').onSnapshot(
           (snapshot) => {
@@ -1019,7 +1020,7 @@
         return () => unsubscribe();
       }, []);
 
-      // Listener das categorias (documento global compartilhado por todas as obras)
+      // Listener das categorias
       useEffect(() => {
         const unsubscribe = db.collection('config').doc('categorias').onSnapshot(
           (doc) => {
