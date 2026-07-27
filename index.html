@@ -1,847 +1,323 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MEDI-O ENG v2.0 - Gestão e Medição de Obras</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        :root {
-            --primary: #0F172A;
-            --primary-hover: #1E293B;  
-            --bg-body: #F8FAFC;
-            --surface: #FFFFFF;
-            --border: #E2E8F0;
-            --text-main: #1E293B;
-            --text-muted: #64748B;
-            --success: #10B981;
-            --danger: #EF4444;
-            --warning: #F59E0B;
-        }
-
-        html, body {
-            height: 100%;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            -webkit-font-smoothing: antialiased;
-        }
-
-        .app-wrapper {
-            display: flex;
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-        }
-
-        .mobile-view {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            height: 100%;
-            background-color: var(--bg-body);
-        }
-
-        .app-container {
-            flex: 1;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        .header {
-            background-color: var(--primary);
-            color: #FFFFFF;
-            padding: 16px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .header-back {
-            background: none;
-            border: none;
-            color: #FFFFFF;
-            font-size: 20px;
-            cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 4px;
-        }
-
-        .header-title {
-            font-size: 18px;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-        }
-
-        .header-subtitle {
-            font-size: 11px;
-            color: #94A3B8;
-        }
-
-        .header-status {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background-color: rgba(255,255,255,0.08);
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 500;
-        }
-
-        .content {
-            padding: 16px;
-            padding-bottom: 90px;
-        }
-
-        .card {
-            background-color: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-        }
-
-        .card-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 6px;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            background-color: #F1F5F9;
-            color: var(--text-muted);
-        }
-
-        .badge.cat-alvenaria { background-color: #FEF3C7; color: #92400E; }
-        .badge.cat-estrutura { background-color: #E0E7FF; color: #3730A3; }
-        .badge.cat-hidraulica { background-color: #E0F2FE; color: #075985; }
-        .badge.cat-eletrica { background-color: #FEF08A; color: #854D0E; }
-        .badge.cat-acabamento { background-color: #FCE7F3; color: #9D174D; }
-
-        .badge.status-normal { background-color: #D1FAE5; color: #065F46; }
-        .badge.status-extrapolou { background-color: #FEE2E2; color: #991B1B; }
-
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background-color: #E2E8F0;
-            border-radius: 3px;
-            overflow: hidden;
-            margin-top: 8px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background-color: var(--primary);
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .tabs {
-            display: flex;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 16px;
-            gap: 12px;
-        }
-
-        .tab-button {
-            padding: 10px 4px;
-            background: none;
-            border: none;
-            border-bottom: 2px solid transparent;
-            color: var(--text-muted);
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .tab-button.active {
-            border-bottom-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid #F1F5F9;
-        }
-
-        .action-buttons button {
-            flex: 1;
-            padding: 8px;
-            background-color: #F8FAFC;
-            border: 1px solid var(--border);
-            color: var(--primary);
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-        }
-
-        .modal {
-            position: fixed;
-            inset: 0;
-            background-color: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(2px);
-            display: flex;
-            align-items: flex-end;
-            z-index: 200;
-        }
-
-        .modal-content {
-            width: 100%;
-            background-color: var(--surface);
-            border-radius: 12px 12px 0 0;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border);
-            background-color: var(--primary);
-            color: #FFFFFF;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            color: #FFFFFF;
-            font-size: 20px;
-            cursor: pointer;
-        }
-
-        .modal-body {
-            padding: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: var(--primary);
-        }
-
-        .form-input, .form-textarea, select.form-input {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 14px;
-            color: var(--text-main);
-            background-color: #FFFFFF;
-        }
-
-        .form-input:focus, .form-textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .form-textarea {
-            min-height: 70px;
-            resize: vertical;
-        }
-
-        .alert-warning {
-            background-color: #FEF2F2;
-            border: 1px solid #FECACA;
-            color: #991B1B;
-            padding: 10px 12px;
-            border-radius: 6px;
-            margin-bottom: 16px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 12px;
-            margin-top: 24px;
-        }
-
-        .btn-primary {
-            flex: 1;
-            padding: 12px;
-            background-color: var(--primary);
-            color: #FFFFFF;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .btn-secondary {
-            flex: 1;
-            padding: 12px;
-            background-color: #F1F5F9;
-            color: var(--text-main);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .fab {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 52px;
-            height: 52px;
-            border-radius: 50%;
-            background-color: var(--primary);
-            color: #FFFFFF;
-            border: none;
-            cursor: pointer;
-            font-size: 24px;
-            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 50;
-        }
-
-        .hidden { display: none !important; }
-        .screen { display: none; }
-        .screen.active { display: block; }
-
-        .desktop-view {
-            display: none;
-            width: 100%;
-            height: 100%;
-            background-color: var(--bg-body);
-        }
-
-        .sidebar {
-            width: 250px;
-            background-color: var(--primary);
-            color: #FFFFFF;
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
-
-        .sidebar-logo {
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-        .sidebar nav {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .sidebar button {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 14px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #94A3B8;
-            border-radius: 6px;
-            text-align: left;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .sidebar button.active {
-            background-color: var(--primary-hover);
-            color: #FFFFFF;
-        }
-
-        .desktop-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .desktop-header {
-            background-color: var(--surface);
-            border-bottom: 1px solid var(--border);
-            padding: 16px 32px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .desktop-body {
-            flex: 1;
-            overflow-y: auto;
-            padding: 32px;
-        }
-
-        @media (min-width: 1024px) {
-            .mobile-view { display: none !important; }
-            .desktop-view { display: flex !important; }
-            .modal { align-items: center; justify-content: center; }
-            .modal-content { max-width: 500px; border-radius: 8px; }
-        }
-    </style>
-</head>
-<body>
-    <div class="app-wrapper">
-        <!-- ===== MOBILE ===== -->
-        <div class="mobile-view">
-            <div class="app-container">
-                <!-- TELA 1: HOME -->
-                <div id="screen-home" class="screen active">
-                    <div class="header">
-                        <div class="header-left">
-                            <div>
-                                <h1 class="header-title">MEDI-O ENG</h1>
-                                <p class="header-subtitle">Gestão & Medição de Obras</p>
-                            </div>
-                        </div>
-                        <div class="header-status">
-                            <span id="firebase-status">🟢</span>
-                            <span id="firebase-text">Local</span>
-                        </div>
-                    </div>
-
-                    <div class="content">
-                        <div id="obras-list"></div>
-                    </div>
-                </div>
-
-                <!-- TELA 2: OBRA -->
-                <div id="screen-obra" class="screen">
-                    <div class="header">
-                        <div class="header-left">
-                            <button class="header-back" onclick="app.goHome()">←</button>
-                            <h1 class="header-title" id="obra-title">Obra</h1>
-                        </div>
-                    </div>
-
-                    <div class="content">
-                        <div class="card">
-                            <h2 class="card-title" id="obra-card-title">Obra</h2>
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                <span style="font-size: 12px; color: var(--text-muted);">Progresso Geral</span>
-                                <span style="font-size: 18px; font-weight: 700; color: var(--primary);" id="obra-progress">0%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" id="obra-progress-bar" style="width: 0%;"></div>
-                            </div>
-                        </div>
-
-                        <div class="tabs">
-                            <button class="tab-button active" onclick="app.switchTab('servicos', event)">SERVIÇOS</button>
-                            <button class="tab-button" onclick="app.switchTab('graficos', event)">GRÁFICOS</button>
-                        </div>
-
-                        <div id="servicos-content"></div>
-                        <div id="graficos-content" class="hidden">
-                            <div class="card">
-                                <h3 style="margin-bottom: 12px; font-size: 14px; font-weight: 600;">Evolução do Projeto</h3>
-                                <div style="position: relative; height: 180px;">
-                                    <canvas id="mobile-chart-evolucao"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- HISTÓRICO -->
-                <div id="screen-historico" class="screen">
-                    <div class="header">
-                        <div class="header-left">
-                            <button class="header-back" onclick="app.goToObra()">←</button>
-                            <h1 class="header-title">Histórico de Medições</h1>
-                        </div>
-                    </div>
-                    <div class="content" id="historico-content"></div>
-                </div>
-            </div>
-
-            <button class="fab" onclick="app.openNovaObraModal()">+</button>
-        </div>
-
-        <!-- ===== DESKTOP ===== -->
-        <div class="desktop-view">
-            <div class="sidebar">
-                <h2 class="sidebar-logo">📐 MEDI-O ENG</h2>
-                <nav>
-                    <button class="active">📊 Dashboard</button>
-                </nav>
-            </div>
-
-            <div class="desktop-content">
-                <div class="desktop-header">
-                    <h1 style="margin: 0; font-size: 18px; font-weight: 700;">Dashboard</h1>
-                </div>
-
-                <div class="desktop-body">
-                    <p style="color: var(--text-muted);">Acesse pelo celular ou adicione dados no painel.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL NOVA OBRA -->
-    <div id="modal-nova-obra" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 style="margin: 0; font-size: 15px; font-weight: 600;">Nova Obra</h2>
-                <button class="modal-close" onclick="app.closeNovaObraModal()">✕</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label class="form-label">Nome da Obra *</label>
-                    <input type="text" class="form-input" id="nova-obra-nome" placeholder="Ex: Residencial Boulevard">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Categoria *</label>
-                    <select class="form-input" id="nova-obra-categoria">
-                        <option value="">Selecione...</option>
-                        <option value="Residencial">Residencial</option>
-                        <option value="Comercial">Comercial</option>
-                        <option value="Industrial">Industrial</option>
-                    </select>
-                </div>
-                <div class="button-group">
-                    <button class="btn-secondary" onclick="app.closeNovaObraModal()">Cancelar</button>
-                    <button class="btn-primary" onclick="app.salvarNovaObra()">Criar Obra</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL MEDIÇÃO -->
-    <div id="modal-medicao" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 style="margin: 0; font-size: 15px; font-weight: 600;">Registrar Medição</h2>
-                <button class="modal-close" onclick="app.closeMedicaoModal()">✕</button>
-            </div>
-            <div class="modal-body">
-                <div id="medicao-info" style="background-color: #F8FAFC; border: 1px solid var(--border); padding: 12px; border-radius: 6px; margin-bottom: 16px; font-size: 12px;"></div>
-
-                <div id="medicao-alert" class="alert-warning hidden">⚠ Atenção: A quantidade inserida ultrapassa a meta do serviço!</div>
-
-                <div class="form-group">
-                    <label class="form-label">Quantidade Realizada (m²) *</label>
-                    <input type="number" class="form-input" id="medicao-quantidade" placeholder="0.00" step="0.01" oninput="app.onQuantidadeChange()" onkeyup="app.onQuantidadeChange()">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Data *</label>
-                    <input type="date" class="form-input" id="medicao-data">
-                </div>
-
-                <div id="medicao-justificativa-group" class="form-group hidden">
-                    <label class="form-label" style="color: var(--danger);">Justificativa de Extrapolação (Obrigatória) *</label>
-                    <textarea class="form-textarea" id="medicao-justificativa" placeholder="Informe o motivo do excesso de área executada..."></textarea>
-                </div>
-
-                <div class="button-group">
-                    <button class="btn-secondary" onclick="app.closeMedicaoModal()">Cancelar</button>
-                    <button class="btn-primary" onclick="app.salvarMedicao()">Salvar Medição</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Dados em memória local para funcionamento instantâneo offline/demo
-        let localObras = [
-            { id: 'demo1', name: 'Residencial Boulevard', category: 'Residencial', progress: 64 },
-            { id: 'demo2', name: 'Centro Comercial Alpha', category: 'Comercial', progress: 45 }
-        ];
-
-        let localServicos = [
+<script>
+    // Dicionário para armazenar os serviços de CADA obra pelo seu ID
+    let localObras = [
+        { id: 'demo1', name: 'Residencial Boulevard', category: 'Residencial', progress: 64 },
+        { id: 'demo2', name: 'Centro Comercial Alpha', category: 'Comercial', progress: 0 }
+    ];
+
+    // Serviços vinculados especificamente por ID da obra
+    let localServicosPorObra = {
+        'demo1': [
             { id: 's1', name: 'Alvenaria Estrutural', category: 'Alvenaria', meta: 350, executada: 230 },
             { id: 's2', name: 'Concretagem de Pilares', category: 'Estrutura', meta: 280, executada: 150 },
             { id: 's3', name: 'Instalação Hidráulica', category: 'Hidráulica', meta: 150, executada: 95 }
-        ];
+        ]
+        // Novas obras (como a sua obra 'Teste') entram em branco por padrão!
+    };
 
-        let localHistorico = {};
+    let localHistorico = {};
 
-        const app = {
-            currentObra: null,
-            currentServico: null,
+    const app = {
+        currentObra: null,
+        currentServico: null,
 
-            init() {
-                this.setDataToday();
-                this.renderObras(localObras);
-            },
+        init() {
+            this.setDataToday();
+            this.renderObras(localObras);
+        },
 
-            setDataToday() {
-                const today = new Date().toISOString().split('T')[0];
-                document.getElementById('medicao-data').value = today;
-            },
+        setDataToday() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('medicao-data').value = today;
+        },
 
-            renderObras(obras) {
-                const list = document.getElementById('obras-list');
-                if (!obras.length) {
-                    list.innerHTML = '<div class="card"><p style="text-align: center; color: var(--text-muted);">Nenhuma obra cadastrada.</p></div>';
-                    return;
-                }
+        renderObras(obras) {
+            const list = document.getElementById('obras-list');
+            if (!obras.length) {
+                list.innerHTML = '<div class="card"><p style="text-align: center; color: var(--text-muted);">Nenhuma obra cadastrada.</p></div>';
+                return;
+            }
 
-                list.innerHTML = obras.map(obra => `
-                    <div class="card" onclick="app.selectObra('${obra.id}', '${obra.name}')" style="cursor: pointer;">
-                        <h3 class="card-title">${obra.name}</h3>
-                        <span class="badge">${obra.category}</span>
-                        <div style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 11px; color: var(--text-muted);">Progresso Geral</span>
-                            <span style="font-size: 13px; font-weight: 700; color: var(--primary);">${obra.progress || 0}%</span>
+            list.innerHTML = obras.map(obra => `
+                <div class="card" onclick="app.selectObra('${obra.id}', '${obra.name}')" style="cursor: pointer;">
+                    <h3 class="card-title">${obra.name}</h3>
+                    <span class="badge">${obra.category}</span>
+                    <div style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 11px; color: var(--text-muted);">Progresso Geral</span>
+                        <span style="font-size: 13px; font-weight: 700; color: var(--primary);">${obra.progress || 0}%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${obra.progress || 0}%;"></div>
+                    </div>
+                </div>
+            `).join('');
+        },
+
+        selectObra(id, name) {
+            this.currentObra = { id, name };
+            document.getElementById('obra-title').textContent = name;
+            document.getElementById('obra-card-title').textContent = name;
+
+            // Garante que existe uma lista de serviços (mesmo que vazia) para essa obra
+            if (!localServicosPorObra[id]) {
+                localServicosPorObra[id] = [];
+            }
+
+            this.renderServicos(localServicosPorObra[id]);
+            this.recalcularProgressoObra(id);
+            this.showScreen('screen-obra');
+        },
+
+        renderServicos(servicos) {
+            const container = document.getElementById('servicos-content');
+            
+            if (!servicos || servicos.length === 0) {
+                container.innerHTML = `
+                    <div class="card" style="text-align: center; padding: 24px 16px;">
+                        <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px;">Nenhum serviço cadastrado nesta obra.</p>
+                        <button class="btn-primary" style="padding: 8px 16px; font-size: 12px;" onclick="app.openNovoServicoModal()">+ Adicionar Serviço</button>
+                    </div>
+                `;
+                return;
+            }
+
+            const getCategoryClass = (category) => {
+                const cat = (category || '').toLowerCase();
+                if (cat.includes('alvenaria')) return 'cat-alvenaria';
+                if (cat.includes('estrutura')) return 'cat-estrutura';
+                if (cat.includes('hidráulica') || cat.includes('hidraulica')) return 'cat-hidraulica';
+                if (cat.includes('elétrica') || cat.includes('eletrica')) return 'cat-eletrica';
+                if (cat.includes('acabamento')) return 'cat-acabamento';
+                return '';
+            };
+
+            const htmlServicos = servicos.map(s => {
+                const pct = s.meta > 0 ? Math.min(100, Math.round((s.executada / s.meta) * 100)) : 0;
+                const categoryClass = getCategoryClass(s.category);
+                return `
+                    <div class="card">
+                        <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 6px;">${s.name}</h4>
+                        <span class="badge ${categoryClass}">${s.category}</span>
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-top: 10px;">
+                            <span>Meta: ${s.meta} m²</span>
+                            <span>Executado: ${s.executada} m²</span>
                         </div>
                         <div class="progress-bar">
-                            <div class="progress-fill" style="width: ${obra.progress || 0}%;"></div>
+                            <div class="progress-fill" style="width: ${pct}%;"></div>
+                        </div>
+                        <div class="action-buttons">
+                            <button onclick="app.openMedicaoModal('${s.id}', '${s.name}', ${s.meta}, ${s.executada})">📏 Medir</button>
+                            <button onclick="app.openHistorico('${s.id}')">📋 Histórico</button>
                         </div>
                     </div>
-                `).join('');
-            },
-
-            selectObra(id, name) {
-                this.currentObra = { id, name };
-                document.getElementById('obra-title').textContent = name;
-                document.getElementById('obra-card-title').textContent = name;
-                this.renderServicos(localServicos);
-                this.showScreen('screen-obra');
-            },
-
-            renderServicos(servicos) {
-                const container = document.getElementById('servicos-content');
-                
-                const getCategoryClass = (category) => {
-                    const cat = category.toLowerCase();
-                    if (cat.includes('alvenaria')) return 'cat-alvenaria';
-                    if (cat.includes('estrutura')) return 'cat-estrutura';
-                    if (cat.includes('hidráulica') || cat.includes('hidraulica')) return 'cat-hidraulica';
-                    return '';
-                };
-
-                container.innerHTML = servicos.map(s => {
-                    const pct = Math.min(100, Math.round((s.executada / s.meta) * 100));
-                    const categoryClass = getCategoryClass(s.category);
-                    return `
-                        <div class="card">
-                            <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 6px;">${s.name}</h4>
-                            <span class="badge ${categoryClass}">${s.category}</span>
-                            <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-top: 10px;">
-                                <span>Meta: ${s.meta} m²</span>
-                                <span>Executado: ${s.executada} m²</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${pct}%;"></div>
-                            </div>
-                            <div class="action-buttons">
-                                <button onclick="app.openMedicaoModal('${s.id}', '${s.name}', ${s.meta}, ${s.executada})">📏 Medir</button>
-                                <button onclick="app.openHistorico('${s.id}')">📋 Histórico</button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            },
-
-            // FIX 1: Lógica corrigida para exibir o campo de justificativa em qualquer extrapolação
-            onQuantidadeChange() {
-                const input = document.getElementById('medicao-quantidade');
-                if (!input || !this.currentServico) return;
-                
-                const qtdDigitada = parseFloat(input.value) || 0;
-                const meta = this.currentServico.meta;
-                const executada = this.currentServico.executada;
-
-                // Extrapola se o valor total acumulado OU a nova medição sozinha ultrapassar a meta
-                const extrapolado = (executada + qtdDigitada > meta) || (qtdDigitada > meta);
-
-                const alertBox = document.getElementById('medicao-alert');
-                const groupJustificativa = document.getElementById('medicao-justificativa-group');
-
-                if (extrapolado) {
-                    alertBox.classList.remove('hidden');
-                    groupJustificativa.classList.remove('hidden');
-                } else {
-                    alertBox.classList.add('hidden');
-                    groupJustificativa.classList.add('hidden');
-                }
-            },
-
-            openMedicaoModal(servicoId, servicoName, meta, executada) {
-                this.currentServico = { id: servicoId, name: servicoName, meta, executada };
-                const pct = Math.round((executada / meta) * 100);
-                
-                document.getElementById('medicao-info').innerHTML = `
-                    <strong>${servicoName}</strong><br>
-                    Meta: ${meta} m² | Executado Atual: ${executada} m² (${pct}%)
                 `;
-                document.getElementById('medicao-quantidade').value = '';
-                document.getElementById('medicao-justificativa').value = '';
-                document.getElementById('medicao-alert').classList.add('hidden');
-                document.getElementById('medicao-justificativa-group').classList.add('hidden');
-                document.getElementById('modal-medicao').classList.remove('hidden');
-            },
+            }).join('');
 
-            closeMedicaoModal() {
-                document.getElementById('modal-medicao').classList.add('hidden');
-            },
+            container.innerHTML = htmlServicos + `
+                <button class="btn-secondary" style="width: 100%; margin-top: 8px;" onclick="app.openNovoServicoModal()">+ Adicionar Outro Serviço</button>
+            `;
+        },
 
-            salvarMedicao() {
-                const qtd = parseFloat(document.getElementById('medicao-quantidade').value);
-                if (!qtd || qtd <= 0) {
-                    alert('Informe uma quantidade válida.');
-                    return;
-                }
+        recalcularProgressoObra(obraId) {
+            const servicos = localServicosPorObra[obraId] || [];
+            let percentualGeral = 0;
 
-                const extrapolou = (this.currentServico.executada + qtd > this.currentServico.meta) || (qtd > this.currentServico.meta);
-                const justificativa = document.getElementById('medicao-justificativa').value;
-
-                if (extrapolou && !justificativa.trim()) {
-                    alert('A meta foi excedida! É obrigatório preencher a justificativa.');
-                    return;
-                }
-
-                // Atualizar dados no estado local
-                const s = localServicos.find(item => item.id === this.currentServico.id);
-                if (s) {
-                    s.executada += qtd;
-                }
-
-                if (!localHistorico[this.currentServico.id]) {
-                    localHistorico[this.currentServico.id] = [];
-                }
-
-                localHistorico[this.currentServico.id].unshift({
-                    data: document.getElementById('medicao-data').value,
-                    quantidade: qtd,
-                    status: extrapolou ? 'extrapolou' : 'normal',
-                    justificativa: extrapolou ? justificativa : null
-                });
-
-                alert('✅ Medição registrada com sucesso!');
-                this.closeMedicaoModal();
-                this.renderServicos(localServicos);
-            },
-
-            openHistorico(servicoId) {
-                this.currentServico = { id: servicoId };
-                this.showScreen('screen-historico');
-                this.loadHistorico();
-            },
-
-            loadHistorico() {
-                const container = document.getElementById('historico-content');
-                const list = localHistorico[this.currentServico.id] || [];
-
-                if (!list.length) {
-                    container.innerHTML = '<div class="card"><p style="text-align: center; color: var(--text-muted);">Nenhuma medição cadastrada.</p></div>';
-                    return;
-                }
-
-                container.innerHTML = list.map(med => `
-                    <div class="card">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                            <div>
-                                <h4 style="font-size: 14px; font-weight: 600;">Data: ${med.data}</h4>
-                                <p style="font-size: 15px; font-weight: 700; color: var(--primary); margin-top: 6px;">${med.quantidade} m²</p>
-                            </div>
-                            <span class="badge ${med.status === 'extrapolou' ? 'status-extrapolou' : 'status-normal'}">
-                                ${med.status === 'extrapolou' ? 'Excedeu Meta' : 'Normal'}
-                            </span>
-                        </div>
-                        ${med.justificativa ? `<p style="margin-top: 8px; font-size: 11px; color: var(--danger); background: #FEF2F2; padding: 6px; border-radius: 4px;"><strong>Justificativa:</strong> ${med.justificativa}</p>` : ''}
-                    </div>
-                `).join('');
-            },
-
-            openNovaObraModal() {
-                document.getElementById('modal-nova-obra').classList.remove('hidden');
-            },
-
-            closeNovaObraModal() {
-                document.getElementById('modal-nova-obra').classList.add('hidden');
-            },
-
-            // FIX 3: Criação de obras sem travamento
-            salvarNovaObra() {
-                const nome = document.getElementById('nova-obra-nome').value;
-                const categoria = document.getElementById('nova-obra-categoria').value;
-
-                if (!nome || !categoria) {
-                    alert('Preencha os campos obrigatórios.');
-                    return;
-                }
-
-                const novaObra = {
-                    id: 'obra_' + Date.now(),
-                    name: nome,
-                    category: categoria,
-                    progress: 0
-                };
-
-                localObras.unshift(novaObra);
-                this.renderObras(localObras);
-                
-                document.getElementById('nova-obra-nome').value = '';
-                document.getElementById('nova-obra-categoria').value = '';
-                
-                alert('✅ Obra criada com sucesso!');
-                this.closeNovaObraModal();
-            },
-
-            switchTab(tab, e) {
-                document.querySelectorAll('#screen-obra .tab-button').forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-                document.getElementById('servicos-content').classList.toggle('hidden', tab !== 'servicos');
-                document.getElementById('graficos-content').classList.toggle('hidden', tab !== 'graficos');
-            },
-
-            goHome() { this.showScreen('screen-home'); },
-            goToObra() { if (this.currentObra) this.showScreen('screen-obra'); },
-
-            showScreen(screenId) {
-                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-                document.getElementById(screenId).classList.add('active');
+            if (servicos.length > 0) {
+                const totalMeta = servicos.reduce((acc, s) => acc + (s.meta || 0), 0);
+                const totalExecutado = servicos.reduce((acc, s) => acc + (s.executada || 0), 0);
+                percentualGeral = totalMeta > 0 ? Math.min(100, Math.round((totalExecutado / totalMeta) * 100)) : 0;
             }
-        };
 
-        app.init();
-    </script>
-</body>
-</html>
+            // Atualiza na tela
+            document.getElementById('obra-progress').textContent = percentualGeral + '%';
+            document.getElementById('obra-progress-bar').style.width = percentualGeral + '%';
+
+            // Atualiza no objeto da obra
+            const obra = localObras.find(o => o.id === obraId);
+            if (obra) obra.progress = percentualGeral;
+        },
+
+        onQuantidadeChange() {
+            const input = document.getElementById('medicao-quantidade');
+            if (!input || !this.currentServico) return;
+            
+            const qtdDigitada = parseFloat(input.value) || 0;
+            const meta = this.currentServico.meta;
+            const executada = this.currentServico.executada;
+
+            const extrapolado = (executada + qtdDigitada > meta) || (qtdDigitada > meta);
+
+            const alertBox = document.getElementById('medicao-alert');
+            const groupJustificativa = document.getElementById('medicao-justificativa-group');
+
+            if (extrapolado) {
+                alertBox.classList.remove('hidden');
+                groupJustificativa.classList.remove('hidden');
+            } else {
+                alertBox.classList.add('hidden');
+                groupJustificativa.classList.add('hidden');
+            }
+        },
+
+        openMedicaoModal(servicoId, servicoName, meta, executada) {
+            this.currentServico = { id: servicoId, name: servicoName, meta, executada };
+            const pct = meta > 0 ? Math.round((executada / meta) * 100) : 0;
+            
+            document.getElementById('medicao-info').innerHTML = `
+                <strong>${servicoName}</strong><br>
+                Meta: ${meta} m² | Executado Atual: ${executada} m² (${pct}%)
+            `;
+            document.getElementById('medicao-quantidade').value = '';
+            document.getElementById('medicao-justificativa').value = '';
+            document.getElementById('medicao-alert').classList.add('hidden');
+            document.getElementById('medicao-justificativa-group').classList.add('hidden');
+            document.getElementById('modal-medicao').classList.remove('hidden');
+        },
+
+        closeMedicaoModal() {
+            document.getElementById('modal-medicao').classList.add('hidden');
+        },
+
+        salvarMedicao() {
+            const qtd = parseFloat(document.getElementById('medicao-quantidade').value);
+            if (!qtd || qtd <= 0) {
+                alert('Informe uma quantidade válida.');
+                return;
+            }
+
+            const extrapolou = (this.currentServico.executada + qtd > this.currentServico.meta) || (qtd > this.currentServico.meta);
+            const justificativa = document.getElementById('medicao-justificativa').value;
+
+            if (extrapolou && !justificativa.trim()) {
+                alert('A meta foi excedida! É obrigatório preencher a justificativa.');
+                return;
+            }
+
+            const servicos = localServicosPorObra[this.currentObra.id];
+            const s = servicos.find(item => item.id === this.currentServico.id);
+            if (s) {
+                s.executada += qtd;
+            }
+
+            if (!localHistorico[this.currentServico.id]) {
+                localHistorico[this.currentServico.id] = [];
+            }
+
+            localHistorico[this.currentServico.id].unshift({
+                data: document.getElementById('medicao-data').value,
+                quantidade: qtd,
+                status: extrapolou ? 'extrapolou' : 'normal',
+                justificativa: extrapolou ? justificativa : null
+            });
+
+            alert('✅ Medição registrada com sucesso!');
+            this.closeMedicaoModal();
+            this.renderServicos(servicos);
+            this.recalcularProgressoObra(this.currentObra.id);
+        },
+
+        openNovoServicoModal() {
+            const nome = prompt('Nome do serviço (ex: Pintura Interna):');
+            if (!nome) return;
+
+            const categoria = prompt('Categoria (ex: Acabamento, Alvenaria, Estrutura, Hidráulica):') || 'Geral';
+            const meta = parseFloat(prompt('Meta total em m²:') || '0');
+
+            const novoServico = {
+                id: 'serv_' + Date.now(),
+                name: nome,
+                category: categoria,
+                meta: meta,
+                executada: 0
+            };
+
+            localServicosPorObra[this.currentObra.id].push(novoServico);
+            this.renderServicos(localServicosPorObra[this.currentObra.id]);
+            this.recalcularProgressoObra(this.currentObra.id);
+        },
+
+        openHistorico(servicoId) {
+            this.currentServico = { id: servicoId };
+            this.showScreen('screen-historico');
+            this.loadHistorico();
+        },
+
+        loadHistorico() {
+            const container = document.getElementById('historico-content');
+            const list = localHistorico[this.currentServico.id] || [];
+
+            if (!list.length) {
+                container.innerHTML = '<div class="card"><p style="text-align: center; color: var(--text-muted);">Nenhuma medição cadastrada.</p></div>';
+                return;
+            }
+
+            container.innerHTML = list.map(med => `
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <h4 style="font-size: 14px; font-weight: 600;">Data: ${med.data}</h4>
+                            <p style="font-size: 15px; font-weight: 700; color: var(--primary); margin-top: 6px;">${med.quantidade} m²</p>
+                        </div>
+                        <span class="badge ${med.status === 'extrapolou' ? 'status-extrapolou' : 'status-normal'}">
+                            ${med.status === 'extrapolou' ? 'Excedeu Meta' : 'Normal'}
+                        </span>
+                    </div>
+                    ${med.justificativa ? `<p style="margin-top: 8px; font-size: 11px; color: var(--danger); background: #FEF2F2; padding: 6px; border-radius: 4px;"><strong>Justificativa:</strong> ${med.justificativa}</p>` : ''}
+                </div>
+            `).join('');
+        },
+
+        openNovaObraModal() {
+            document.getElementById('modal-nova-obra').classList.remove('hidden');
+        },
+
+        closeNovaObraModal() {
+            document.getElementById('modal-nova-obra').classList.add('hidden');
+        },
+
+        salvarNovaObra() {
+            const nome = document.getElementById('nova-obra-nome').value;
+            const categoria = document.getElementById('nova-obra-categoria').value;
+
+            if (!nome || !categoria) {
+                alert('Preencha os campos obrigatórios.');
+                return;
+            }
+
+            const novaObra = {
+                id: 'obra_' + Date.now(),
+                name: nome,
+                category: categoria,
+                progress: 0
+            };
+
+            localObras.unshift(novaObra);
+            localServicosPorObra[novaObra.id] = []; // Inicia com lista em branco
+            
+            this.renderObras(localObras);
+            
+            document.getElementById('nova-obra-nome').value = '';
+            document.getElementById('nova-obra-categoria').value = '';
+            
+            this.closeNovaObraModal();
+            this.selectObra(novaObra.id, novaObra.name); // Já abre a nova obra diretamente
+        },
+
+        switchTab(tab, e) {
+            document.querySelectorAll('#screen-obra .tab-button').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            document.getElementById('servicos-content').classList.toggle('hidden', tab !== 'servicos');
+            document.getElementById('graficos-content').classList.toggle('hidden', tab !== 'graficos');
+        },
+
+        goHome() { this.showScreen('screen-home'); },
+        goToObra() { if (this.currentObra) this.showScreen('screen-obra'); },
+
+        showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+    };
+
+    app.init();
+</script>
