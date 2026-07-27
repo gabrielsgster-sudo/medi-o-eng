@@ -22,9 +22,6 @@
             --medium-gray: #d0d5dd;
             --dark-gray: #6b7280;
             --charcoal: #374151;
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.15);
         }
         html, body {
             margin: 0; padding: 0;
@@ -100,12 +97,12 @@
             border-radius: 8px;
             padding: 16px;
             margin-bottom: 16px;
-            box-shadow: var(--shadow-sm);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
             cursor: pointer;
             transition: all 0.2s ease;
         }
         .card:active {
-            box-shadow: var(--shadow-md);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transform: translateY(-2px);
         }
         .card-title {
@@ -129,22 +126,11 @@
         .badge.status-extrapolou {
             background-color: var(--danger);
         }
-        .badge.categoria-alvenaria {
-            background-color: #d4451f;
-        }
-        .badge.categoria-estrutura {
-            background-color: #536e6f;
-        }
-        .badge.categoria-hidraulica {
-            background-color: #0099cc;
-        }
-        .badge.categoria-eletrica {
-            background-color: #ffcc00;
-            color: #000;
-        }
-        .badge.categoria-acabamento {
-            background-color: #9b59b6;
-        }
+        .badge.cat-alvenaria { background-color: #d4451f; }
+        .badge.cat-estrutura { background-color: #536e6f; }
+        .badge.cat-hidraulica { background-color: #0099cc; }
+        .badge.cat-eletrica { background-color: #ffcc00; color: #000; }
+        .badge.cat-acabamento { background-color: #9b59b6; }
         .progress-bar {
             width: 100%;
             height: 8px;
@@ -171,14 +157,11 @@
             margin-bottom: 16px;
             transition: all 0.2s ease;
         }
-        .accordion-header:active {
-            background-color: var(--primary-light);
-        }
         .accordion-content {
             background-color: var(--white);
             border-radius: 0 0 12px 12px;
             overflow: hidden;
-            box-shadow: var(--shadow-sm);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
             margin-bottom: 16px;
             max-height: 0;
             opacity: 0;
@@ -240,9 +223,6 @@
         }
         .action-buttons button:nth-child(3) {
             background-color: var(--primary);
-        }
-        .action-buttons button:hover {
-            opacity: 0.9;
         }
         .modal {
             position: fixed;
@@ -365,7 +345,7 @@
             border: none;
             cursor: pointer;
             font-size: 28px;
-            box-shadow: var(--shadow-lg);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -529,84 +509,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--primary-light);
         }
         .desktop-body {
             flex: 1;
             overflow-y: auto;
             padding: 32px;
-        }
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 24px;
-            margin-bottom: 32px;
-        }
-        .metric-card {
-            background-color: var(--white);
-            padding: 24px;
-            border-radius: 8px;
-            box-shadow: var(--shadow-sm);
-        }
-        .metric-icon {
-            font-size: 32px;
-            margin-bottom: 16px;
-        }
-        .metric-label {
-            font-size: 12px;
-            color: var(--dark-gray);
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-        .metric-value {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--primary);
-        }
-        .chart-container {
-            background-color: var(--white);
-            padding: 24px;
-            border-radius: 8px;
-            box-shadow: var(--shadow-sm);
-            margin-bottom: 32px;
-            position: relative;
-            min-height: 400px;
-        }
-        .chart-container h3 {
-            margin: 0 0 24px 0;
-            font-size: 16px;
-            font-weight: 600;
-        }
-        .chart-inner {
-            position: relative;
-            height: 350px;
-        }
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: var(--white);
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: var(--shadow-sm);
-            margin-bottom: 32px;
-        }
-        .table thead {
-            background-color: var(--light-gray);
-            border-bottom: 2px solid var(--medium-gray);
-        }
-        .table th {
-            text-align: left;
-            padding: 16px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        .table td {
-            padding: 16px;
-            font-size: 12px;
-            border-bottom: 1px solid var(--medium-gray);
-        }
-        .table tbody tr:hover {
-            background-color: var(--light-gray);
         }
         .loading {
             display: flex;
@@ -651,15 +558,11 @@
                     </div>
 
                     <div class="content">
-                        <div style="display: flex; gap: 8px; margin-bottom: 24px;">
-                            <input type="text" id="search-input" placeholder="Pesquisa/Filtros" style="flex: 1; padding: 12px 16px; border: 1px solid var(--medium-gray); border-radius: 8px; font-size: 14px;">
-                            <button style="padding: 12px 16px; background-color: var(--white); border: 1px solid var(--medium-gray); border-radius: 8px; cursor: pointer;">↑↓</button>
-                        </div>
                         <div id="obras-list"></div>
                     </div>
                 </div>
 
-                <!-- TELA 2: OBRA (com abas corretas) -->
+                <!-- TELA 2: OBRA -->
                 <div id="screen-obra" class="screen">
                     <div class="header">
                         <div class="header-left">
@@ -685,12 +588,12 @@
                         </div>
 
                         <div class="tabs">
-                            <button class="tab-button active" onclick="app.switchTab('empreiteiros', event)">👷 EMPREITEIROS</button>
-                            <button class="tab-button" onclick="app.switchTab('dashboard', event)">📊 DASHBOARD</button>
+                            <button class="tab-button active" onclick="app.switchTab('servicos', event)">📋 SERVIÇOS</button>
+                            <button class="tab-button" onclick="app.switchTab('graficos', event)">📊 GRÁFICOS</button>
                         </div>
 
-                        <div id="empreiteiros-content"></div>
-                        <div id="dashboard-content" class="hidden">
+                        <div id="servicos-content"></div>
+                        <div id="graficos-content" class="hidden">
                             <div class="card">
                                 <h3 style="margin: 0 0 12px 0; font-weight: 600;">Evolução</h3>
                                 <div style="position: relative; height: 200px;">
@@ -718,18 +621,7 @@
                     <div class="content" id="historico-content"></div>
                 </div>
 
-                <!-- TELA 5A: HISTÓRICO EXPANDIDO -->
-                <div id="screen-historico-detalhe" class="screen">
-                    <div class="header">
-                        <div class="header-left">
-                            <button class="header-back" onclick="app.goToHistorico()">←</button>
-                            <h1 class="header-title">DETALHES</h1>
-                        </div>
-                    </div>
-                    <div class="content" id="historico-detalhe-content"></div>
-                </div>
-
-                <!-- TELA 6: FOTOS & GALERIA -->
+                <!-- TELA 6: GALERIA -->
                 <div id="screen-galeria" class="screen">
                     <div class="header">
                         <div class="header-left">
@@ -741,8 +633,7 @@
                 </div>
             </div>
 
-            <button class="fab" id="fab-main" onclick="app.openNovaObraModal()">+</button>
-            <button class="fab" id="fab-photo" style="bottom: 100px; display: none;" onclick="app.openFotoIndependenteModal()">📸</button>
+            <button class="fab" onclick="app.openNovaObraModal()">+</button>
         </div>
 
         <!-- ===== DESKTOP ===== -->
@@ -751,11 +642,8 @@
                 <h2 class="sidebar-logo">📐 MEDI-O</h2>
                 <nav>
                     <button class="active" onclick="app.switchDesktopMenu('dashboard', event)">📊 Dashboard</button>
-                    <button onclick="app.switchDesktopMenu('engenharias', event)">👷 Engenharias</button>
+                    <button onclick="app.switchDesktopMenu('servicos', event)">👷 Serviços</button>
                     <button onclick="app.switchDesktopMenu('medicoes', event)">📏 Medições</button>
-                    <button onclick="app.switchDesktopMenu('galeria', event)">🖼️ Galeria</button>
-                    <button onclick="app.switchDesktopMenu('export', event)">📤 Exportar</button>
-                    <button onclick="app.switchDesktopMenu('config', event)">⚙️ Configurações</button>
                 </nav>
             </div>
 
@@ -770,11 +658,8 @@
 
                 <div class="desktop-body" id="desktop-content">
                     <div id="dashboard-desktop"></div>
-                    <div id="engenharias-desktop" class="hidden"></div>
+                    <div id="servicos-desktop" class="hidden"></div>
                     <div id="medicoes-desktop" class="hidden"></div>
-                    <div id="galeria-desktop" class="hidden"></div>
-                    <div id="export-desktop" class="hidden"></div>
-                    <div id="config-desktop" class="hidden"></div>
                 </div>
             </div>
         </div>
@@ -823,88 +708,36 @@
             <div class="modal-body">
                 <div id="medicao-info" style="background-color: var(--light-gray); padding: 12px; border-radius: 8px; margin-bottom: 24px; font-size: 12px;"></div>
 
-                <div class="tabs">
-                    <button class="tab-button active" onclick="app.switchMedicaoTab('quantidade', event)">Quantidade</button>
-                    <button class="tab-button" onclick="app.switchMedicaoTab('fotos', event)">Fotos</button>
+                <div id="medicao-alert" class="alert-warning hidden">⚠ ALERTA: Quantidade maior que meta!</div>
+
+                <div class="form-group">
+                    <label class="form-label">Quantidade (m²) *</label>
+                    <input type="number" class="form-input" id="medicao-quantidade" placeholder="0" step="0.01" onchange="app.onQuantidadeChange()">
                 </div>
 
-                <div id="medicao-quantidade">
-                    <div id="medicao-alert" class="alert-warning hidden">⚠ ALERTA DISTINÇÃO QUANTIDADES</div>
-
-                    <div class="form-group">
-                        <label class="form-label">Quantidade a registrar (m²) *</label>
-                        <input type="number" class="form-input" id="medicao-quantidade-input" placeholder="0" step="0.01" onchange="app.onQuantidadeChange()">
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Data *</label>
-                        <input type="date" class="form-input" id="medicao-data">
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Funcionários</label>
-                        <input type="text" class="form-input" id="medicao-funcionarios" placeholder="Nomes dos funcionários">
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Observações</label>
-                        <textarea class="form-textarea" id="medicao-observacoes" placeholder="Observações sobre a medição"></textarea>
-                    </div>
-
-                    <div id="medicao-justificativa-group" class="form-group hidden">
-                        <label class="form-label">Justificativa (Obrigatória) *</label>
-                        <textarea class="form-textarea" id="medicao-justificativa" placeholder="Justifique porque foi extrapolado"></textarea>
-                    </div>
+                <div class="form-group">
+                    <label class="form-label">Data *</label>
+                    <input type="date" class="form-input" id="medicao-data">
                 </div>
 
-                <div id="medicao-fotos" class="hidden">
-                    <button type="button" style="width: 100%; padding: 24px; border: 2px dashed var(--primary); background-color: rgba(0, 31, 63, 0.05); border-radius: 8px; cursor: pointer; font-weight: 600; color: var(--primary); margin-bottom: 12px; font-family: inherit;" onclick="document.getElementById('file-input').click()">
-                        📸 Adicionar fotos
-                    </button>
-                    <input type="file" id="file-input" multiple accept="image/*" style="display: none;" onchange="app.handleFileSelect(event)">
-                    <div id="fotos-preview" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;"></div>
+                <div class="form-group">
+                    <label class="form-label">Funcionários</label>
+                    <input type="text" class="form-input" id="medicao-funcionarios" placeholder="Nomes">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Observações</label>
+                    <textarea class="form-textarea" id="medicao-observacoes" placeholder="Notas"></textarea>
+                </div>
+
+                <div id="medicao-justificativa-group" class="form-group hidden">
+                    <label class="form-label">Justificativa (Obrigatória) *</label>
+                    <textarea class="form-textarea" id="medicao-justificativa" placeholder="Por que foi extrapolado?"></textarea>
                 </div>
 
                 <div class="button-group">
                     <button class="btn-secondary" onclick="app.closeMedicaoModal()">Cancelar</button>
                     <button class="btn-primary" onclick="app.salvarMedicao()">Registrar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL FOTO INDEPENDENTE -->
-    <div id="modal-foto-independente" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 style="margin: 0; font-size: 18px;">ANEXAR FOTO</h2>
-                <button class="modal-close" onclick="app.closeFotoIndependenteModal()">✕</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label class="form-label">Serviço *</label>
-                    <select class="form-input" id="foto-servico-select" style="cursor: pointer;"></select>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Data *</label>
-                    <input type="date" class="form-input" id="foto-data">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Legenda (Opcional)</label>
-                    <input type="text" class="form-input" id="foto-legenda" placeholder="Ex: Detalhe da alvenaria">
-                </div>
-
-                <button type="button" style="width: 100%; padding: 24px; border: 2px dashed var(--primary); background-color: rgba(0, 31, 63, 0.05); border-radius: 8px; cursor: pointer; font-weight: 600; color: var(--primary); margin-bottom: 12px; font-family: inherit;" onclick="document.getElementById('file-input-independente').click()">
-                    📸 Selecionar fotos
-                </button>
-                <input type="file" id="file-input-independente" multiple accept="image/*" style="display: none;" onchange="app.handleIndependentFileSelect(event)">
-                <div id="fotos-independente-preview" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;"></div>
-
-                <div class="button-group">
-                    <button class="btn-secondary" onclick="app.closeFotoIndependenteModal()">Cancelar</button>
-                    <button class="btn-primary" onclick="app.salvarFotosIndependentes()">Anexar</button>
                 </div>
             </div>
         </div>
@@ -956,11 +789,8 @@
         const app = {
             currentObra: null,
             currentServico: null,
-            currentMedicao: null,
             lightboxIndex: 0,
             allFotos: [],
-            expandedAccordionIndex: -1,
-            fileManager: [],
 
             init() {
                 this.setDataToday();
@@ -980,7 +810,6 @@
             setDataToday() {
                 const today = new Date().toISOString().split('T')[0];
                 document.getElementById('medicao-data').value = today;
-                document.getElementById('foto-data').value = today;
             },
 
             async loadObras() {
@@ -997,15 +826,15 @@
                     });
                     this.renderObras(obras);
                 } catch (error) {
-                    console.error('Error:', error);
+                    console.error('Error loading obras:', error);
                     this.renderObrasLocal();
                 }
             },
 
             renderObrasLocal() {
                 const obras = [
-                    { id: 'demo1', name: 'Residencial Boulevard', category: 'Residencial', progress: 66, empreiteiros: 2 },
-                    { id: 'demo2', name: 'Centro Comercial', category: 'Comercial', progress: 45, empreiteiros: 3 }
+                    { id: 'demo1', name: 'Residencial Boulevard', category: 'Residencial', progress: 64 },
+                    { id: 'demo2', name: 'Centro Comercial', category: 'Comercial', progress: 45 }
                 ];
                 this.renderObras(obras);
             },
@@ -1020,14 +849,8 @@
 
                 const html = obras.map(obra => `
                     <div class="card" onclick="app.selectObra('${obra.id}', '${obra.name}')">
-                        <div style="display: flex; justify-content: space-between; align-items: start;">
-                            <div style="flex: 1;">
-                                <h3 class="card-title" style="margin: 0 0 6px 0;">${obra.name}</h3>
-                                <span class="badge">${obra.category}</span>
-                                <p style="font-size: 12px; color: var(--dark-gray); margin: 8px 0 0 0;">${obra.empreiteiros || 0} empreiteiros</p>
-                            </div>
-                            <button class="menu-button" onclick="event.stopPropagation(); app.showObraMenu(event, '${obra.id}')">⋯</button>
-                        </div>
+                        <h3 class="card-title" style="margin: 0 0 6px 0;">${obra.name}</h3>
+                        <span class="badge">${obra.category}</span>
                         <div style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                             <span style="font-size: 12px; color: var(--dark-gray);">Progresso</span>
                             <span style="font-size: 14px; font-weight: 600; color: var(--primary);">${obra.progress || 0}%</span>
@@ -1045,115 +868,30 @@
                 this.currentObra = { id, name };
                 document.getElementById('obra-title').textContent = name;
                 document.getElementById('obra-card-title').textContent = name;
-                this.loadEmpreiteiros(id);
+                this.loadServicos(id);
                 this.showScreen('screen-obra');
-                document.getElementById('fab-main').style.display = 'none';
-                document.getElementById('fab-photo').style.display = 'flex';
             },
 
-            async loadEmpreiteiros(obraId) {
+            async loadServicos(obraId) {
                 if (!isFirebaseReady) {
-                    this.renderEmpreiteirosLocal();
+                    this.renderServicosLocal();
                     return;
                 }
 
                 try {
-                    const snapshot = await db.collection('obras').doc(obraId).collection('empreiteiros').get();
-                    const empreiteiros = [];
-                    snapshot.forEach(doc => {
-                        empreiteiros.push({ id: doc.id, ...doc.data() });
-                    });
-                    this.renderEmpreiteiros(empreiteiros);
-                } catch (error) {
-                    console.error('Error:', error);
-                    this.renderEmpreiteirosLocal();
-                }
-            },
-
-            renderEmpreiteirosLocal() {
-                const empreiteiros = [
-                    { id: 'e1', name: 'Construtora Alfa', servicos: 2, progress: 66 },
-                    { id: 'e2', name: 'Construtora Silva', servicos: 2, progress: 45 }
-                ];
-                this.renderEmpreiteiros(empreiteiros);
-            },
-
-            renderEmpreiteiros(empreiteiros) {
-                const container = document.getElementById('empreiteiros-content');
-
-                if (!empreiteiros.length) {
-                    container.innerHTML = '<div class="card"><p style="text-align: center;">Nenhum empreiteiro</p></div>';
-                    return;
-                }
-
-                let html = '';
-
-                for (let idx = 0; idx < empreiteiros.length; idx++) {
-                    const emp = empreiteiros[idx];
-                    const isActive = this.expandedAccordionIndex === idx;
-
-                    html += `
-                        <div class="accordion-header" onclick="app.toggleAccordion(${idx}, '${emp.id}')">
-                            <div>
-                                <h3 style="margin: 0; font-size: 16px; color: white; font-weight: 600;">${emp.name}</h3>
-                                <p style="margin: 4px 0 0 0; font-size: 12px; opacity: 0.9;">${emp.servicos || 0} serviços</p>
-                            </div>
-                            <span style="font-size: 20px; transition: transform 0.3s; transform: ${isActive ? 'rotate(180deg)' : 'rotate(0)'};">▼</span>
-                        </div>
-                        <div class="accordion-content accordion-accordion-${idx} ${isActive ? 'active' : ''}">
-                            <div id="servicos-container-${idx}"></div>
-                        </div>
-                    `;
-                }
-
-                container.innerHTML = html;
-
-                // Carregar serviços do primeiro accordion se expandido
-                if (this.expandedAccordionIndex >= 0 && empreiteiros[this.expandedAccordionIndex]) {
-                    this.loadServicos(empreiteiros[this.expandedAccordionIndex].id, this.expandedAccordionIndex);
-                }
-            },
-
-            toggleAccordion(idx, empreiteirosId) {
-                // Fechar anterior se aberto
-                if (this.expandedAccordionIndex !== -1 && this.expandedAccordionIndex !== idx) {
-                    const prevEl = document.querySelector(`.accordion-accordion-${this.expandedAccordionIndex}`);
-                    if (prevEl) prevEl.classList.remove('active');
-                }
-
-                // Toggle atual
-                const el = document.querySelector(`.accordion-accordion-${idx}`);
-                if (el) {
-                    el.classList.toggle('active');
-                    this.expandedAccordionIndex = el.classList.contains('active') ? idx : -1;
-
-                    if (this.expandedAccordionIndex === idx) {
-                        this.loadServicos(empreiteirosId, idx);
-                    }
-                }
-            },
-
-            async loadServicos(empreiteirosId, accordionIdx) {
-                if (!isFirebaseReady) {
-                    this.renderServicosLocal(accordionIdx);
-                    return;
-                }
-
-                try {
-                    const snapshot = await db.collection('obras').doc(this.currentObra.id)
-                        .collection('empreiteiros').doc(empreiteirosId)
-                        .collection('servicos').get();
+                    const snapshot = await db.collection('obras').doc(obraId).collection('servicos').get();
                     const servicos = [];
                     snapshot.forEach(doc => {
                         servicos.push({ id: doc.id, ...doc.data() });
                     });
-                    this.renderServicos(servicos, accordionIdx);
+                    this.renderServicos(servicos);
                 } catch (error) {
-                    this.renderServicosLocal(accordionIdx);
+                    console.error('Error loading servicos:', error);
+                    this.renderServicosLocal();
                 }
             },
 
-            renderServicosLocal(accordionIdx) {
+            renderServicosLocal() {
                 const servicos = [
                     { id: 's1', name: 'Alvenaria', category: 'Alvenaria', meta: 350, executada: 230 },
                     { id: 's2', name: 'Estrutura', category: 'Estrutura', meta: 280, executada: 150 },
@@ -1161,25 +899,24 @@
                     { id: 's4', name: 'Instalação Elétrica', category: 'Elétrica', meta: 200, executada: 120 },
                     { id: 's5', name: 'Acabamento', category: 'Acabamento', meta: 400, executada: 180 }
                 ];
-                this.renderServicos(servicos, accordionIdx);
+                this.renderServicos(servicos);
             },
 
-            renderServicos(servicos, accordionIdx) {
-                const container = document.getElementById(`servicos-container-${accordionIdx}`);
-                if (!container) return;
+            renderServicos(servicos) {
+                const container = document.getElementById('servicos-content');
 
                 if (!servicos.length) {
-                    container.innerHTML = '<div style="padding: 16px; text-align: center;">Nenhum serviço</div>';
+                    container.innerHTML = '<div class="card"><p style="text-align: center;">Nenhum serviço</p></div>';
                     return;
                 }
 
                 const getCategoryClass = (category) => {
                     const cat = category.toLowerCase();
-                    if (cat.includes('alvenaria')) return 'categoria-alvenaria';
-                    if (cat.includes('estrutura')) return 'categoria-estrutura';
-                    if (cat.includes('hidráulica') || cat.includes('hidraulica')) return 'categoria-hidraulica';
-                    if (cat.includes('elétrica') || cat.includes('eletrica')) return 'categoria-eletrica';
-                    if (cat.includes('acabamento')) return 'categoria-acabamento';
+                    if (cat.includes('alvenaria')) return 'cat-alvenaria';
+                    if (cat.includes('estrutura')) return 'cat-estrutura';
+                    if (cat.includes('hidráulica') || cat.includes('hidraulica')) return 'cat-hidraulica';
+                    if (cat.includes('elétrica') || cat.includes('eletrica')) return 'cat-eletrica';
+                    if (cat.includes('acabamento')) return 'cat-acabamento';
                     return '';
                 };
 
@@ -1187,15 +924,10 @@
                     const pct = Math.round((s.executada / s.meta) * 100);
                     const categoryClass = getCategoryClass(s.category);
                     return `
-                        <div class="accordion-item">
-                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
-                                <div>
-                                    <h4 style="font-size: 14px; margin: 0 0 4px 0; font-weight: 600;">${s.name}</h4>
-                                    <span class="badge ${categoryClass}">${s.category}</span>
-                                </div>
-                                <button class="menu-button" onclick="app.showServicoMenu(event, '${s.id}', '${s.name}', ${s.meta}, ${s.executada})">⋯</button>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--dark-gray); margin-bottom: 6px;">
+                        <div class="card">
+                            <h4 style="margin: 0 0 8px 0; font-weight: 600;">${s.name}</h4>
+                            <span class="badge ${categoryClass}">${s.category}</span>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--dark-gray); margin: 8px 0 6px 0;">
                                 <span>Meta: ${s.meta}m²</span>
                                 <span>Exec: ${s.executada}m²</span>
                             </div>
@@ -1217,35 +949,12 @@
                 container.innerHTML = html;
             },
 
-            showServicoMenu(e, servicoId, servicoName, meta, executada) {
-                const actions = ['📏 Registrar Medição', '✏️ Editar Meta', '📋 Histórico', '🖼️ Galeria', '🗑️ Deletar'];
-                const menu = prompt(`${servicoName}\n\n1. Registrar Medição\n2. Editar Meta\n3. Histórico\n4. Galeria\n5. Deletar\n\nEscolha:`, '1');
-                
-                switch(menu) {
-                    case '1':
-                        this.openMedicaoModal(servicoId, servicoName, meta, executada);
-                        break;
-                    case '2':
-                        this.openEditarMetaModal(servicoId, servicoName, meta);
-                        break;
-                    case '3':
-                        this.openHistorico(servicoId);
-                        break;
-                    case '4':
-                        this.openGaleria(servicoId);
-                        break;
-                    case '5':
-                        alert('Delete não implementado ainda');
-                        break;
-                }
-            },
-
             switchTab(tab, e) {
                 document.querySelectorAll('#screen-obra .tab-button').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
-                document.getElementById('empreiteiros-content').classList.toggle('hidden', tab !== 'empreiteiros');
-                document.getElementById('dashboard-content').classList.toggle('hidden', tab !== 'dashboard');
-                if (tab === 'dashboard') {
+                document.getElementById('servicos-content').classList.toggle('hidden', tab !== 'servicos');
+                document.getElementById('graficos-content').classList.toggle('hidden', tab !== 'graficos');
+                if (tab === 'graficos') {
                     setTimeout(() => {
                         this.chartEvolucaoMobile();
                         this.chartServicosMobile();
@@ -1253,184 +962,13 @@
                 }
             },
 
-            switchMedicaoTab(tab, e) {
-                document.querySelectorAll('#modal-medicao .tab-button').forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-                document.getElementById('medicao-quantidade').classList.toggle('hidden', tab !== 'quantidade');
-                document.getElementById('medicao-fotos').classList.toggle('hidden', tab !== 'fotos');
-            },
-
             switchDesktopMenu(menu, e) {
                 document.querySelectorAll('.sidebar button').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
                 document.querySelectorAll('#desktop-content > div').forEach(d => d.classList.add('hidden'));
-                const titles = { dashboard: 'Dashboard', engenharias: 'Engenharias', medicoes: 'Medições', galeria: 'Galeria', export: 'Exportar', config: 'Configurações' };
+                const titles = { dashboard: 'Dashboard', servicos: 'Serviços', medicoes: 'Medições' };
                 document.getElementById('desktop-title').textContent = titles[menu];
                 document.getElementById(menu + '-desktop').classList.remove('hidden');
-
-                if (menu === 'dashboard') {
-                    this.buildDashboard();
-                } else if (menu === 'engenharias') {
-                    this.buildEngenharias();
-                } else if (menu === 'medicoes') {
-                    this.buildMedicoes();
-                } else if (menu === 'galeria') {
-                    this.buildGaleria();
-                }
-            },
-
-            buildDashboard() {
-                const content = document.getElementById('dashboard-desktop');
-                content.innerHTML = `
-                    <div class="metrics-grid">
-                        <div class="metric-card">
-                            <div class="metric-icon">📊</div>
-                            <div class="metric-label">PROGRESSO GERAL</div>
-                            <div class="metric-value">68%</div>
-                            <div class="progress-bar" style="margin-top: 16px;">
-                                <div class="progress-fill" style="width: 68%;"></div>
-                            </div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-icon">👷</div>
-                            <div class="metric-label">EMPREITEIROS</div>
-                            <div class="metric-value">2</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-icon">📏</div>
-                            <div class="metric-label">MEDIÇÕES</div>
-                            <div class="metric-value">8</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-icon">⚠️</div>
-                            <div class="metric-label">EXTRAPOLAÇÕES</div>
-                            <div class="metric-value" style="color: var(--danger);">1</div>
-                        </div>
-                    </div>
-
-                    <div class="chart-container">
-                        <h3>📈 Evolução das Medições</h3>
-                        <div class="chart-inner">
-                            <canvas id="desktop-chart-1"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="chart-container">
-                        <h3>📊 Status dos Empreiteiros</h3>
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Empreiteiro</th>
-                                    <th>Progresso</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Construtora Alfa</td>
-                                    <td>
-                                        <div class="progress-bar" style="width: 150px;">
-                                            <div class="progress-fill" style="width: 72%;"></div>
-                                        </div>
-                                    </td>
-                                    <td><span class="badge">Em Progresso</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Construtora Silva</td>
-                                    <td>
-                                        <div class="progress-bar" style="width: 150px;">
-                                            <div class="progress-fill" style="width: 58%;"></div>
-                                        </div>
-                                    </td>
-                                    <td><span class="badge">Em Progresso</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="chart-container">
-                        <h3>📋 Últimas Medições Registradas</h3>
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Data</th>
-                                    <th>Empreiteiro</th>
-                                    <th>Serviço</th>
-                                    <th>Quantidade</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>2026-07-27</td>
-                                    <td>Construtora Alfa</td>
-                                    <td>Alvenaria</td>
-                                    <td>50m²</td>
-                                    <td><span class="badge status-normal">Normal</span></td>
-                                </tr>
-                                <tr>
-                                    <td>2026-07-26</td>
-                                    <td>Construtora Silva</td>
-                                    <td>Estrutura</td>
-                                    <td>40m²</td>
-                                    <td><span class="badge status-normal">Normal</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-
-                setTimeout(() => {
-                    if (charts.desktop1) charts.desktop1.destroy();
-                    const ctx = document.getElementById('desktop-chart-1');
-                    charts.desktop1 = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: ['S1', 'S2', 'S3', 'S4', 'S5'],
-                            datasets: [{
-                                label: 'Medições (m²)',
-                                data: [50, 100, 180, 240, 370],
-                                borderColor: '#001f3f',
-                                backgroundColor: 'rgba(0, 31, 63, 0.1)',
-                                fill: true,
-                                tension: 0.4
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: { legend: { position: 'bottom' } }
-                        }
-                    });
-                }, 100);
-            },
-
-            buildEngenharias() {
-                const content = document.getElementById('engenharias-desktop');
-                content.innerHTML = `
-                    <h2 style="margin-bottom: 24px;">Engenharias - Visão Completa</h2>
-                    <div id="engenharias-list"></div>
-                `;
-            },
-
-            buildMedicoes() {
-                const content = document.getElementById('medicoes-desktop');
-                content.innerHTML = `
-                    <h2 style="margin-bottom: 24px;">Todas as Medições</h2>
-                    <div style="background-color: var(--white); padding: 24px; border-radius: 8px; box-shadow: var(--shadow-sm);">
-                        <p style="text-align: center; color: var(--dark-gray);">Seção Medições - Em desenvolvimento</p>
-                    </div>
-                `;
-            },
-
-            buildGaleria() {
-                const content = document.getElementById('galeria-desktop');
-                content.innerHTML = `
-                    <h2 style="margin-bottom: 24px;">Galeria Completa</h2>
-                    <div style="background-color: var(--white); padding: 24px; border-radius: 8px; box-shadow: var(--shadow-sm);">
-                        <p style="text-align: center; color: var(--dark-gray);">Seção Galeria - Em desenvolvimento</p>
-                    </div>
-                `;
             },
 
             chartEvolucaoMobile() {
@@ -1442,7 +980,7 @@
                         labels: ['S1', 'S2', 'S3', 'S4', 'S5'],
                         datasets: [{
                             label: 'Progresso (%)',
-                            data: [15, 28, 42, 58, 66],
+                            data: [15, 28, 42, 58, 64],
                             borderColor: '#2ecc71',
                             backgroundColor: 'rgba(46, 204, 113, 0.1)',
                             fill: true,
@@ -1464,8 +1002,8 @@
                 charts.mobileServicos = new Chart(ctx, {
                     type: 'bar',
                     data: {
-                        labels: ['Alvenaria', 'Estrutura'],
-                        datasets: [{ label: 'Progresso (%)', data: [66, 54], backgroundColor: '#2ecc71', borderRadius: 4 }]
+                        labels: ['Alvenaria', 'Estrutura', 'Hidráulica', 'Elétrica', 'Acabamento'],
+                        datasets: [{ label: 'Progresso (%)', data: [66, 54, 63, 60, 45], backgroundColor: '#2ecc71', borderRadius: 4 }]
                     },
                     options: {
                         responsive: true,
@@ -1485,56 +1023,6 @@
                 document.getElementById('medicao-justificativa-group').classList.toggle('hidden', !extrapolado);
             },
 
-            handleFileSelect(e) {
-                const files = Array.from(e.target.files || []);
-                const preview = document.getElementById('fotos-preview');
-
-                files.forEach(file => {
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        this.fileManager.push({ file, dataUrl: event.target.result });
-
-                        const div = document.createElement('div');
-                        div.style.position = 'relative';
-                        div.style.backgroundColor = 'var(--light-gray)';
-                        div.style.height = '100px';
-                        div.style.borderRadius = '8px';
-                        div.style.overflow = 'hidden';
-
-                        const img = document.createElement('img');
-                        img.src = event.target.result;
-                        img.style.width = '100%';
-                        img.style.height = '100%';
-                        img.style.objectFit = 'cover';
-
-                        const btn = document.createElement('button');
-                        btn.textContent = '✕';
-                        btn.style.position = 'absolute';
-                        btn.style.top = '4px';
-                        btn.style.right = '4px';
-                        btn.style.backgroundColor = 'var(--danger)';
-                        btn.style.color = 'var(--white)';
-                        btn.style.border = 'none';
-                        btn.style.borderRadius = '50%';
-                        btn.style.width = '28px';
-                        btn.style.height = '28px';
-                        btn.style.cursor = 'pointer';
-                        btn.style.display = 'flex';
-                        btn.style.alignItems = 'center';
-                        btn.style.justifyContent = 'center';
-                        btn.onclick = () => {
-                            div.remove();
-                            this.fileManager = this.fileManager.filter(f => f.dataUrl !== event.target.result);
-                        };
-
-                        div.appendChild(img);
-                        div.appendChild(btn);
-                        preview.appendChild(div);
-                    };
-                    reader.readAsDataURL(file);
-                });
-            },
-
             openMedicaoModal(servicoId, servicoName, meta, executada) {
                 this.currentServico = { id: servicoId, name: servicoName, meta, executada };
                 const pct = Math.round((executada / meta) * 100);
@@ -1542,14 +1030,12 @@
                     <strong>${servicoName}</strong><br>
                     Meta: ${meta}m² | Executado: ${executada}m² (${pct}%) | Restante: ${meta - executada}m²
                 `;
-                document.getElementById('medicao-quantidade-input').value = '';
+                document.getElementById('medicao-quantidade').value = '';
                 document.getElementById('medicao-funcionarios').value = '';
                 document.getElementById('medicao-observacoes').value = '';
                 document.getElementById('medicao-justificativa').value = '';
                 document.getElementById('medicao-alert').classList.add('hidden');
                 document.getElementById('medicao-justificativa-group').classList.add('hidden');
-                document.getElementById('fotos-preview').innerHTML = '';
-                this.fileManager = [];
                 document.getElementById('modal-medicao').classList.remove('hidden');
             },
 
@@ -1558,151 +1044,141 @@
             },
 
             async salvarMedicao() {
-                const qtd = parseFloat(document.getElementById('medicao-quantidade-input').value);
+                const qtd = parseFloat(document.getElementById('medicao-quantidade').value);
                 if (!qtd) {
                     alert('Informe a quantidade');
                     return;
                 }
 
-                const meta = this.currentServico.meta;
-                if (qtd > meta) {
-                    const justificativa = document.getElementById('medicao-justificativa').value;
-                    if (!justificativa) {
+                if (qtd > this.currentServico.meta) {
+                    if (!document.getElementById('medicao-justificativa').value) {
                         alert('Justificativa obrigatória em extrapolação');
                         return;
                     }
                 }
 
-                alert('✅ Medição registrada com sucesso!');
-                this.closeMedicaoModal();
+                if (!isFirebaseReady) {
+                    alert('Aguarde conexão com Firebase');
+                    return;
+                }
+
+                try {
+                    await db.collection('obras').doc(this.currentObra.id)
+                        .collection('servicos').doc(this.currentServico.id)
+                        .collection('medicoes').add({
+                            quantidade: qtd,
+                            data: document.getElementById('medicao-data').value,
+                            funcionarios: document.getElementById('medicao-funcionarios').value,
+                            observacoes: document.getElementById('medicao-observacoes').value,
+                            justificativa: document.getElementById('medicao-justificativa').value || null,
+                            status: qtd > this.currentServico.meta ? 'extrapolou' : 'normal',
+                            dataMedicao: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+
+                    alert('✅ Medição registrada com sucesso!');
+                    this.closeMedicaoModal();
+                    this.loadServicos(this.currentObra.id);
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('❌ Erro ao salvar');
+                }
             },
 
             openHistorico(servicoId) {
                 this.currentServico = { id: servicoId };
                 this.showScreen('screen-historico');
-                this.renderHistorico();
+                this.loadHistorico();
             },
 
-            goToHistorico() {
-                this.showScreen('screen-historico');
-            },
+            async loadHistorico() {
+                if (!isFirebaseReady) {
+                    document.getElementById('historico-content').innerHTML = '<div class="card"><p style="text-align: center;">Offline</p></div>';
+                    return;
+                }
 
-            renderHistorico() {
-                const container = document.getElementById('historico-content');
-                const medicoes = [
-                    { id: '1', data: '2026-07-27', quantidade: 50, funcionarios: 'João', status: 'normal' },
-                    { id: '2', data: '2026-07-26', quantidade: 40, funcionarios: 'Maria', status: 'normal' },
-                    { id: '3', data: '2026-07-25', quantidade: 380, funcionarios: 'Pedro', status: 'extrapolou', justificativa: 'Erro de medição anterior' }
-                ];
+                try {
+                    const snapshot = await db.collection('obras').doc(this.currentObra.id)
+                        .collection('servicos').doc(this.currentServico.id)
+                        .collection('medicoes').orderBy('dataMedicao', 'desc').get();
 
-                const html = medicoes.map((med, idx) => `
-                    <div class="card" onclick="app.openHistoricoDetalhe(${idx})">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div>
-                                <h4 style="margin: 0 0 4px 0; font-weight: 600;">${med.data}</h4>
-                                <p style="margin: 0; font-size: 12px; color: var(--dark-gray);">👤 ${med.funcionarios}</p>
-                                <p style="margin: 4px 0 0 0; font-size: 14px; font-weight: 600; color: var(--success);">${med.quantidade}m²</p>
+                    const html = snapshot.docs.length ? snapshot.docs.map(doc => {
+                        const med = doc.data();
+                        return `
+                            <div class="card">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <h4 style="margin: 0 0 4px 0; font-weight: 600;">${med.data}</h4>
+                                        <p style="margin: 0 0 6px 0; font-size: 12px; color: var(--dark-gray);">👤 ${med.funcionarios || 'N/A'}</p>
+                                        <p style="margin: 0; font-size: 14px; font-weight: 600; color: var(--success);">${med.quantidade}m²</p>
+                                    </div>
+                                    <span class="badge ${med.status === 'extrapolou' ? 'status-extrapolou' : 'status-normal'}">
+                                        ${med.status === 'extrapolou' ? 'Extrapolou' : 'Normal'}
+                                    </span>
+                                </div>
+                                ${med.justificativa ? `<p style="margin: 12px 0 0 0; font-size: 11px; color: var(--dark-gray);">📝 ${med.justificativa}</p>` : ''}
                             </div>
-                            <span class="badge ${med.status === 'extrapolou' ? 'status-extrapolou' : 'status-normal'}">
-                                ${med.status === 'extrapolou' ? 'Extrapolou' : 'Normal'}
-                            </span>
-                        </div>
-                    </div>
-                `).join('');
+                        `;
+                    }).join('') : '<div class="card"><p style="text-align: center;">Nenhuma medição</p></div>';
 
-                container.innerHTML = html;
-            },
-
-            openHistoricoDetalhe(idx) {
-                this.currentMedicao = idx;
-                this.showScreen('screen-historico-detalhe');
-                this.renderHistoricoDetalhe(idx);
-            },
-
-            renderHistoricoDetalhe(idx) {
-                const container = document.getElementById('historico-detalhe-content');
-                const medicoes = [
-                    { id: '1', data: '2026-07-27', quantidade: 50, funcionarios: 'João', observacoes: 'Alvenaria normal', status: 'normal', fotos: 2 },
-                    { id: '2', data: '2026-07-26', quantidade: 40, funcionarios: 'Maria', observacoes: 'Sem intercorrências', status: 'normal', fotos: 1 },
-                    { id: '3', data: '2026-07-25', quantidade: 380, funcionarios: 'Pedro', observacoes: 'Aceleração do cronograma', status: 'extrapolou', justificativa: 'Erro de medição anterior', fotos: 3 }
-                ];
-
-                const med = medicoes[idx];
-                const html = `
-                    <div class="card">
-                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
-                            <div>
-                                <h3 class="card-title" style="margin: 0 0 12px 0;">Detalhes da Medição</h3>
-                                <p style="margin: 0; font-size: 12px; color: var(--dark-gray);">${med.data}</p>
-                            </div>
-                            <span class="badge ${med.status === 'extrapolou' ? 'status-extrapolou' : 'status-normal'}" style="font-size: 12px; padding: 6px 12px;">
-                                ${med.status === 'extrapolou' ? 'EXTRAPOLOU' : 'NORMAL'}
-                            </span>
-                        </div>
-
-                        <div style="background-color: var(--light-gray); padding: 12px; border-radius: 8px; margin-bottom: 16px;">
-                            <p style="margin: 0 0 8px 0; font-size: 12px; font-weight: 600;">📏 Quantidade: <strong style="color: var(--success);">${med.quantidade}m²</strong></p>
-                            <p style="margin: 0 0 8px 0; font-size: 12px;">👤 Funcionários: ${med.funcionarios}</p>
-                            <p style="margin: 0; font-size: 12px;">📸 Fotos: ${med.fotos}</p>
-                        </div>
-
-                        ${med.observacoes ? `
-                            <div style="margin-bottom: 16px;">
-                                <h4 style="margin: 0 0 8px 0; font-size: 12px; font-weight: 600;">📝 Observações</h4>
-                                <p style="margin: 0; font-size: 12px; color: var(--dark-gray);">${med.observacoes}</p>
-                            </div>
-                        ` : ''}
-
-                        ${med.status === 'extrapolou' ? `
-                            <div style="background-color: rgba(231, 76, 60, 0.1); border: 1px solid var(--danger); border-radius: 8px; padding: 12px; margin-bottom: 16px;">
-                                <h4 style="margin: 0 0 8px 0; font-size: 12px; font-weight: 600; color: var(--danger);">⚠️ Justificativa</h4>
-                                <p style="margin: 0; font-size: 12px; color: var(--danger);">${med.justificativa}</p>
-                            </div>
-                        ` : ''}
-
-                        <div style="display: flex; gap: 8px; margin-top: 24px;">
-                            <button class="btn-secondary" style="flex: 1; padding: 12px;">✏️ Editar</button>
-                            <button class="btn-secondary" style="flex: 1; padding: 12px;">🗑️ Deletar</button>
-                        </div>
-                    </div>
-                `;
-
-                container.innerHTML = html;
+                    document.getElementById('historico-content').innerHTML = html;
+                } catch (error) {
+                    console.error('Error loading historico:', error);
+                    document.getElementById('historico-content').innerHTML = '<div class="card"><p>Erro ao carregar</p></div>';
+                }
             },
 
             openGaleria(servicoId) {
                 this.currentServico = { id: servicoId };
                 this.showScreen('screen-galeria');
-                this.renderGaleria();
+                this.loadFotos();
             },
 
-            renderGaleria() {
-                const container = document.getElementById('galeria-content');
-                const fotos = [
-                    { id: '1', data: '2026-07-27', legenda: 'Detalhe da alvenaria' },
-                    { id: '2', data: '2026-07-26', legenda: 'Vista geral' },
-                    { id: '3', data: '2026-07-25', legenda: 'Acabamento' }
-                ];
+            async loadFotos() {
+                if (!isFirebaseReady) {
+                    document.getElementById('galeria-content').innerHTML = '<div class="card"><p>Offline</p></div>';
+                    return;
+                }
 
-                const html = `
-                    <div class="gallery">
-                        ${fotos.map((f, idx) => `
-                            <div class="gallery-item" onclick="app.openLightbox(${idx})">
-                                <div style="width: 100%; height: 100%; background-color: var(--light-gray); display: flex; align-items: center; justify-content: center; color: var(--dark-gray);">📸</div>
-                                <div class="gallery-date">${f.data}</div>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
+                try {
+                    const snapshot = await db.collection('obras').doc(this.currentObra.id)
+                        .collection('servicos').doc(this.currentServico.id)
+                        .collection('medicoes').get();
 
-                container.innerHTML = html;
-                this.allFotos = fotos;
+                    this.allFotos = [];
+                    const html = [];
+
+                    for (const doc of snapshot.docs) {
+                        const med = doc.data();
+                        if (med.fotos && med.fotos.length) {
+                            for (const fotoPath of med.fotos) {
+                                try {
+                                    const url = await storage.ref(fotoPath).getDownloadURL();
+                                    this.allFotos.push({ url, data: med.data });
+                                    html.push(`
+                                        <div class="gallery-item" onclick="app.openLightbox(${this.allFotos.length - 1})">
+                                            <img src="${url}" alt="Foto">
+                                            <div class="gallery-date">${med.data}</div>
+                                        </div>
+                                    `);
+                                } catch (e) {
+                                    console.log('Foto não disponível:', fotoPath);
+                                }
+                            }
+                        }
+                    }
+
+                    document.getElementById('galeria-content').innerHTML = html.length ? 
+                        `<div class="gallery">${html.join('')}</div>` : 
+                        '<div class="card"><p style="text-align: center;">Nenhuma foto</p></div>';
+                } catch (error) {
+                    console.error('Error loading fotos:', error);
+                    document.getElementById('galeria-content').innerHTML = '<div class="card"><p>Erro ao carregar fotos</p></div>';
+                }
             },
 
             openLightbox(idx) {
                 this.lightboxIndex = idx;
-                const foto = this.allFotos[idx];
-                document.getElementById('lightbox-image').src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300"%3E%3Crect fill="%23f5f7fa" width="400" height="300"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%236b7280" font-size="24"%3E📸 ${foto.legenda}%3C/text%3E%3C/svg%3E';
+                document.getElementById('lightbox-image').src = this.allFotos[idx].url;
                 document.getElementById('lightbox-counter').textContent = (idx + 1) + ' de ' + this.allFotos.length;
                 document.getElementById('lightbox').classList.remove('hidden');
             },
@@ -1729,43 +1205,40 @@
                 document.getElementById('modal-nova-obra').classList.add('hidden');
             },
 
-            salvarNovaObra() {
-                alert('✅ Obra criada com sucesso!');
-                this.closeNovaObraModal();
-                this.loadObras();
-            },
+            async salvarNovaObra() {
+                const nome = document.getElementById('nova-obra-nome').value;
+                const categoria = document.getElementById('nova-obra-categoria').value;
 
-            openFotoIndependenteModal() {
-                document.getElementById('modal-foto-independente').classList.remove('hidden');
-                this.setDataToday();
-            },
+                if (!nome || !categoria) {
+                    alert('Preencha os campos obrigatórios');
+                    return;
+                }
 
-            closeFotoIndependenteModal() {
-                document.getElementById('modal-foto-independente').classList.add('hidden');
-            },
+                if (!isFirebaseReady) {
+                    alert('Aguarde a conexão com Firebase');
+                    return;
+                }
 
-            handleIndependentFileSelect(e) {
-                // Mesmo comportamento do handleFileSelect
-            },
+                try {
+                    await db.collection('obras').add({
+                        name: nome,
+                        category: categoria,
+                        description: document.getElementById('nova-obra-descricao').value,
+                        progress: 0,
+                        dataCriacao: firebase.firestore.FieldValue.serverTimestamp()
+                    });
 
-            salvarFotosIndependentes() {
-                alert('✅ Fotos anexadas com sucesso à galeria!');
-                this.closeFotoIndependenteModal();
-            },
-
-            showObraMenu(e, obraId) {
-                // Menu de contexto para obra
-            },
-
-            openEditarMetaModal(servicoId, servicoName, meta) {
-                alert('Função "Editar Meta" - Em desenvolvimento');
+                    alert('✅ Obra criada com sucesso!');
+                    this.closeNovaObraModal();
+                    this.loadObras();
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('❌ Erro ao salvar');
+                }
             },
 
             goHome() {
                 this.showScreen('screen-home');
-                document.getElementById('fab-main').style.display = 'flex';
-                document.getElementById('fab-photo').style.display = 'none';
-                this.expandedAccordionIndex = -1;
             },
 
             goToObra() {
