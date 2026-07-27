@@ -90,17 +90,6 @@
             color: #94A3B8;
         }
 
-        .header-status {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background-color: rgba(255,255,255,0.08);
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 500;
-        }
-
         .content {
             padding: 16px;
             padding-bottom: 90px;
@@ -132,15 +121,6 @@
             background-color: #F1F5F9;
             color: var(--text-muted);
         }
-
-        .badge.cat-alvenaria { background-color: #FEF3C7; color: #92400E; }
-        .badge.cat-estrutura { background-color: #E0E7FF; color: #3730A3; }
-        .badge.cat-hidraulica { background-color: #E0F2FE; color: #075985; }
-        .badge.cat-eletrica { background-color: #FEF08A; color: #854D0E; }
-        .badge.cat-acabamento { background-color: #FCE7F3; color: #9D174D; }
-
-        .badge.status-normal { background-color: #D1FAE5; color: #065F46; }
-        .badge.status-extrapolou { background-color: #FEE2E2; color: #991B1B; }
 
         .progress-bar {
             width: 100%;
@@ -272,11 +252,6 @@
             border-color: var(--primary);
         }
 
-        .form-textarea {
-            min-height: 70px;
-            resize: vertical;
-        }
-
         .alert-warning {
             background-color: #FEF2F2;
             border: 1px solid #FECACA;
@@ -337,91 +312,34 @@
             z-index: 50;
         }
 
-        .hidden { display: none !important; }
-        .screen { display: none; }
-        .screen.active { display: block; }
-
-        .desktop-view {
-            display: none;
-            width: 100%;
-            height: 100%;
-            background-color: var(--bg-body);
-        }
-
-        .sidebar {
-            width: 250px;
-            background-color: var(--primary);
-            color: #FFFFFF;
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
-
-        .sidebar-logo {
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-        .sidebar nav {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .sidebar button {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 14px;
-            background: none;
+        .btn-icon-top {
+            background: rgba(255,255,255,0.15);
             border: none;
-            cursor: pointer;
-            color: #94A3B8;
+            color: white;
+            padding: 6px 12px;
             border-radius: 6px;
-            text-align: left;
-            font-size: 13px;
+            font-size: 12px;
+            cursor: pointer;
             font-weight: 600;
         }
 
-        .sidebar button.active {
-            background-color: var(--primary-hover);
-            color: #FFFFFF;
-        }
-
-        .desktop-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .desktop-header {
-            background-color: var(--surface);
-            border-bottom: 1px solid var(--border);
-            padding: 16px 32px;
+        .category-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
         }
 
-        .desktop-body {
-            flex: 1;
-            overflow-y: auto;
-            padding: 32px;
-        }
+        .category-item:last-child { border-bottom: none; }
 
-        @media (min-width: 1024px) {
-            .mobile-view { display: none !important; }
-            .desktop-view { display: flex !important; }
-            .modal { align-items: center; justify-content: center; }
-            .modal-content { max-width: 500px; border-radius: 8px; }
-        }
+        .hidden { display: none !important; }
+        .screen { display: none; }
+        .screen.active { display: block; }
     </style>
 </head>
 <body>
     <div class="app-wrapper">
-        <!-- ===== MOBILE ===== -->
         <div class="mobile-view">
             <div class="app-container">
                 <!-- TELA 1: HOME -->
@@ -433,10 +351,7 @@
                                 <p class="header-subtitle">Gestão & Medição de Obras</p>
                             </div>
                         </div>
-                        <div class="header-status">
-                            <span id="firebase-status">🟢</span>
-                            <span id="firebase-text">Local</span>
-                        </div>
+                        <button class="btn-icon-top" onclick="app.openGerenciarCategoriasModal()">🏷 Categorias</button>
                     </div>
 
                     <div class="content">
@@ -451,6 +366,7 @@
                             <button class="header-back" onclick="app.goHome()">←</button>
                             <h1 class="header-title" id="obra-title">Obra</h1>
                         </div>
+                        <button class="btn-icon-top" onclick="app.openGerenciarCategoriasModal()">🏷 Categorias</button>
                     </div>
 
                     <div class="content">
@@ -474,13 +390,13 @@
                         <div id="graficos-content" class="hidden">
                             <div class="card">
                                 <h3 style="margin-bottom: 12px; font-size: 14px; font-weight: 600;">Evolução do Projeto</h3>
-                                <p style="font-size: 12px; color: var(--text-muted);">Gráfico disponível nas medições registradas.</p>
+                                <p style="font-size: 12px; color: var(--text-muted);">Acompanhamento gráfico em breve.</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- HISTÓRICO -->
+                <!-- TELA HISTÓRICO -->
                 <div id="screen-historico" class="screen">
                     <div class="header">
                         <div class="header-left">
@@ -494,23 +410,49 @@
 
             <button class="fab" onclick="app.openNovaObraModal()">+</button>
         </div>
+    </div>
 
-        <!-- ===== DESKTOP ===== -->
-        <div class="desktop-view">
-            <div class="sidebar">
-                <h2 class="sidebar-logo">📐 MEDI-O ENG</h2>
-                <nav>
-                    <button class="active">📊 Dashboard</button>
-                </nav>
+    <!-- MODAL GERENCIAR CATEGORIAS -->
+    <div id="modal-categorias" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="margin: 0; font-size: 15px; font-weight: 600;">Gerenciar Categorias</h2>
+                <button class="modal-close" onclick="app.closeGerenciarCategoriasModal()">✕</button>
             </div>
-
-            <div class="desktop-content">
-                <div class="desktop-header">
-                    <h1 style="margin: 0; font-size: 18px; font-weight: 700;">Dashboard</h1>
+            <div class="modal-body">
+                <div class="form-group" style="display: flex; gap: 8px;">
+                    <input type="text" class="form-input" id="nova-categoria-nome" placeholder="Nome da nova categoria...">
+                    <button class="btn-primary" style="flex: 0 0 80px;" onclick="app.salvarCategoria()">Criar</button>
                 </div>
+                <h4 style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;">Categorias Existentes:</h4>
+                <div id="lista-categorias-gerenciar" style="border: 1px solid var(--border); border-radius: 6px; max-height: 200px; overflow-y: auto;"></div>
+            </div>
+        </div>
+    </div>
 
-                <div class="desktop-body">
-                    <p style="color: var(--text-muted);">Acesse pelo celular ou adicione dados no painel.</p>
+    <!-- MODAL NOVO SERVIÇO (COM SELECT DE CATEGORIAS) -->
+    <div id="modal-novo-servico" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="margin: 0; font-size: 15px; font-weight: 600;">Novo Serviço</h2>
+                <button class="modal-close" onclick="app.closeNovoServicoModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Nome do Serviço *</label>
+                    <input type="text" class="form-input" id="novo-servico-nome" placeholder="Ex: Pintura Externa">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Categoria *</label>
+                    <select class="form-input" id="novo-servico-categoria"></select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Meta Total (m²) *</label>
+                    <input type="number" class="form-input" id="novo-servico-meta" placeholder="0.00" step="0.01">
+                </div>
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="app.closeNovoServicoModal()">Cancelar</button>
+                    <button class="btn-primary" onclick="app.salvarNovoServico()">Salvar Serviço</button>
                 </div>
             </div>
         </div>
@@ -526,16 +468,11 @@
             <div class="modal-body">
                 <div class="form-group">
                     <label class="form-label">Nome da Obra *</label>
-                    <input type="text" class="form-input" id="nova-obra-nome" placeholder="Ex: Residencial Boulevard">
+                    <input type="text" class="form-input" id="nova-obra-nome" placeholder="Ex: Edifício Central">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Categoria *</label>
-                    <select class="form-input" id="nova-obra-categoria">
-                        <option value="">Selecione...</option>
-                        <option value="Residencial">Residencial</option>
-                        <option value="Comercial">Comercial</option>
-                        <option value="Industrial">Industrial</option>
-                    </select>
+                    <label class="form-label">Categoria da Obra *</label>
+                    <select class="form-input" id="nova-obra-categoria"></select>
                 </div>
                 <div class="button-group">
                     <button class="btn-secondary" onclick="app.closeNovaObraModal()">Cancelar</button>
@@ -554,24 +491,20 @@
             </div>
             <div class="modal-body">
                 <div id="medicao-info" style="background-color: #F8FAFC; border: 1px solid var(--border); padding: 12px; border-radius: 6px; margin-bottom: 16px; font-size: 12px;"></div>
-
                 <div id="medicao-alert" class="alert-warning hidden">⚠ Atenção: A quantidade inserida ultrapassa a meta do serviço!</div>
 
                 <div class="form-group">
                     <label class="form-label">Quantidade Realizada (m²) *</label>
                     <input type="number" class="form-input" id="medicao-quantidade" placeholder="0.00" step="0.01" oninput="app.onQuantidadeChange()" onkeyup="app.onQuantidadeChange()">
                 </div>
-
                 <div class="form-group">
                     <label class="form-label">Data *</label>
                     <input type="date" class="form-input" id="medicao-data">
                 </div>
-
                 <div id="medicao-justificativa-group" class="form-group hidden">
-                    <label class="form-label" style="color: var(--danger);">Justificativa de Extrapolação (Obrigatória) *</label>
-                    <textarea class="form-textarea" id="medicao-justificativa" placeholder="Informe o motivo do excesso de área executada..."></textarea>
+                    <label class="form-label" style="color: var(--danger);">Justificativa de Extrapolação *</label>
+                    <textarea class="form-textarea" id="medicao-justificativa" placeholder="Informe o motivo..."></textarea>
                 </div>
-
                 <div class="button-group">
                     <button class="btn-secondary" onclick="app.closeMedicaoModal()">Cancelar</button>
                     <button class="btn-primary" onclick="app.salvarMedicao()">Salvar Medição</button>
@@ -581,16 +514,17 @@
     </div>
 
     <script>
+        // LEQUE DE CATEGORIAS CUSTOMIZÁVEL
+        let localCategorias = ['Alvenaria', 'Estrutura', 'Hidráulica', 'Elétrica', 'Acabamento', 'Residencial', 'Comercial'];
+
         let localObras = [
-            { id: 'demo1', name: 'Residencial Boulevard', category: 'Residencial', progress: 64 },
-            { id: 'demo2', name: 'Centro Comercial Alpha', category: 'Comercial', progress: 0 }
+            { id: 'demo1', name: 'Residencial Boulevard', category: 'Residencial', progress: 64 }
         ];
 
         let localServicosPorObra = {
             'demo1': [
                 { id: 's1', name: 'Alvenaria Estrutural', category: 'Alvenaria', meta: 350, executada: 230 },
-                { id: 's2', name: 'Concretagem de Pilares', category: 'Estrutura', meta: 280, executada: 150 },
-                { id: 's3', name: 'Instalação Hidráulica', category: 'Hidráulica', meta: 150, executada: 95 }
+                { id: 's2', name: 'Concretagem de Pilares', category: 'Estrutura', meta: 280, executada: 150 }
             ]
         };
 
@@ -610,6 +544,59 @@
                 document.getElementById('medicao-data').value = today;
             },
 
+            // --- CATEGORIAS DINÂMICAS ---
+            openGerenciarCategoriasModal() {
+                this.renderListaCategorias();
+                document.getElementById('modal-categorias').classList.remove('hidden');
+            },
+
+            closeGerenciarCategoriasModal() {
+                document.getElementById('modal-categorias').classList.add('hidden');
+            },
+
+            salvarCategoria() {
+                const input = document.getElementById('nova-categoria-nome');
+                const val = input.value.trim();
+                if (!val) return;
+
+                if (!localCategorias.includes(val)) {
+                    localCategorias.push(val);
+                    input.value = '';
+                    this.renderListaCategorias();
+                } else {
+                    alert('Esta categoria já existe!');
+                }
+            },
+
+            removerCategoria(nome) {
+                localCategorias = localCategorias.filter(c => c !== nome);
+                this.renderListaCategorias();
+            },
+
+            renderListaCategorias() {
+                const container = document.getElementById('lista-categorias-gerenciar');
+                if (!localCategorias.length) {
+                    container.innerHTML = '<p style="padding: 10px; font-size: 12px; color: var(--text-muted);">Nenhuma categoria cadastrada.</p>';
+                    return;
+                }
+                container.innerHTML = localCategorias.map(cat => `
+                    <div class="category-item">
+                        <span style="font-size: 13px; font-weight: 500;">${cat}</span>
+                        <button onclick="app.removerCategoria('${cat}')" style="background:none; border:none; color: var(--danger); cursor:pointer; font-size: 12px;">Remover</button>
+                    </div>
+                `).join('');
+            },
+
+            preencherSelectCategorias(selectId) {
+                const select = document.getElementById(selectId);
+                if (!localCategorias.length) {
+                    select.innerHTML = '<option value="">Crie uma categoria primeiro em "🏷 Categorias"</option>';
+                    return;
+                }
+                select.innerHTML = localCategorias.map(c => `<option value="${c}">${c}</option>`).join('');
+            },
+
+            // --- OBRAS ---
             renderObras(obras) {
                 const list = document.getElementById('obras-list');
                 if (!obras.length) {
@@ -646,6 +633,7 @@
                 this.showScreen('screen-obra');
             },
 
+            // --- SERVIÇOS ---
             renderServicos(servicos) {
                 const container = document.getElementById('servicos-content');
                 
@@ -659,23 +647,12 @@
                     return;
                 }
 
-                const getCategoryClass = (category) => {
-                    const cat = (category || '').toLowerCase();
-                    if (cat.includes('alvenaria')) return 'cat-alvenaria';
-                    if (cat.includes('estrutura')) return 'cat-estrutura';
-                    if (cat.includes('hidráulica') || cat.includes('hidraulica')) return 'cat-hidraulica';
-                    if (cat.includes('elétrica') || cat.includes('eletrica')) return 'cat-eletrica';
-                    if (cat.includes('acabamento')) return 'cat-acabamento';
-                    return '';
-                };
-
                 const htmlServicos = servicos.map(s => {
                     const pct = s.meta > 0 ? Math.min(100, Math.round((s.executada / s.meta) * 100)) : 0;
-                    const categoryClass = getCategoryClass(s.category);
                     return `
                         <div class="card">
                             <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 6px;">${s.name}</h4>
-                            <span class="badge ${categoryClass}">${s.category}</span>
+                            <span class="badge">${s.category}</span>
                             <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-top: 10px;">
                                 <span>Meta: ${s.meta} m²</span>
                                 <span>Executado: ${s.executada} m²</span>
@@ -694,6 +671,76 @@
                 container.innerHTML = htmlServicos + `
                     <button class="btn-secondary" style="width: 100%; margin-top: 8px;" onclick="app.openNovoServicoModal()">+ Adicionar Outro Serviço</button>
                 `;
+            },
+
+            openNovoServicoModal() {
+                this.preencherSelectCategorias('novo-servico-categoria');
+                document.getElementById('novo-servico-nome').value = '';
+                document.getElementById('novo-servico-meta').value = '';
+                document.getElementById('modal-novo-servico').classList.remove('hidden');
+            },
+
+            closeNovoServicoModal() {
+                document.getElementById('modal-novo-servico').classList.add('hidden');
+            },
+
+            salvarNovoServico() {
+                const nome = document.getElementById('novo-servico-nome').value.trim();
+                const categoria = document.getElementById('novo-servico-categoria').value;
+                const meta = parseFloat(document.getElementById('novo-servico-meta').value);
+
+                if (!nome || !categoria || isNaN(meta) || meta <= 0) {
+                    alert('Preencha o nome, selecione uma categoria e informe uma meta válida.');
+                    return;
+                }
+
+                const novoServico = {
+                    id: 'serv_' + Date.now(),
+                    name: nome,
+                    category: categoria,
+                    meta: meta,
+                    executada: 0
+                };
+
+                localServicosPorObra[this.currentObra.id].push(novoServico);
+                this.renderServicos(localServicosPorObra[this.currentObra.id]);
+                this.recalcularProgressoObra(this.currentObra.id);
+                this.closeNovoServicoModal();
+            },
+
+            openNovaObraModal() {
+                this.preencherSelectCategorias('nova-obra-categoria');
+                document.getElementById('modal-nova-obra').classList.remove('hidden');
+            },
+
+            closeNovaObraModal() {
+                document.getElementById('modal-nova-obra').classList.add('hidden');
+            },
+
+            salvarNovaObra() {
+                const nome = document.getElementById('nova-obra-nome').value.trim();
+                const categoria = document.getElementById('nova-obra-categoria').value;
+
+                if (!nome || !categoria) {
+                    alert('Preencha o nome da obra e selecione uma categoria.');
+                    return;
+                }
+
+                const novaObra = {
+                    id: 'obra_' + Date.now(),
+                    name: nome,
+                    category: categoria,
+                    progress: 0
+                };
+
+                localObras.unshift(novaObra);
+                localServicosPorObra[novaObra.id] = [];
+                
+                this.renderObras(localObras);
+                document.getElementById('nova-obra-nome').value = '';
+                
+                this.closeNovaObraModal();
+                this.selectObra(novaObra.id, novaObra.name);
             },
 
             recalcularProgressoObra(obraId) {
@@ -792,26 +839,6 @@
                 this.recalcularProgressoObra(this.currentObra.id);
             },
 
-            openNovoServicoModal() {
-                const nome = prompt('Nome do serviço (ex: Pintura Interna):');
-                if (!nome) return;
-
-                const categoria = prompt('Categoria (ex: Acabamento, Alvenaria, Estrutura, Hidráulica):') || 'Geral';
-                const meta = parseFloat(prompt('Meta total em m²:') || '0');
-
-                const novoServico = {
-                    id: 'serv_' + Date.now(),
-                    name: nome,
-                    category: categoria,
-                    meta: meta,
-                    executada: 0
-                };
-
-                localServicosPorObra[this.currentObra.id].push(novoServico);
-                this.renderServicos(localServicosPorObra[this.currentObra.id]);
-                this.recalcularProgressoObra(this.currentObra.id);
-            },
-
             openHistorico(servicoId) {
                 this.currentServico = { id: servicoId };
                 this.showScreen('screen-historico');
@@ -841,42 +868,6 @@
                         ${med.justificativa ? `<p style="margin-top: 8px; font-size: 11px; color: var(--danger); background: #FEF2F2; padding: 6px; border-radius: 4px;"><strong>Justificativa:</strong> ${med.justificativa}</p>` : ''}
                     </div>
                 `).join('');
-            },
-
-            openNovaObraModal() {
-                document.getElementById('modal-nova-obra').classList.remove('hidden');
-            },
-
-            closeNovaObraModal() {
-                document.getElementById('modal-nova-obra').classList.add('hidden');
-            },
-
-            salvarNovaObra() {
-                const nome = document.getElementById('nova-obra-nome').value;
-                const categoria = document.getElementById('nova-obra-categoria').value;
-
-                if (!nome || !categoria) {
-                    alert('Preencha os campos obrigatórios.');
-                    return;
-                }
-
-                const novaObra = {
-                    id: 'obra_' + Date.now(),
-                    name: nome,
-                    category: categoria,
-                    progress: 0
-                };
-
-                localObras.unshift(novaObra);
-                localServicosPorObra[novaObra.id] = [];
-                
-                this.renderObras(localObras);
-                
-                document.getElementById('nova-obra-nome').value = '';
-                document.getElementById('nova-obra-categoria').value = '';
-                
-                this.closeNovaObraModal();
-                this.selectObra(novaObra.id, novaObra.name);
             },
 
             switchTab(tab, e) {
