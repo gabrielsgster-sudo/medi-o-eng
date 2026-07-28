@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MEDI-O ENG v2.0 - Gestão e Medição de Obras</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -42,6 +41,7 @@
             width: 100%;
             height: 100%;
             background-color: var(--bg-body);
+            position: relative;
         }
 
         .app-container {
@@ -95,6 +95,48 @@
             padding-bottom: 90px;
         }
 
+        /* BOTTOM NAVIGATION BAR */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            background-color: var(--surface);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 150;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            flex: 1;
+            height: 100%;
+            gap: 4px;
+            transition: color 0.2s ease;
+        }
+
+        .nav-item .icon {
+            font-size: 18px;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        /* CARDS & COMPONENTS */
         .card {
             background-color: var(--surface);
             border: 1px solid var(--border);
@@ -122,9 +164,7 @@
             border-radius: 4px;
         }
 
-        .btn-delete-card:hover {
-            background-color: #FEF2F2;
-        }
+        .btn-delete-card:hover { background-color: #FEF2F2; }
 
         .card-title {
             font-size: 16px;
@@ -143,6 +183,8 @@
             background-color: #F1F5F9;
             color: var(--text-muted);
         }
+
+        .badge-warning { background-color: #FEF3C7; color: #92400E; }
 
         .progress-bar {
             width: 100%;
@@ -206,6 +248,7 @@
             gap: 4px;
         }
 
+        /* MODAIS */
         .modal {
             position: fixed;
             inset: 0;
@@ -243,13 +286,9 @@
             cursor: pointer;
         }
 
-        .modal-body {
-            padding: 20px;
-        }
+        .modal-body { padding: 20px; }
 
-        .form-group {
-            margin-bottom: 16px;
-        }
+        .form-group { margin-bottom: 16px; }
 
         .form-label {
             display: block;
@@ -269,11 +308,6 @@
             background-color: #FFFFFF;
         }
 
-        .form-input:focus, .form-textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
         .alert-warning {
             background-color: #FEF2F2;
             border: 1px solid #FECACA;
@@ -285,39 +319,23 @@
             font-weight: 500;
         }
 
-        .button-group {
-            display: flex;
-            gap: 12px;
-            margin-top: 24px;
-        }
+        .button-group { display: flex; gap: 12px; margin-top: 24px; }
 
         .btn-primary {
-            flex: 1;
-            padding: 12px;
-            background-color: var(--primary);
-            color: #FFFFFF;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
+            flex: 1; padding: 12px; background-color: var(--primary);
+            color: #FFFFFF; border: none; border-radius: 6px; cursor: pointer;
+            font-size: 14px; font-weight: 600;
         }
 
         .btn-secondary {
-            flex: 1;
-            padding: 12px;
-            background-color: #F1F5F9;
-            color: var(--text-main);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
+            flex: 1; padding: 12px; background-color: #F1F5F9;
+            color: var(--text-main); border: 1px solid var(--border);
+            border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;
         }
 
         .fab {
             position: fixed;
-            bottom: 20px;
+            bottom: 80px;
             right: 20px;
             width: 52px;
             height: 52px;
@@ -331,59 +349,46 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 50;
-        }
-
-        .btn-icon-top {
-            background: rgba(255,255,255,0.15);
-            border: none;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-            font-weight: 600;
+            z-index: 100;
         }
 
         .category-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px; border-bottom: 1px solid var(--border);
         }
-
         .category-item:last-child { border-bottom: none; }
 
         .photo-upload-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-top: 8px;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px;
         }
 
         .photo-preview {
-            width: 100%;
-            height: 75px;
-            border-radius: 6px;
-            object-fit: cover;
-            border: 1px solid var(--border);
+            width: 100%; height: 75px; border-radius: 6px; object-fit: cover; border: 1px solid var(--border);
         }
 
         .photo-add-btn {
-            height: 75px;
-            border: 2px dashed var(--border);
-            border-radius: 6px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: #F8FAFC;
-            cursor: pointer;
-            color: var(--text-muted);
-            font-size: 11px;
-            font-weight: 600;
+            height: 75px; border: 2px dashed var(--border); border-radius: 6px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: #F8FAFC; cursor: pointer; color: var(--text-muted); font-size: 11px; font-weight: 600;
         }
+
+        /* GRID DASHBOARD */
+        .dash-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .dash-kpi {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            padding: 14px;
+            border-radius: 8px;
+        }
+
+        .dash-kpi-title { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
+        .dash-kpi-value { font-size: 20px; font-weight: 700; color: var(--primary); margin-top: 4px; }
 
         .hidden { display: none !important; }
         .screen { display: none; }
@@ -394,33 +399,73 @@
     <div class="app-wrapper">
         <div class="mobile-view">
             <div class="app-container">
-                <!-- TELA 1: HOME -->
-                <div id="screen-home" class="screen active">
-                    <div class="header">
-                        <div class="header-left">
-                            <div>
-                                <h1 class="header-title">MEDI-O ENG</h1>
-                                <p class="header-subtitle">Gestão & Medição de Obras</p>
-                            </div>
-                        </div>
-                        <button class="btn-icon-top" onclick="app.openGerenciarCategoriasModal()">🏷 Categorias</button>
-                    </div>
 
+                <!-- HEADER COMPARTILHADO -->
+                <div class="header">
+                    <div class="header-left">
+                        <button class="header-back hidden" id="header-back-btn" onclick="app.goHome()">←</button>
+                        <div>
+                            <h1 class="header-title" id="main-header-title">MEDI-O ENG</h1>
+                            <p class="header-subtitle" id="main-header-subtitle">Gestão & Medição de Obras</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TELA 1: OBRAS (HOME) -->
+                <div id="screen-obras" class="screen active">
                     <div class="content">
                         <div id="obras-list"></div>
                     </div>
                 </div>
 
-                <!-- TELA 2: OBRA -->
-                <div id="screen-obra" class="screen">
-                    <div class="header">
-                        <div class="header-left">
-                            <button class="header-back" onclick="app.goHome()">←</button>
-                            <h1 class="header-title" id="obra-title">Obra</h1>
+                <!-- TELA 2: DASHBOARD -->
+                <div id="screen-dashboard" class="screen">
+                    <div class="content">
+                        <div class="dash-grid">
+                            <div class="dash-kpi">
+                                <div class="dash-kpi-title">Obras Ativas</div>
+                                <div class="dash-kpi-value" id="kpi-obras-total">0</div>
+                            </div>
+                            <div class="dash-kpi">
+                                <div class="dash-kpi-title">Progresso Médio</div>
+                                <div class="dash-kpi-value" id="kpi-progresso-medio">0%</div>
+                            </div>
                         </div>
-                        <button class="btn-icon-top" onclick="app.openGerenciarCategoriasModal()">🏷 Categorias</button>
-                    </div>
 
+                        <div class="card">
+                            <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">📊 Resumo do Portfólio</h3>
+                            <div id="dash-obras-resumo"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TELA 3: CATEGORIAS -->
+                <div id="screen-categorias" class="screen">
+                    <div class="content">
+                        <div class="card">
+                            <div class="tabs" style="margin-bottom: 12px;">
+                                <button class="tab-button active" id="tab-cat-obras" onclick="app.switchCatTab('obras')">TIPOS DE OBRA</button>
+                                <button class="tab-button" id="tab-cat-servicos" onclick="app.switchCatTab('servicos')">SERVIÇOS</button>
+                            </div>
+
+                            <div class="form-group" style="display: flex; gap: 8px;">
+                                <input type="text" class="form-input" id="nova-categoria-nome" placeholder="Nova categoria...">
+                                <button class="btn-primary" style="flex: 0 0 80px;" onclick="app.salvarCategoria()">Criar</button>
+                            </div>
+
+                            <h4 style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;" id="cat-lista-titulo">Categorias de Obras:</h4>
+                            <div id="lista-categorias-gerenciar" style="border: 1px solid var(--border); border-radius: 6px; max-height: 300px; overflow-y: auto;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TELA 4: HISTÓRICO GERAL -->
+                <div id="screen-historico-geral" class="screen">
+                    <div class="content" id="historico-geral-content"></div>
+                </div>
+
+                <!-- TELA DETALHES DA OBRA -->
+                <div id="screen-obra-detalhe" class="screen">
                     <div class="content">
                         <div class="card">
                             <h2 class="card-title" id="obra-card-title">Obra</h2>
@@ -433,57 +478,62 @@
                             </div>
                         </div>
 
-                        <div class="tabs">
-                            <button class="tab-button active" onclick="app.switchTab('servicos', event)">SERVIÇOS</button>
-                            <button class="tab-button" onclick="app.switchTab('graficos', event)">GRÁFICOS</button>
-                        </div>
-
                         <div id="servicos-content"></div>
-                        <div id="graficos-content" class="hidden">
-                            <div class="card">
-                                <h3 style="margin-bottom: 12px; font-size: 14px; font-weight: 600;">Evolução do Projeto</h3>
-                                <p style="font-size: 12px; color: var(--text-muted);">Acompanhamento gráfico em breve.</p>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
-                <!-- TELA HISTÓRICO -->
-                <div id="screen-historico" class="screen">
-                    <div class="header">
-                        <div class="header-left">
-                            <button class="header-back" onclick="app.goToObra()">←</button>
-                            <h1 class="header-title">Histórico de Medições</h1>
-                        </div>
-                    </div>
-                    <div class="content" id="historico-content"></div>
+                <!-- TELA HISTÓRICO DO SERVIÇO -->
+                <div id="screen-historico-servico" class="screen">
+                    <div class="content" id="historico-servico-content"></div>
                 </div>
+
             </div>
 
-            <button class="fab" onclick="app.openNovaObraModal()">+</button>
+            <!-- BOTÃO FLUTUANTE (FAB) -->
+            <button class="fab" id="fab-add" onclick="app.handleFabClick()">+</button>
+
+            <!-- BOTTOM NAVIGATION BAR -->
+            <div class="bottom-nav">
+                <button class="nav-item active" id="nav-obras" onclick="app.switchNav('obras')">
+                    <span class="icon">🏗️</span>
+                    <span>Obras</span>
+                </button>
+                <button class="nav-item" id="nav-dashboard" onclick="app.switchNav('dashboard')">
+                    <span class="icon">📊</span>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-item" id="nav-categorias" onclick="app.switchNav('categorias')">
+                    <span class="icon">🏷️</span>
+                    <span>Categorias</span>
+                </button>
+                <button class="nav-item" id="nav-historico" onclick="app.switchNav('historico')">
+                    <span class="icon">📋</span>
+                    <span>Histórico</span>
+                </button>
+            </div>
         </div>
     </div>
 
-    <!-- MODAL GERENCIAR CATEGORIAS -->
-    <div id="modal-categorias" class="modal hidden">
+    <!-- MODAL NOVA OBRA -->
+    <div id="modal-nova-obra" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 style="margin: 0; font-size: 15px; font-weight: 600;">Gerenciar Categorias</h2>
-                <button class="modal-close" onclick="app.closeGerenciarCategoriasModal()">✕</button>
+                <h2 style="margin: 0; font-size: 15px; font-weight: 600;">Nova Obra</h2>
+                <button class="modal-close" onclick="app.closeNovaObraModal()">✕</button>
             </div>
             <div class="modal-body">
-                <div class="tabs" style="margin-bottom: 12px;">
-                    <button class="tab-button active" id="tab-cat-obras" onclick="app.switchCatTab('obras')">TIPOS DE OBRA</button>
-                    <button class="tab-button" id="tab-cat-servicos" onclick="app.switchCatTab('servicos')">SERVIÇOS</button>
+                <div class="form-group">
+                    <label class="form-label">Nome da Obra *</label>
+                    <input type="text" class="form-input" id="nova-obra-nome" placeholder="Ex: Residencial Alphaville">
                 </div>
-
-                <div class="form-group" style="display: flex; gap: 8px;">
-                    <input type="text" class="form-input" id="nova-categoria-nome" placeholder="Nome da nova categoria...">
-                    <button class="btn-primary" style="flex: 0 0 80px;" onclick="app.salvarCategoria()">Criar</button>
+                <div class="form-group">
+                    <label class="form-label">Categoria da Obra *</label>
+                    <select class="form-input" id="nova-obra-categoria"></select>
                 </div>
-
-                <h4 style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;" id="cat-lista-titulo">Categorias de Obras:</h4>
-                <div id="lista-categorias-gerenciar" style="border: 1px solid var(--border); border-radius: 6px; max-height: 200px; overflow-y: auto;"></div>
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="app.closeNovaObraModal()">Cancelar</button>
+                    <button class="btn-primary" onclick="app.salvarNovaObra()">Criar Obra</button>
+                </div>
             </div>
         </div>
     </div>
@@ -511,30 +561,6 @@
                 <div class="button-group">
                     <button class="btn-secondary" onclick="app.closeNovoServicoModal()">Cancelar</button>
                     <button class="btn-primary" onclick="app.salvarNovoServico()">Salvar Serviço</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL NOVA OBRA -->
-    <div id="modal-nova-obra" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 style="margin: 0; font-size: 15px; font-weight: 600;">Nova Obra</h2>
-                <button class="modal-close" onclick="app.closeNovaObraModal()">✕</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label class="form-label">Nome da Obra *</label>
-                    <input type="text" class="form-input" id="nova-obra-nome" placeholder="Ex: Edifício Central">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Categoria da Obra *</label>
-                    <select class="form-input" id="nova-obra-categoria"></select>
-                </div>
-                <div class="button-group">
-                    <button class="btn-secondary" onclick="app.closeNovaObraModal()">Cancelar</button>
-                    <button class="btn-primary" onclick="app.salvarNovaObra()">Criar Obra</button>
                 </div>
             </div>
         </div>
@@ -591,7 +617,6 @@
     <script>
         let localCategoriasObras = ['Residencial', 'Comercial', 'Industrial', 'Infraestrutura'];
         let localCategoriasServicos = ['Alvenaria', 'Estrutura', 'Hidráulica', 'Elétrica', 'Acabamento', 'Pintura'];
-
         let activeCatTab = 'obras';
 
         let localObras = [
@@ -609,6 +634,7 @@
         let tempFotos = [];
 
         const app = {
+            currentNav: 'obras',
             currentObra: null,
             currentServico: null,
 
@@ -622,16 +648,147 @@
                 document.getElementById('medicao-data').value = today;
             },
 
+            // --- BOTÃO BOTTOM BAR & NAVEGAÇÃO ---
+            switchNav(nav) {
+                this.currentNav = nav;
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                document.getElementById(`nav-${nav}`).classList.add('active');
+
+                const btnBack = document.getElementById('header-back-btn');
+                btnBack.classList.add('hidden');
+
+                const title = document.getElementById('main-header-title');
+                const subtitle = document.getElementById('main-header-subtitle');
+
+                document.getElementById('fab-add').classList.remove('hidden');
+
+                if (nav === 'obras') {
+                    title.textContent = "MEDI-O ENG";
+                    subtitle.textContent = "Gestão & Medição de Obras";
+                    this.renderObras(localObras);
+                    this.showScreen('screen-obras');
+                } else if (nav === 'dashboard') {
+                    title.textContent = "Dashboard Global";
+                    subtitle.textContent = "Indicadores consolidados";
+                    this.renderDashboard();
+                    this.showScreen('screen-dashboard');
+                } else if (nav === 'categorias') {
+                    title.textContent = "Categorias";
+                    subtitle.textContent = "Gestão de Cadastros";
+                    this.switchCatTab(activeCatTab);
+                    this.showScreen('screen-categorias');
+                } else if (nav === 'historico') {
+                    title.textContent = "Histórico Geral";
+                    subtitle.textContent = "Linha do tempo de medições";
+                    this.renderHistoricoGeral();
+                    this.showScreen('screen-historico-geral');
+                }
+            },
+
+            handleFabClick() {
+                if (this.currentNav === 'obras') {
+                    this.openNovaObraModal();
+                } else if (this.currentObra && document.getElementById('screen-obra-detalhe').classList.contains('active')) {
+                    this.openNovoServicoModal();
+                } else {
+                    this.openNovaObraModal();
+                }
+            },
+
+            showScreen(screenId) {
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                document.getElementById(screenId).classList.add('active');
+            },
+
+            goHome() {
+                this.currentObra = null;
+                this.switchNav('obras');
+            },
+
+            // --- TELA OBRAS ---
+            renderObras(obras) {
+                const list = document.getElementById('obras-list');
+                if (!obras.length) {
+                    list.innerHTML = '<div class="card"><p style="text-align: center; color: var(--text-muted);">Nenhuma obra cadastrada.</p></div>';
+                    return;
+                }
+
+                list.innerHTML = obras.map(obra => `
+                    <div class="card" onclick="app.selectObra('${obra.id}', '${obra.name}')" style="cursor: pointer;">
+                        <div class="card-header-actions">
+                            <h3 class="card-title">${obra.name}</h3>
+                            <button class="btn-delete-card" onclick="app.removerObra('${obra.id}', event)">🗑 Excluir</button>
+                        </div>
+                        <span class="badge">${obra.category}</span>
+                        <div style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 11px; color: var(--text-muted);">Progresso Geral</span>
+                            <span style="font-size: 13px; font-weight: 700; color: var(--primary);">${obra.progress || 0}%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${obra.progress || 0}%;"></div>
+                        </div>
+                    </div>
+                `).join('');
+            },
+
+            selectObra(id, name) {
+                this.currentObra = { id, name };
+                
+                document.getElementById('main-header-title').textContent = name;
+                document.getElementById('main-header-subtitle').textContent = "Detalhamento da Obra";
+                document.getElementById('header-back-btn').classList.remove('hidden');
+
+                document.getElementById('obra-card-title').textContent = name;
+
+                if (!localServicosPorObra[id]) {
+                    localServicosPorObra[id] = [];
+                }
+
+                this.renderServicos(localServicosPorObra[id]);
+                this.recalcularProgressoObra(id);
+                this.showScreen('screen-obra-detalhe');
+            },
+
+            removerObra(id, event) {
+                if (event) event.stopPropagation();
+                const obra = localObras.find(o => o.id === id);
+                if (!obra) return;
+
+                if (confirm(`Tem certeza que deseja excluir a obra "${obra.name}"?`)) {
+                    localObras = localObras.filter(o => o.id !== id);
+                    delete localServicosPorObra[id];
+                    this.renderObras(localObras);
+                }
+            },
+
+            // --- TELA DASHBOARD ---
+            renderDashboard() {
+                document.getElementById('kpi-obras-total').textContent = localObras.length;
+                
+                let somaProgresso = localObras.reduce((acc, o) => acc + (o.progress || 0), 0);
+                let media = localObras.length ? Math.round(somaProgresso / localObras.length) : 0;
+                document.getElementById('kpi-progresso-medio').textContent = media + '%';
+
+                const container = document.getElementById('dash-obras-resumo');
+                if (!localObras.length) {
+                    container.innerHTML = '<p style="font-size: 12px; color: var(--text-muted);">Sem dados de obras para exibir.</p>';
+                    return;
+                }
+
+                container.innerHTML = localObras.map(o => `
+                    <div style="margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600;">
+                            <span>${o.name}</span>
+                            <span>${o.progress || 0}%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${o.progress || 0}%;"></div>
+                        </div>
+                    </div>
+                `).join('');
+            },
+
             // --- CATEGORIAS ---
-            openGerenciarCategoriasModal() {
-                this.switchCatTab('obras');
-                document.getElementById('modal-categorias').classList.remove('hidden');
-            },
-
-            closeGerenciarCategoriasModal() {
-                document.getElementById('modal-categorias').classList.add('hidden');
-            },
-
             switchCatTab(tab) {
                 activeCatTab = tab;
                 document.getElementById('tab-cat-obras').classList.toggle('active', tab === 'obras');
@@ -673,7 +830,7 @@
                 const targetList = activeCatTab === 'obras' ? localCategoriasObras : localCategoriasServicos;
 
                 if (!targetList.length) {
-                    container.innerHTML = '<p style="padding: 10px; font-size: 12px; color: var(--text-muted);">Nenhuma categoria cadastrada nesta aba.</p>';
+                    container.innerHTML = '<p style="padding: 10px; font-size: 12px; color: var(--text-muted);">Nenhuma categoria cadastrada.</p>';
                     return;
                 }
                 container.innerHTML = targetList.map(cat => `
@@ -686,67 +843,10 @@
 
             preencherSelect(selectId, lista) {
                 const select = document.getElementById(selectId);
-                if (!lista.length) {
-                    select.innerHTML = '<option value="">Cadastre uma categoria em "🏷 Categorias"</option>';
-                    return;
-                }
                 select.innerHTML = lista.map(c => `<option value="${c}">${c}</option>`).join('');
             },
 
-            // --- OBRAS ---
-            renderObras(obras) {
-                const list = document.getElementById('obras-list');
-                if (!obras.length) {
-                    list.innerHTML = '<div class="card"><p style="text-align: center; color: var(--text-muted);">Nenhuma obra cadastrada.</p></div>';
-                    return;
-                }
-
-                list.innerHTML = obras.map(obra => `
-                    <div class="card" onclick="app.selectObra('${obra.id}', '${obra.name}')" style="cursor: pointer;">
-                        <div class="card-header-actions">
-                            <h3 class="card-title">${obra.name}</h3>
-                            <button class="btn-delete-card" onclick="app.removerObra('${obra.id}', event)">🗑 Excluir</button>
-                        </div>
-                        <span class="badge">${obra.category}</span>
-                        <div style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 11px; color: var(--text-muted);">Progresso Geral</span>
-                            <span style="font-size: 13px; font-weight: 700; color: var(--primary);">${obra.progress || 0}%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: ${obra.progress || 0}%;"></div>
-                        </div>
-                    </div>
-                `).join('');
-            },
-
-            removerObra(id, event) {
-                if (event) event.stopPropagation(); // Evita abrir a obra ao clicar no botão de excluir
-
-                const obra = localObras.find(o => o.id === id);
-                if (!obra) return;
-
-                if (confirm(`Tem certeza que deseja excluir a obra "${obra.name}"? Esta ação removerá todos os serviços vinculados.`)) {
-                    localObras = localObras.filter(o => o.id !== id);
-                    delete localServicosPorObra[id];
-                    this.renderObras(localObras);
-                }
-            },
-
-            selectObra(id, name) {
-                this.currentObra = { id, name };
-                document.getElementById('obra-title').textContent = name;
-                document.getElementById('obra-card-title').textContent = name;
-
-                if (!localServicosPorObra[id]) {
-                    localServicosPorObra[id] = [];
-                }
-
-                this.renderServicos(localServicosPorObra[id]);
-                this.recalcularProgressoObra(id);
-                this.showScreen('screen-obra');
-            },
-
-            // --- SERVIÇOS ---
+            // --- SERVIÇOS DA OBRA ---
             renderServicos(servicos) {
                 const container = document.getElementById('servicos-content');
                 
@@ -778,7 +878,7 @@
                             </div>
                             <div class="action-buttons">
                                 <button onclick="app.openMedicaoModal('${s.id}', '${s.name}', ${s.meta}, ${s.executada})">📏 Medir</button>
-                                <button onclick="app.openHistorico('${s.id}')">📋 Histórico</button>
+                                <button onclick="app.openHistoricoServico('${s.id}')">📋 Histórico</button>
                             </div>
                         </div>
                     `;
@@ -863,7 +963,6 @@
                 
                 this.renderObras(localObras);
                 document.getElementById('nova-obra-nome').value = '';
-                
                 this.closeNovaObraModal();
                 this.selectObra(novaObra.id, novaObra.name);
             },
@@ -885,50 +984,28 @@
                 if (obra) obra.progress = percentualGeral;
             },
 
-            // --- PROCESSAMENTO DE FOTOS ---
-            handleFotoUpload(event) {
-                const files = event.target.files;
-                if (!files || !files.length) return;
-
-                Array.from(files).forEach(file => {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        tempFotos.push(e.target.result);
-                        this.renderFotosPreview();
-                    };
-                    reader.readAsDataURL(file);
-                });
+            // --- MEDIÇÃO ---
+            openMedicaoModal(servicoId, servicoName, meta, executada) {
+                this.currentServico = { id: servicoId, name: servicoName, meta, executada };
+                tempFotos = [];
                 
-                event.target.value = '';
-            },
-
-            renderFotosPreview() {
-                const container = document.getElementById('photo-container');
+                const pct = meta > 0 ? Math.round((executada / meta) * 100) : 0;
                 
-                const addBtnsHtml = `
-                    <div class="photo-add-btn" onclick="document.getElementById('input-camera').click()">
-                        <span style="font-size: 20px;">📸</span>
-                        <span>Tirar Foto</span>
-                    </div>
-                    <div class="photo-add-btn" onclick="document.getElementById('input-galeria').click()">
-                        <span style="font-size: 20px;">🖼️</span>
-                        <span>Galeria</span>
-                    </div>
+                document.getElementById('medicao-info').innerHTML = `
+                    <strong>${servicoName}</strong><br>
+                    Meta: ${meta} m² | Executado Atual: ${executada} m² (${pct}%)
                 `;
-
-                const photosHtml = tempFotos.map((src, index) => `
-                    <div style="position: relative;">
-                        <img src="${src}" class="photo-preview">
-                        <button onclick="app.removerFoto(${index})" style="position: absolute; top: 2px; right: 2px; background: rgba(239, 68, 68, 0.8); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 10px; cursor: pointer;">✕</button>
-                    </div>
-                `).join('');
-
-                container.innerHTML = addBtnsHtml + photosHtml;
+                document.getElementById('medicao-quantidade').value = '';
+                document.getElementById('medicao-equipe').value = '';
+                document.getElementById('medicao-justificativa').value = '';
+                document.getElementById('medicao-alert').classList.add('hidden');
+                document.getElementById('medicao-justificativa-group').classList.add('hidden');
+                this.renderFotosPreview();
+                document.getElementById('modal-medicao').classList.remove('hidden');
             },
 
-            removerFoto(index) {
-                tempFotos.splice(index, 1);
-                this.renderFotosPreview();
+            closeMedicaoModal() {
+                document.getElementById('modal-medicao').classList.add('hidden');
             },
 
             onQuantidadeChange() {
@@ -953,27 +1030,47 @@
                 }
             },
 
-            openMedicaoModal(servicoId, servicoName, meta, executada) {
-                this.currentServico = { id: servicoId, name: servicoName, meta, executada };
-                tempFotos = [];
-                
-                const pct = meta > 0 ? Math.round((executada / meta) * 100) : 0;
-                
-                document.getElementById('medicao-info').innerHTML = `
-                    <strong>${servicoName}</strong><br>
-                    Meta: ${meta} m² | Executado Atual: ${executada} m² (${pct}%)
-                `;
-                document.getElementById('medicao-quantidade').value = '';
-                document.getElementById('medicao-equipe').value = '';
-                document.getElementById('medicao-justificativa').value = '';
-                document.getElementById('medicao-alert').classList.add('hidden');
-                document.getElementById('medicao-justificativa-group').classList.add('hidden');
-                this.renderFotosPreview();
-                document.getElementById('modal-medicao').classList.remove('hidden');
+            handleFotoUpload(event) {
+                const files = event.target.files;
+                if (!files || !files.length) return;
+
+                Array.from(files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        tempFotos.push(e.target.result);
+                        this.renderFotosPreview();
+                    };
+                    reader.readAsDataURL(file);
+                });
+                event.target.value = '';
             },
 
-            closeMedicaoModal() {
-                document.getElementById('modal-medicao').classList.add('hidden');
+            renderFotosPreview() {
+                const container = document.getElementById('photo-container');
+                const addBtnsHtml = `
+                    <div class="photo-add-btn" onclick="document.getElementById('input-camera').click()">
+                        <span style="font-size: 20px;">📸</span>
+                        <span>Câmera</span>
+                    </div>
+                    <div class="photo-add-btn" onclick="document.getElementById('input-galeria').click()">
+                        <span style="font-size: 20px;">🖼️</span>
+                        <span>Galeria</span>
+                    </div>
+                `;
+
+                const photosHtml = tempFotos.map((src, index) => `
+                    <div style="position: relative;">
+                        <img src="${src}" class="photo-preview">
+                        <button onclick="app.removerFoto(${index})" style="position: absolute; top: 2px; right: 2px; background: rgba(239, 68, 68, 0.8); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 10px; cursor: pointer;">✕</button>
+                    </div>
+                `).join('');
+
+                container.innerHTML = addBtnsHtml + photosHtml;
+            },
+
+            removerFoto(index) {
+                tempFotos.splice(index, 1);
+                this.renderFotosPreview();
             },
 
             salvarMedicao() {
@@ -1004,6 +1101,8 @@
                 }
 
                 localHistorico[this.currentServico.id].unshift({
+                    obraNome: this.currentObra.name,
+                    servicoNome: this.currentServico.name,
                     data: document.getElementById('medicao-data').value,
                     quantidade: qtd,
                     equipe: equipe,
@@ -1018,30 +1117,55 @@
                 this.recalcularProgressoObra(this.currentObra.id);
             },
 
-            openHistorico(servicoId) {
+            // --- HISTÓRICOS ---
+            openHistoricoServico(servicoId) {
                 this.currentServico = { id: servicoId };
-                this.showScreen('screen-historico');
-                this.loadHistorico();
+                document.getElementById('header-back-btn').classList.remove('hidden');
+                this.showScreen('screen-historico-servico');
+                this.renderHistoricoServico();
             },
 
-            loadHistorico() {
-                const container = document.getElementById('historico-content');
+            renderHistoricoServico() {
+                const container = document.getElementById('historico-servico-content');
                 const list = localHistorico[this.currentServico.id] || [];
 
                 if (!list.length) {
-                    container.innerHTML = '<div class="card"><p style="text-align: center; color: var(--text-muted);">Nenhuma medição cadastrada.</p></div>';
+                    container.innerHTML = '<div class="card"><p style="text-align: center; color: var(--text-muted);">Nenhuma medição cadastrada neste serviço.</p></div>';
                     return;
                 }
 
-                container.innerHTML = list.map(med => `
+                container.innerHTML = list.map(med => this.buildCardHistorico(med)).join('');
+            },
+
+            renderHistoricoGeral() {
+                const container = document.getElementById('historico-geral-content');
+                let todasMedicoes = [];
+
+                Object.keys(localHistorico).forEach(servId => {
+                    todasMedicoes = todasMedicoes.concat(localHistorico[servId]);
+                });
+
+                if (!todasMedicoes.length) {
+                    container.innerHTML = '<div class="card"><p style="text-align: center; color: var(--text-muted);">Nenhuma medição registrada até o momento.</p></div>';
+                    return;
+                }
+
+                todasMedicoes.sort((a, b) => new Date(b.data) - new Date(a.data));
+
+                container.innerHTML = todasMedicoes.map(med => this.buildCardHistorico(med, true)).join('');
+            },
+
+            buildCardHistorico(med, showContext = false) {
+                return `
                     <div class="card">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                             <div>
-                                <h4 style="font-size: 14px; font-weight: 600;">Data: ${med.data}</h4>
-                                <p style="font-size: 15px; font-weight: 700; color: var(--primary); margin-top: 4px;">${med.quantidade} m²</p>
+                                ${showContext ? `<p style="font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase;">${med.obraNome} - ${med.servicoNome}</p>` : ''}
+                                <h4 style="font-size: 13px; font-weight: 600; color: var(--text-muted); margin-top: 2px;">Data: ${med.data}</h4>
+                                <p style="font-size: 16px; font-weight: 700; color: var(--primary); margin-top: 4px;">${med.quantidade} m²</p>
                                 ${med.equipe ? `<p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">👷 Equipe: <strong>${med.equipe} func.</strong></p>` : ''}
                             </div>
-                            <span class="badge ${med.status === 'extrapolou' ? 'status-extrapolou' : 'status-normal'}">
+                            <span class="badge ${med.status === 'extrapolou' ? 'badge-warning' : ''}">
                                 ${med.status === 'extrapolou' ? 'Excedeu Meta' : 'Normal'}
                             </span>
                         </div>
@@ -1054,22 +1178,7 @@
 
                         ${med.justificativa ? `<p style="margin-top: 8px; font-size: 11px; color: var(--danger); background: #FEF2F2; padding: 6px; border-radius: 4px;"><strong>Justificativa:</strong> ${med.justificativa}</p>` : ''}
                     </div>
-                `).join('');
-            },
-
-            switchTab(tab, e) {
-                document.querySelectorAll('#screen-obra .tab-button').forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-                document.getElementById('servicos-content').classList.toggle('hidden', tab !== 'servicos');
-                document.getElementById('graficos-content').classList.toggle('hidden', tab !== 'graficos');
-            },
-
-            goHome() { this.showScreen('screen-home'); },
-            goToObra() { if (this.currentObra) this.showScreen('screen-obra'); },
-
-            showScreen(screenId) {
-                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-                document.getElementById(screenId).classList.add('active');
+                `;
             }
         };
 
