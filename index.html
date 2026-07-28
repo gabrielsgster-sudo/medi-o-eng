@@ -733,10 +733,19 @@
                 <div id="screen-dashboard" class="screen">
                     <div class="content" style="padding-top: 16px;">
                         <div class="card" style="padding: 12px 16px; margin-bottom: 16px; background-color: #F1F5F9;">
-                            <label class="form-label" for="dash-obra-filtro" style="margin-bottom: 4px; font-size: 11px;">FILTRAR ANÁLISE DA DASHBOARD:</label>
-                            <select id="dash-obra-filtro" class="form-input" onchange="app.onDashFiltroChange()">
-                                <option value="todas">🌐 Visão Geral (Todas as Obras)</option>
-                            </select>
+                            <div class="form-group" style="margin-bottom: 10px;">
+                                <label class="form-label" for="dash-obra-filtro" style="margin-bottom: 4px; font-size: 11px;">FILTRAR ANÁLISE DA DASHBOARD:</label>
+                                <select id="dash-obra-filtro" class="form-input" onchange="app.onDashFiltroChange()">
+                                    <option value="todas">🌐 Visão Geral (Todas as Obras)</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-label" for="dash-data-filtro" style="margin-bottom: 4px; font-size: 11px;">FILTRAR POR DIA ESPECÍFICO:</label>
+                                <div style="display: flex; gap: 8px;">
+                                    <input type="date" id="dash-data-filtro" class="form-input" onchange="app.onDashFiltroChange()">
+                                    <button class="btn-secondary" style="flex: 0 0 90px; font-size: 11px; padding: 6px;" onclick="app.limparFiltroDataDashboard()">Limpar Dia</button>
+                                </div>
+                            </div>
                         </div>
                         <div class="dash-grid">
                             <div class="dash-kpi">
@@ -1200,6 +1209,14 @@
                 this.renderDashboard();
             },
 
+            limparFiltroDataDashboard() {
+                const inputData = document.getElementById('dash-data-filtro');
+                if (inputData) {
+                    inputData.value = '';
+                }
+                this.renderDashboard();
+            },
+
             renderObras(obras) {
                 const list = document.getElementById('obras-list');
                 if (!obras.length) {
@@ -1370,6 +1387,7 @@
 
             renderDashboard() {
                 const obraIdSelecionada = document.getElementById('dash-obra-filtro').value;
+                const dataSelecionada = document.getElementById('dash-data-filtro').value;
                 const containerResumo = document.getElementById('dash-obras-resumo');
 
                 const kpiTitle1 = document.getElementById('kpi-card-title-1');
@@ -1378,33 +1396,64 @@
                 const chartTitle2 = document.getElementById('chart-title-2');
                 const resumoTitle = document.getElementById('resumo-card-title');
 
+                // Se houver filtro de data, coletamos as medições feitas nesse dia específico
+                let medicoesFiltradasNoDia = [];
+                Object.keys(localHistorico).forEach(sId => {
+                    (localHistorico[sId] || []).forEach(m => {
+                        if (!dataSelecionada || m.data === dataSelecionada) {
+                            // Validar se pertence à obra selecionada (caso não seja 'todas')
+                            if (obraIdSelecionada === 'todas') {
+                                medicoesFiltradasNoDia.push({ ...m, servicoId: sId });
+                            } else {
+                                const obraRef = localObras.find(o => o.id === obraIdSelecionada);
+                                if (obraRef && m.obraNome === obraRef.name) {
+                                    medicoesFiltradasNoDia.push({ ...m, servicoId: sId });
+                                }
+                            }
+                        }
+                    });
+                });
+
                 if (obraIdSelecionada === 'todas') {
-                    kpiTitle1.textContent = 'Obras Ativas';
-                    document.getElementById('kpi-obras-total').textContent = localObras.length;
+                    kpiTitle1.textContent = dataSelecionada ? 'Medições no Dia' : 'Obras Ativas';
+                    document.getElementById('kpi-obras-total').textContent = dataSelecionada ? medicoesFiltradasNoDia.length : localObras.length;
                     
                     let somaProgresso = localObras.reduce((acc, o) => acc + (o.progress || 0), 0);
                     let media = localObras.length ? Math.round(somaProgresso / localObras.length) : 0;
                     kpiTitle2.textContent = 'Progresso Médio';
                     document.getElementById('kpi-progresso-medio').textContent = media + '%';
 
-                    chartTitle1.textContent = 'Progresso por Obra';
+                    chartTitle1.textContent = dataSelecionada ? 'Progresso por Obra (Acumulado)' : 'Progresso por Obra';
                     chartTitle2.textContent = 'Distribuição por Categoria';
-                    resumoTitle.textContent = 'Resumo do Portfólio';
+                    resumoTitle.textContent = dataSelecionada ? `Atividades Realizadas em ${dataSelecionada.split('-').reverse().join('/')} (Geral)` : 'Resumo do Portfólio';
 
-                    if (!localObras.length) {
-                        containerResumo.innerHTML = '<p style="font-size: 12px; color: var(--text-muted);">Sem dados de obras para exibir.</p>';
+                    if (dataSelecionada) {
+                        if (!medicoesFiltradasNoDia.length) {
+                            containerResumo.innerHTML = '<p style="font-size: 12px; color: var(--text-muted);">Nenhuma atividade registrada nesta data para o portfólio.</p>';
+                        } else {
+                            containerResumo.innerHTML = medicoesFiltradasNoDia.map(m => `
+                                <div style="margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border);">
+                                    <div style="font-size: 12px; font-weight: 700; color: var(--primary);">${m.obraNome} - ${m.servicoNome}</div>
+                                    <div style="font-size: 11px; color: var(--text-muted);">Realizado: <strong>${m.quantidade} ${m.unit || 'm²'}</strong> ${m.equipe ? `| Equipe: ${m.equipe} func.` : ''}</div>
+                                </div>
+                            `).join('');
+                        }
                     } else {
-                        containerResumo.innerHTML = localObras.map(o => `
-                            <div style="margin-bottom: 12px;">
-                                <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600;">
-                                    <span>${o.name}</span>
-                                    <span>${o.progress || 0}%</span>
+                        if (!localObras.length) {
+                            containerResumo.innerHTML = '<p style="font-size: 12px; color: var(--text-muted);">Sem dados de obras para exibir.</p>';
+                        } else {
+                            containerResumo.innerHTML = localObras.map(o => `
+                                <div style="margin-bottom: 12px;">
+                                    <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600;">
+                                        <span>${o.name}</span>
+                                        <span>${o.progress || 0}%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: ${o.progress || 0}%;"></div>
+                                    </div>
                                 </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: ${o.progress || 0}%;"></div>
-                                </div>
-                            </div>
-                        `).join('');
+                            `).join('');
+                        }
                     }
 
                     this.renderChartsGlobal();
@@ -1417,8 +1466,8 @@
                         if (emp.servicos) servicos = servicos.concat(emp.servicos);
                     });
 
-                    kpiTitle1.textContent = 'Serviços Cadastrados';
-                    document.getElementById('kpi-obras-total').textContent = servicos.length;
+                    kpiTitle1.textContent = dataSelecionada ? 'Medições na Data' : 'Serviços Cadastrados';
+                    document.getElementById('kpi-obras-total').textContent = dataSelecionada ? medicoesFiltradasNoDia.length : servicos.length;
 
                     let totalMeta = servicos.reduce((acc, s) => acc + (s.meta || 0), 0);
                     let totalExec = servicos.reduce((acc, s) => acc + (s.executada || 0), 0);
@@ -1427,30 +1476,43 @@
                     kpiTitle2.textContent = 'Progresso da Obra';
                     document.getElementById('kpi-progresso-medio').textContent = progObra + '%';
 
-                    chartTitle1.textContent = 'Evolução dos Serviços';
+                    chartTitle1.textContent = dataSelecionada ? 'Atividades do Dia por Serviço' : 'Evolução dos Serviços';
                     chartTitle2.textContent = 'Serviços por Categoria';
-                    resumoTitle.textContent = `Detalhamento - ${obraRef ? obraRef.name : ''}`;
+                    resumoTitle.textContent = dataSelecionada ? `Atividades em ${dataSelecionada.split('-').reverse().join('/')} - ${obraRef ? obraRef.name : ''}` : `Detalhamento - ${obraRef ? obraRef.name : ''}`;
 
-                    if (!servicos.length) {
-                        containerResumo.innerHTML = '<p style="font-size: 12px; color: var(--text-muted);">Nenhum serviço cadastrado nesta obra.</p>';
-                    } else {
-                        containerResumo.innerHTML = servicos.map(s => {
-                            const pct = s.meta > 0 ? Math.min(100, Math.round((s.executada / s.meta) * 100)) : 0;
-                            return `
-                                <div style="margin-bottom: 12px;">
-                                    <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600;">
-                                        <span>${s.name} (${s.executada}/${s.meta} ${s.unit || 'm²'})</span>
-                                        <span>${pct}%</span>
-                                    </div>
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: ${pct}%;"></div>
-                                    </div>
+                    if (dataSelecionada) {
+                        if (!medicoesFiltradasNoDia.length) {
+                            containerResumo.innerHTML = '<p style="font-size: 12px; color: var(--text-muted);">Nenhuma atividade registrada nesta data para esta obra.</p>';
+                        } else {
+                            containerResumo.innerHTML = medicoesFiltradasNoDia.map(m => `
+                                <div style="margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border);">
+                                    <div style="font-size: 12px; font-weight: 700; color: var(--primary);">${m.servicoNome}</div>
+                                    <div style="font-size: 11px; color: var(--text-muted);">Realizado no dia: <strong>${m.quantidade} ${m.unit || 'm²'}</strong> ${m.equipe ? `| Equipe: ${m.equipe} func.` : ''}</div>
                                 </div>
-                            `;
-                        }).join('');
+                            `).join('');
+                        }
+                    } else {
+                        if (!servicos.length) {
+                            containerResumo.innerHTML = '<p style="font-size: 12px; color: var(--text-muted);">Nenhum serviço cadastrado nesta obra.</p>';
+                        } else {
+                            containerResumo.innerHTML = servicos.map(s => {
+                                const pct = s.meta > 0 ? Math.min(100, Math.round((s.executada / s.meta) * 100)) : 0;
+                                return `
+                                    <div style="margin-bottom: 12px;">
+                                        <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600;">
+                                            <span>${s.name} (${s.executada}/${s.meta} ${s.unit || 'm²'})</span>
+                                            <span>${pct}%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: ${pct}%;"></div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('');
+                        }
                     }
 
-                    this.renderChartsObraEspecifica(servicos);
+                    this.renderChartsObraEspecifica(servicos, dataSelecionada, medicoesFiltradasNoDia);
                 }
             },
 
@@ -1506,19 +1568,29 @@
                 });
             },
 
-            renderChartsObraEspecifica(servicos) {
-                const nomesServicos = servicos.map(s => s.name);
-                const percentuaisServicos = servicos.map(s => s.meta > 0 ? Math.min(100, Math.round((s.executada / s.meta) * 100)) : 0);
+            renderChartsObraEspecifica(servicos, dataSelecionada, medicoesDoDia) {
+                let labels = [];
+                let dados = [];
+                let labelDataset = 'Executado (%)';
+
+                if (dataSelecionada) {
+                    labelDataset = 'Qtd Realizada no Dia';
+                    labels = medicoesDoDia.map(m => m.servicoNome);
+                    dados = medicoesDoDia.map(m => m.quantidade);
+                } else {
+                    labels = servicos.map(s => s.name);
+                    dados = servicos.map(s => s.meta > 0 ? Math.min(100, Math.round((s.executada / s.meta) * 100)) : 0);
+                }
 
                 const ctxProgresso = document.getElementById('chartProgressoObras').getContext('2d');
                 if (chartProgressoInstance) chartProgressoInstance.destroy();
                 chartProgressoInstance = new Chart(ctxProgresso, {
                     type: 'bar',
                     data: {
-                        labels: nomesServicos.length ? nomesServicos : ['Sem serviços'],
+                        labels: labels.length ? labels : ['Sem registros'],
                         datasets: [{
-                            label: 'Executado (%)',
-                            data: percentuaisServicos.length ? percentuaisServicos : [0],
+                            label: labelDataset,
+                            data: dados.length ? dados : [0],
                             backgroundColor: '#2563EB',
                             borderRadius: 4
                         }]
@@ -1527,7 +1599,7 @@
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: { legend: { display: false } },
-                        scales: { y: { beginAtZero: true, max: 100 } }
+                        scales: { y: { beginAtZero: true, max: dataSelecionada ? undefined : 100 } }
                     }
                 });
 
@@ -1625,7 +1697,6 @@
                 select.innerHTML = lista.map(c => `<option value="${c}">${c}</option>`).join('');
             },
 
-            /* RENDERIZAÇÃO HIERÁRQUICA COM SUPORTE A MINIMIZAÇÃO */
             renderEmpreiteirosEServicos(empreiteiros) {
                 const container = document.getElementById('servicos-content');
                 
