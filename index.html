@@ -591,13 +591,6 @@
                             <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">Resumo do Portfólio</h3>
                             <div id="dash-obras-resumo"></div>
                         </div>
-
-                        <div class="card">
-                            <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">Evidências Recentes (Auditoria)</h3>
-                            <div id="dash-galeria-fotos" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
-                                <p style="font-size: 11px; color: var(--text-muted); grid-column: span 3;">Nenhuma foto registrada ainda.</p>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -640,11 +633,11 @@
                             <div class="summary-dates">
                                 <div class="summary-date-item">
                                     <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
-                                    <span id="obra-data-inicio">Início: --/--/----</span>
+                                    <span id="obra-data-inicio">Início: 10/01/2026</span>
                                 </div>
                                 <div class="summary-date-item">
                                     <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
-                                    <span id="obra-dias-decorridos">Aguardando 1ª medição</span>
+                                    <span id="obra-dias-decorridos">0 dias em andamento</span>
                                 </div>
                             </div>
                         </div>
@@ -789,7 +782,6 @@
 
                 <div class="form-group">
                     <label class="form-label">Evidências / Fotos de Campo</label>
-                    <!-- Input com capture="environment" aciona a câmera traseira do celular -->
                     <input type="file" id="input-camera" accept="image/*" capture="environment" class="hidden" onchange="app.handleFotoUpload(event)">
                     <input type="file" id="input-galeria" accept="image/*" multiple class="hidden" onchange="app.handleFotoUpload(event)">
 
@@ -1129,41 +1121,20 @@
                 const container = document.getElementById('dash-obras-resumo');
                 if (!localObras.length) {
                     container.innerHTML = '<p style="font-size: 12px; color: var(--text-muted);">Sem dados de obras para exibir.</p>';
-                } else {
-                    container.innerHTML = localObras.map(o => `
-                        <div style="margin-bottom: 12px;">
-                            <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600;">
-                                <span>${o.name}</span>
-                                <span>${o.progress || 0}%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${o.progress || 0}%;"></div>
-                            </div>
+                    return;
+                }
+
+                container.innerHTML = localObras.map(o => `
+                    <div style="margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600;">
+                            <span>${o.name}</span>
+                            <span>${o.progress || 0}%</span>
                         </div>
-                    `).join('');
-                }
-
-                // Renderiza as fotos mais recentes no Dashboard
-                const galeriaContainer = document.getElementById('dash-galeria-fotos');
-                let todasFotos = [];
-                
-                Object.keys(localHistorico).forEach(sId => {
-                    localHistorico[sId].forEach(med => {
-                        if (med.fotos && med.fotos.length) {
-                            med.fotos.forEach(fotoUrl => {
-                                todasFotos.push({ url: fotoUrl, obra: med.obraNome, servico: med.servicoNome });
-                            });
-                        }
-                    });
-                });
-
-                if (todasFotos.length === 0) {
-                    galeriaContainer.innerHTML = '<p style="font-size: 11px; color: var(--text-muted); grid-column: span 3;">Nenhuma foto registrada ainda.</p>';
-                } else {
-                    galeriaContainer.innerHTML = todasFotos.slice(0, 6).map(f => `
-                        <img src="${f.url}" title="${f.obra} - ${f.servico}" style="width: 100%; height: 75px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border);">
-                    `).join('');
-                }
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${o.progress || 0}%;"></div>
+                        </div>
+                    </div>
+                `).join('');
             },
 
             switchCatTab(tab) {
@@ -1430,10 +1401,10 @@
                 const container = document.getElementById('photo-container');
                 const addBtnsHtml = `
                     <div class="photo-add-btn" onclick="document.getElementById('input-camera').click()">
-                        <span>📷 Câmera</span>
+                        <span>Câmera</span>
                     </div>
                     <div class="photo-add-btn" onclick="document.getElementById('input-galeria').click()">
-                        <span>🖼️ Galeria</span>
+                        <span>Galeria</span>
                     </div>
                 `;
 
