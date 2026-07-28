@@ -687,8 +687,11 @@
             },
 
             setDataToday() {
-                const today = new Date().toISOString().split('T')[0];
-                document.getElementById('medicao-data').value = today;
+                const now = new Date();
+                const ano = now.getFullYear();
+                const mes = String(now.getMonth() + 1).padStart(2, '0');
+                const dia = String(now.getDate()).padStart(2, '0');
+                document.getElementById('medicao-data').value = `${ano}-${mes}-${dia}`;
             },
 
             switchNav(nav) {
@@ -844,23 +847,30 @@
                     return;
                 }
 
-                todasMedicoesObra.sort((a, b) => new Date(a.data) - new Date(b.data));
-                
-                const primeiraMedicao = new Date(todasMedicoesObra[0].data + 'T00:00:00');
-                const dataFormatada = primeiraMedicao.toLocaleDateString('pt-BR');
-                
-                elInicio.textContent = `Início: ${dataFormatada}`;
+                todasMedicoesObra.sort((a, b) => a.data.localeCompare(b.data));
+
+                const [ano, mes, dia] = todasMedicoesObra[0].data.split('-').map(Number);
+                const primeiraMedicao = new Date(ano, mes - 1, dia);
+
+                const diaFmt = String(primeiraMedicao.getDate()).padStart(2, '0');
+                const mesFmt = String(primeiraMedicao.getMonth() + 1).padStart(2, '0');
+                const anoFmt = primeiraMedicao.getFullYear();
+
+                elInicio.textContent = `Início: ${diaFmt}/${mesFmt}/${anoFmt}`;
+
+                const hoje = new Date();
+                hoje.setHours(0, 0, 0, 0);
 
                 if (percentualGeral >= 100) {
-                    const ultimaMedicao = new Date(todasMedicoesObra[todasMedicoesObra.length - 1].data + 'T00:00:00');
+                    const [uAno, uMes, uDia] = todasMedicoesObra[todasMedicoesObra.length - 1].data.split('-').map(Number);
+                    const ultimaMedicao = new Date(uAno, uMes - 1, uDia);
                     const diffTime = Math.abs(ultimaMedicao - primeiraMedicao);
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
                     elDias.textContent = `Obra concluída em ${diffDays} dias!`;
                 } else {
-                    const hoje = new Date();
                     const diffTime = Math.abs(hoje - primeiraMedicao);
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                    elDias.textContent = `${diffDays} dias em andamento`;
+                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                    elDias.textContent = `${diffDays} dia(s) em andamento`;
                 }
             },
 
@@ -1102,6 +1112,7 @@
                 document.getElementById('medicao-quantidade').value = '';
                 document.getElementById('medicao-equipe').value = '';
                 document.getElementById('medicao-justificativa').value = '';
+                this.setDataToday();
                 document.getElementById('medicao-alert').classList.add('hidden');
                 document.getElementById('medicao-justificativa-group').classList.add('hidden');
                 this.renderFotosPreview();
@@ -1253,19 +1264,23 @@
                     return;
                 }
 
-                todasMedicoes.sort((a, b) => new Date(b.data) - new Date(a.data));
+                todasMedicoes.sort((a, b) => b.data.localeCompare(a.data));
 
                 container.innerHTML = todasMedicoes.map(med => this.buildCardHistorico(med, true)).join('');
             },
 
             buildCardHistorico(med, showContext = false) {
                 const unit = med.unit || 'm²';
+                
+                const [ano, mes, dia] = med.data.split('-');
+                const dataFmt = `${dia}/${mes}/${ano}`;
+
                 return `
                     <div class="card">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                             <div>
                                 ${showContext ? `<p style="font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase;">${med.obraNome} - ${med.servicoNome}</p>` : ''}
-                                <h4 style="font-size: 13px; font-weight: 600; color: var(--text-muted); margin-top: 2px;">Data: ${med.data}</h4>
+                                <h4 style="font-size: 13px; font-weight: 600; color: var(--text-muted); margin-top: 2px;">Data: ${dataFmt}</h4>
                                 <p style="font-size: 16px; font-weight: 700; color: var(--primary); margin-top: 4px;">${med.quantidade} ${unit}</p>
                                 ${med.equipe ? `<p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Equipe: <strong>${med.equipe} func.</strong></p>` : ''}
                             </div>
