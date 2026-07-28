@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MEDI-O ENG v2.0 - Gestão e Medição de Obras</title>
+    <title>MEDI-O ENG v2.1 - Gestão e Medição de Obras</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -205,18 +205,20 @@
             display: flex;
             border-bottom: 1px solid var(--border);
             margin-bottom: 16px;
-            gap: 12px;
+            gap: 8px;
+            overflow-x: auto;
         }
 
         .tab-button {
-            padding: 10px 4px;
+            padding: 10px 8px;
             background: none;
             border: none;
             border-bottom: 2px solid transparent;
             color: var(--text-muted);
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 600;
             cursor: pointer;
+            white-space: nowrap;
         }
 
         .tab-button.active {
@@ -372,19 +374,12 @@
             background: #F8FAFC; cursor: pointer; color: var(--text-muted); font-size: 11px; font-weight: 600;
         }
 
-        /* GRID DASHBOARD */
         .dash-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-bottom: 16px;
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px;
         }
 
         .dash-kpi {
-            background-color: var(--surface);
-            border: 1px solid var(--border);
-            padding: 14px;
-            border-radius: 8px;
+            background-color: var(--surface); border: 1px solid var(--border); padding: 14px; border-radius: 8px;
         }
 
         .dash-kpi-title { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
@@ -439,21 +434,22 @@
                     </div>
                 </div>
 
-                <!-- TELA 3: CATEGORIAS -->
+                <!-- TELA 3: CATEGORIAS & UNIDADES -->
                 <div id="screen-categorias" class="screen">
                     <div class="content">
                         <div class="card">
                             <div class="tabs" style="margin-bottom: 12px;">
                                 <button class="tab-button active" id="tab-cat-obras" onclick="app.switchCatTab('obras')">TIPOS DE OBRA</button>
-                                <button class="tab-button" id="tab-cat-servicos" onclick="app.switchCatTab('servicos')">SERVIÇOS</button>
+                                <button class="tab-button" id="tab-cat-servicos" onclick="app.switchCatTab('servicos')">TIPOS DE SERVIÇO</button>
+                                <button class="tab-button" id="tab-cat-unidades" onclick="app.switchCatTab('unidades')">UNIDADES DE MEDIDA</button>
                             </div>
 
                             <div class="form-group" style="display: flex; gap: 8px;">
-                                <input type="text" class="form-input" id="nova-categoria-nome" placeholder="Nova categoria...">
+                                <input type="text" class="form-input" id="nova-categoria-nome" placeholder="Novo item...">
                                 <button class="btn-primary" style="flex: 0 0 80px;" onclick="app.salvarCategoria()">Criar</button>
                             </div>
 
-                            <h4 style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;" id="cat-lista-titulo">Categorias de Obras:</h4>
+                            <h4 style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;" id="cat-lista-titulo">Lista de Itens:</h4>
                             <div id="lista-categorias-gerenciar" style="border: 1px solid var(--border); border-radius: 6px; max-height: 300px; overflow-y: auto;"></div>
                         </div>
                     </div>
@@ -554,9 +550,15 @@
                     <label class="form-label">Categoria do Serviço *</label>
                     <select class="form-input" id="novo-servico-categoria"></select>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Meta Total (m²) *</label>
-                    <input type="number" class="form-input" id="novo-servico-meta" placeholder="0.00" step="0.01">
+                <div style="display: flex; gap: 12px;">
+                    <div class="form-group" style="flex: 2;">
+                        <label class="form-label">Meta Total *</label>
+                        <input type="number" class="form-input" id="novo-servico-meta" placeholder="0.00" step="0.01">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label">Unidade *</label>
+                        <select class="form-input" id="novo-servico-unidade"></select>
+                    </div>
                 </div>
                 <div class="button-group">
                     <button class="btn-secondary" onclick="app.closeNovoServicoModal()">Cancelar</button>
@@ -578,7 +580,7 @@
                 <div id="medicao-alert" class="alert-warning hidden">⚠ Atenção: A quantidade inserida ultrapassa a meta do serviço!</div>
 
                 <div class="form-group">
-                    <label class="form-label">Quantidade Realizada (m²) *</label>
+                    <label class="form-label" id="label-medicao-qtd">Quantidade Realizada *</label>
                     <input type="number" class="form-input" id="medicao-quantidade" placeholder="0.00" step="0.01" oninput="app.onQuantidadeChange()" onkeyup="app.onQuantidadeChange()">
                 </div>
 
@@ -617,6 +619,7 @@
     <script>
         let localCategoriasObras = ['Residencial', 'Comercial', 'Industrial', 'Infraestrutura'];
         let localCategoriasServicos = ['Alvenaria', 'Estrutura', 'Hidráulica', 'Elétrica', 'Acabamento', 'Pintura'];
+        let localUnidadesMedida = ['m²', 'm', 'm³', 'km', 'un', 'kg', 'vb'];
         let activeCatTab = 'obras';
 
         let localObras = [
@@ -625,8 +628,8 @@
 
         let localServicosPorObra = {
             'demo1': [
-                { id: 's1', name: 'Alvenaria Estrutural', category: 'Alvenaria', meta: 350, executada: 230 },
-                { id: 's2', name: 'Concretagem de Pilares', category: 'Estrutura', meta: 280, executada: 150 }
+                { id: 's1', name: 'Alvenaria Estrutural', category: 'Alvenaria', meta: 350, executada: 230, unit: 'm²' },
+                { id: 's2', name: 'Concretagem de Pilares', category: 'Estrutura', meta: 280, executada: 150, unit: 'm³' }
             ]
         };
 
@@ -648,7 +651,6 @@
                 document.getElementById('medicao-data').value = today;
             },
 
-            // --- BOTÃO BOTTOM BAR & NAVEGAÇÃO ---
             switchNav(nav) {
                 this.currentNav = nav;
                 document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -673,7 +675,7 @@
                     this.renderDashboard();
                     this.showScreen('screen-dashboard');
                 } else if (nav === 'categorias') {
-                    title.textContent = "Categorias";
+                    title.textContent = "Categorias e Unidades";
                     subtitle.textContent = "Gestão de Cadastros";
                     this.switchCatTab(activeCatTab);
                     this.showScreen('screen-categorias');
@@ -761,7 +763,7 @@
                 }
             },
 
-            // --- TELA DASHBOARD ---
+            // --- DASHBOARD ---
             renderDashboard() {
                 document.getElementById('kpi-obras-total').textContent = localObras.length;
                 
@@ -788,14 +790,19 @@
                 `).join('');
             },
 
-            // --- CATEGORIAS ---
+            // --- CATEGORIAS & UNIDADES ---
             switchCatTab(tab) {
                 activeCatTab = tab;
                 document.getElementById('tab-cat-obras').classList.toggle('active', tab === 'obras');
                 document.getElementById('tab-cat-servicos').classList.toggle('active', tab === 'servicos');
+                document.getElementById('tab-cat-unidades').classList.toggle('active', tab === 'unidades');
                 
-                document.getElementById('cat-lista-titulo').textContent = 
-                    tab === 'obras' ? 'Categorias de Obras:' : 'Categorias de Serviços:';
+                const titleMap = {
+                    obras: 'Categorias de Obras:',
+                    servicos: 'Categorias de Serviços:',
+                    unidades: 'Unidades de Medida Disponíveis:'
+                };
+                document.getElementById('cat-lista-titulo').textContent = titleMap[tab];
                 
                 this.renderListaCategorias();
             },
@@ -805,32 +812,34 @@
                 const val = input.value.trim();
                 if (!val) return;
 
-                const targetList = activeCatTab === 'obras' ? localCategoriasObras : localCategoriasServicos;
+                let targetList = activeCatTab === 'obras' ? localCategoriasObras : (activeCatTab === 'servicos' ? localCategoriasServicos : localUnidadesMedida);
 
                 if (!targetList.includes(val)) {
                     targetList.push(val);
                     input.value = '';
                     this.renderListaCategorias();
                 } else {
-                    alert('Esta categoria já existe!');
+                    alert('Este item já existe!');
                 }
             },
 
             removerCategoria(nome) {
                 if (activeCatTab === 'obras') {
                     localCategoriasObras = localCategoriasObras.filter(c => c !== nome);
-                } else {
+                } else if (activeCatTab === 'servicos') {
                     localCategoriasServicos = localCategoriasServicos.filter(c => c !== nome);
+                } else {
+                    localUnidadesMedida = localUnidadesMedida.filter(u => u !== nome);
                 }
                 this.renderListaCategorias();
             },
 
             renderListaCategorias() {
                 const container = document.getElementById('lista-categorias-gerenciar');
-                const targetList = activeCatTab === 'obras' ? localCategoriasObras : localCategoriasServicos;
+                let targetList = activeCatTab === 'obras' ? localCategoriasObras : (activeCatTab === 'servicos' ? localCategoriasServicos : localUnidadesMedida);
 
                 if (!targetList.length) {
-                    container.innerHTML = '<p style="padding: 10px; font-size: 12px; color: var(--text-muted);">Nenhuma categoria cadastrada.</p>';
+                    container.innerHTML = '<p style="padding: 10px; font-size: 12px; color: var(--text-muted);">Nenhum item cadastrado.</p>';
                     return;
                 }
                 container.innerHTML = targetList.map(cat => `
@@ -846,7 +855,7 @@
                 select.innerHTML = lista.map(c => `<option value="${c}">${c}</option>`).join('');
             },
 
-            // --- SERVIÇOS DA OBRA ---
+            // --- SERVIÇOS ---
             renderServicos(servicos) {
                 const container = document.getElementById('servicos-content');
                 
@@ -861,6 +870,7 @@
                 }
 
                 const htmlServicos = servicos.map(s => {
+                    const unit = s.unit || 'm²';
                     const pct = s.meta > 0 ? Math.min(100, Math.round((s.executada / s.meta) * 100)) : 0;
                     return `
                         <div class="card">
@@ -870,14 +880,14 @@
                             </div>
                             <span class="badge">${s.category}</span>
                             <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-top: 10px;">
-                                <span>Meta: ${s.meta} m²</span>
-                                <span>Executado: ${s.executada} m²</span>
+                                <span>Meta: ${s.meta} ${unit}</span>
+                                <span>Executado: ${s.executada} ${unit}</span>
                             </div>
                             <div class="progress-bar">
                                 <div class="progress-fill" style="width: ${pct}%;"></div>
                             </div>
                             <div class="action-buttons">
-                                <button onclick="app.openMedicaoModal('${s.id}', '${s.name}', ${s.meta}, ${s.executada})">📏 Medir</button>
+                                <button onclick="app.openMedicaoModal('${s.id}', '${s.name}', ${s.meta}, ${s.executada}, '${unit}')">📏 Medir</button>
                                 <button onclick="app.openHistoricoServico('${s.id}')">📋 Histórico</button>
                             </div>
                         </div>
@@ -900,6 +910,7 @@
 
             openNovoServicoModal() {
                 this.preencherSelect('novo-servico-categoria', localCategoriasServicos);
+                this.preencherSelect('novo-servico-unidade', localUnidadesMedida);
                 document.getElementById('novo-servico-nome').value = '';
                 document.getElementById('novo-servico-meta').value = '';
                 document.getElementById('modal-novo-servico').classList.remove('hidden');
@@ -912,10 +923,11 @@
             salvarNovoServico() {
                 const nome = document.getElementById('novo-servico-nome').value.trim();
                 const categoria = document.getElementById('novo-servico-categoria').value;
+                const unidade = document.getElementById('novo-servico-unidade').value;
                 const meta = parseFloat(document.getElementById('novo-servico-meta').value);
 
-                if (!nome || !categoria || isNaN(meta) || meta <= 0) {
-                    alert('Preencha o nome, selecione uma categoria e informe uma meta válida.');
+                if (!nome || !categoria || !unidade || isNaN(meta) || meta <= 0) {
+                    alert('Preencha o nome, categoria, unidade e uma meta válida.');
                     return;
                 }
 
@@ -923,6 +935,7 @@
                     id: 'serv_' + Date.now(),
                     name: nome,
                     category: categoria,
+                    unit: unidade,
                     meta: meta,
                     executada: 0
                 };
@@ -985,15 +998,16 @@
             },
 
             // --- MEDIÇÃO ---
-            openMedicaoModal(servicoId, servicoName, meta, executada) {
-                this.currentServico = { id: servicoId, name: servicoName, meta, executada };
+            openMedicaoModal(servicoId, servicoName, meta, executada, unit = 'm²') {
+                this.currentServico = { id: servicoId, name: servicoName, meta, executada, unit };
                 tempFotos = [];
                 
                 const pct = meta > 0 ? Math.round((executada / meta) * 100) : 0;
                 
+                document.getElementById('label-medicao-qtd').textContent = `Quantidade Realizada (${unit}) *`;
                 document.getElementById('medicao-info').innerHTML = `
                     <strong>${servicoName}</strong><br>
-                    Meta: ${meta} m² | Executado Atual: ${executada} m² (${pct}%)
+                    Meta: ${meta} ${unit} | Executado Atual: ${executada} ${unit} (${pct}%)
                 `;
                 document.getElementById('medicao-quantidade').value = '';
                 document.getElementById('medicao-equipe').value = '';
@@ -1103,6 +1117,7 @@
                 localHistorico[this.currentServico.id].unshift({
                     obraNome: this.currentObra.name,
                     servicoNome: this.currentServico.name,
+                    unit: this.currentServico.unit || 'm²',
                     data: document.getElementById('medicao-data').value,
                     quantidade: qtd,
                     equipe: equipe,
@@ -1156,13 +1171,14 @@
             },
 
             buildCardHistorico(med, showContext = false) {
+                const unit = med.unit || 'm²';
                 return `
                     <div class="card">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                             <div>
                                 ${showContext ? `<p style="font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase;">${med.obraNome} - ${med.servicoNome}</p>` : ''}
                                 <h4 style="font-size: 13px; font-weight: 600; color: var(--text-muted); margin-top: 2px;">Data: ${med.data}</h4>
-                                <p style="font-size: 16px; font-weight: 700; color: var(--primary); margin-top: 4px;">${med.quantidade} m²</p>
+                                <p style="font-size: 16px; font-weight: 700; color: var(--primary); margin-top: 4px;">${med.quantidade} ${unit}</p>
                                 ${med.equipe ? `<p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">👷 Equipe: <strong>${med.equipe} func.</strong></p>` : ''}
                             </div>
                             <span class="badge ${med.status === 'extrapolou' ? 'badge-warning' : ''}">
