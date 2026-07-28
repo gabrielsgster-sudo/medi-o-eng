@@ -3,2101 +3,1059 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MEDI-O ENG - Gestão e Medição de Obras</title>
-    <!-- Incluindo Chart.js para os gráficos da Dashboard -->
+    <title>Medi-Eng - Gestão Inteligente de Obras</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
         :root {
-            --primary: #0F172A;
-            --primary-hover: #1E293B;  
-            --bg-body: #F8FAFC;
-            --surface: #FFFFFF;
-            --border: #E2E8F0;
-            --text-main: #1E293B;
-            --text-muted: #64748B;
-            --success: #10B981;
-            --danger: #EF4444;
-            --warning: #F59E0B;
+            --primary: #0b1f3a;
+            --primary-hover: #132d54;
+            --success: #10b981;
+            --success-hover: #059669;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
         }
 
-        html, body {
-            height: 100%;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            -webkit-font-smoothing: antialiased;
         }
 
-        .app-wrapper {
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
             display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 480px;
             height: 100vh;
-            width: 100vw;
+            max-height: 900px;
+            background-color: var(--card-bg);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             overflow: hidden;
         }
 
-        .mobile-view {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            height: 100%;
-            background-color: var(--bg-body);
-            position: relative;
+        @media (min-width: 481px) {
+            #app-container {
+                border-radius: 24px;
+                border: 1px solid var(--border);
+                height: 85vh;
+            }
         }
 
-        .app-container {
+        /* Telas */
+        .screen {
+            display: none;
             flex: 1;
+            flex-direction: column;
             overflow-y: auto;
-            position: relative;
+            padding: 20px;
+            padding-bottom: 90px; /* Espaço para a bottom nav */
         }
 
-        /* HEADER FIXO */
-        .header-bg {
-            background-color: var(--primary);
-            color: #FFFFFF;
-            padding: 16px 16px 40px 16px;
-            position: relative;
-        }
-
-        .header-top {
+        .screen.active {
             display: flex;
+        }
+
+        /* Tela de Entrada (Splash/Login) */
+        #screen-login {
+            justify-content: center;
             align-items: center;
-            justify-content: space-between;
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
         }
 
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .header-back {
-            background: none;
-            border: none;
-            color: #FFFFFF;
-            font-size: 20px;
-            cursor: pointer;
-            padding: 2px 6px;
-        }
-
-        .header-title {
-            font-size: 18px;
-            font-weight: 700;
-            letter-spacing: -0.01em;
-        }
-
-        .header-subtitle {
-            font-size: 11px;
-            color: #94A3B8;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .icon-btn {
-            background: none;
-            border: none;
-            color: #FFFFFF;
-            cursor: pointer;
-            position: relative;
+        .login-logo-box {
+            width: 100px;
+            height: 100px;
+            background: #0b1f3a;
+            border-radius: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
+            margin: 0 auto 20px auto;
+            box-shadow: var(--shadow);
         }
 
-        .icon-btn svg { width: 20px; height: 20px; fill: currentColor; }
-
-        .notification-dot {
-            position: absolute;
-            top: 1px;
-            right: 1px;
-            width: 7px;
-            height: 7px;
-            background-color: var(--danger);
-            border-radius: 50%;
-            border: 1px solid var(--primary);
+        .login-logo-box svg {
+            width: 60px;
+            height: 60px;
         }
 
-        /* CARD FLUTUANTE DE PROGRESSO DA OBRA */
-        .obra-summary-card {
-            background-color: var(--surface);
-            border-radius: 12px;
-            padding: 16px;
-            margin: -30px 16px 16px 16px;
-            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
-            border: 1px solid var(--border);
-            display: flex;
-            gap: 16px;
-            position: relative;
-            z-index: 10;
-        }
-
-        .obra-summary-left {
-            flex: 1.3;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .obra-summary-right {
-            flex: 1;
-            border-left: 1px solid var(--border);
-            padding-left: 14px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .summary-title {
-            font-size: 10px;
-            font-weight: 700;
-            color: var(--primary);
-            letter-spacing: 0.05em;
-        }
-
-        .summary-percent {
-            font-size: 34px;
+        .login-title {
+            font-size: 28px;
             font-weight: 800;
             color: var(--primary);
-            line-height: 1;
-            margin: 4px 0;
+            margin-bottom: 5px;
         }
 
-        .progress-bar-container {
-            width: 100%;
-            height: 6px;
-            background-color: #E2E8F0;
-            border-radius: 3px;
-            overflow: hidden;
-            margin: 6px 0 10px 0;
+        .login-title span {
+            color: var(--success);
         }
 
-        .progress-fill-green {
-            height: 100%;
-            background-color: var(--success);
-            transition: width 0.3s ease;
-        }
-
-        .summary-dates {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 10px;
-            color: var(--text-muted);
+        .login-subtitle {
+            font-size: 14px;
             font-weight: 600;
-        }
-
-        .summary-date-item {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .summary-date-item svg { width: 12px; height: 12px; fill: var(--text-muted); }
-
-        .stat-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 11px;
             color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
         }
 
-        .stat-row svg { width: 16px; height: 16px; fill: var(--primary); opacity: 0.8; }
-
-        .stat-row strong {
-            color: var(--primary);
-            font-weight: 700;
-            font-size: 13px;
+        .login-divider {
+            width: 50px;
+            height: 4px;
+            background: var(--success);
+            border-radius: 2px;
+            margin: 0 auto 25px auto;
         }
 
-        .content {
-            padding: 16px;
-            padding-bottom: 90px;
-        }
-
-        /* BOTTOM NAV */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 64px;
-            background-color: var(--surface);
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            z-index: 150;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: none;
-            border: none;
+        .login-desc {
+            font-size: 15px;
             color: var(--text-muted);
-            font-size: 10px;
+            line-height: 1.5;
+            margin-bottom: 40px;
+            max-width: 320px;
+        }
+
+        .btn-full {
+            width: 100%;
+            padding: 14px;
+            border-radius: var(--radius);
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            flex: 1;
-            height: 100%;
-            gap: 4px;
-            transition: color 0.2s ease;
+            border: none;
+            transition: background 0.2s;
         }
 
-        .nav-item svg { width: 20px; height: 20px; fill: currentColor; }
-        .nav-item.active { color: var(--primary); }
-
-        /* CARDS & ELEMENTOS */
-        .card {
-            background-color: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 16px;
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
             margin-bottom: 12px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-            position: relative;
+            box-shadow: 0 4px 12px rgba(11, 31, 58, 0.2);
         }
 
-        .card-header-actions {
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary);
+            border: 2px solid var(--border);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+        }
+
+        .version-tag {
+            margin-top: 30px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Cabeçalhos de Tela */
+        .header-top {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
+            align-items: center;
+            margin-bottom: 20px;
         }
 
-        .btn-delete-card {
-            background: none;
-            border: none;
-            color: var(--danger);
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            padding: 2px 6px;
-            border-radius: 4px;
-        }
-
-        .btn-edit-card {
-            background: none;
-            border: none;
+        .header-top h2 {
+            font-size: 22px;
+            font-weight: 700;
             color: var(--primary);
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            padding: 2px 6px;
-            border-radius: 4px;
         }
 
-        .btn-delete-card:hover { background-color: #FEF2F2; }
-        .btn-edit-card:hover { background-color: #F1F5F9; }
+        .btn-icon {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            font-size: 20px;
+        }
+
+        /* Cards e Listas */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .card:active {
+            transform: scale(0.98);
+        }
 
         .card-title {
             font-size: 16px;
             font-weight: 600;
-            color: var(--primary);
             margin-bottom: 6px;
+            color: var(--text-main);
         }
 
-        .badge-container {
+        .card-info {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        /* Barra de Progresso */
+        .progress-bar-container {
+            width: 100%;
+            background: var(--border);
+            border-radius: 6px;
+            height: 8px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-bar-fill {
+            background: var(--success);
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            background: white;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .nav-item {
+            background: none;
+            border: none;
             display: flex;
             flex-direction: column;
-            gap: 6px;
-            margin-top: 6px;
-            margin-bottom: 8px;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 11px;
+            cursor: pointer;
+            flex: 1;
+            transition: color 0.2s;
         }
 
-        .badge-group {
+        .nav-item.active {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .nav-item svg {
+            width: 22px;
+            height: 22px;
+            margin-bottom: 4px;
+            fill: currentColor;
+        }
+
+        /* Modais */
+        .modal {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .modal.active {
             display: flex;
-            flex-wrap: wrap;
+        }
+
+        .modal-content {
+            background: white;
+            width: 100%;
+            max-height: 85vh;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 24px;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-main);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 14px;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+        }
+
+        .alert-box {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            padding: 12px;
+            border-radius: var(--radius);
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        /* KPIs Grids */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .kpi-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .kpi-card h4 {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .kpi-card span {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .chart-container {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            position: relative;
+            height: 250px;
+        }
+
+        .back-link {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
             gap: 6px;
+            margin-bottom: 15px;
         }
 
         .badge {
             display: inline-block;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: 600;
-            text-transform: uppercase;
-            background-color: #F1F5F9;
-            color: var(--text-muted);
-        }
-
-        .badge-main {
-            background-color: #E2E8F0;
-            color: var(--primary);
-            font-weight: 700;
-        }
-
-        .badge-warning { background-color: #FEF3C7; color: #92400E; }
-
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background-color: #E2E8F0;
-            border-radius: 3px;
-            overflow: hidden;
-            margin-top: 6px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background-color: var(--primary);
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .tabs {
-            display: flex;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 16px;
-            gap: 8px;
-            overflow-x: auto;
-        }
-
-        .tab-button {
-            padding: 10px 8px;
-            background: none;
-            border: none;
-            border-bottom: 2px solid transparent;
-            color: var(--text-muted);
+            padding: 4px 8px;
+            border-radius: 6px;
             font-size: 11px;
             font-weight: 600;
-            cursor: pointer;
-            white-space: nowrap;
         }
-
-        .tab-button.active {
-            border-bottom-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid #F1F5F9;
-        }
-
-        .action-buttons button {
-            flex: 1;
-            padding: 8px;
-            background-color: #F8FAFC;
-            border: 1px solid var(--border);
-            color: var(--primary);
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-        }
-
-        /* MODAIS */
-        .modal {
-            position: fixed;
-            inset: 0;
-            background-color: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(2px);
-            display: flex;
-            align-items: flex-end;
-            z-index: 200;
-        }
-
-        .modal-content {
-            width: 100%;
-            background-color: var(--surface);
-            border-radius: 12px 12px 0 0;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border);
-            background-color: var(--primary);
-            color: #FFFFFF;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            color: #FFFFFF;
-            font-size: 20px;
-            cursor: pointer;
-        }
-
-        .modal-body { padding: 20px; }
-        .form-group { margin-bottom: 16px; }
-
-        .form-label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: var(--primary);
-        }
-
-        .form-input, .form-textarea, select.form-input {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 14px;
-            color: var(--text-main);
-            background-color: #FFFFFF;
-        }
-
-        .alert-warning {
-            background-color: #FEF2F2;
-            border: 1px solid #FECACA;
-            color: #991B1B;
-            padding: 10px 12px;
-            border-radius: 6px;
-            margin-bottom: 16px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .button-group { display: flex; gap: 12px; margin-top: 24px; }
-
-        .btn-primary {
-            flex: 1; padding: 12px; background-color: var(--primary);
-            color: #FFFFFF; border: none; border-radius: 6px; cursor: pointer;
-            font-size: 14px; font-weight: 600;
-        }
-
-        .btn-secondary {
-            flex: 1; padding: 12px; background-color: #F1F5F9;
-            color: var(--text-main); border: 1px solid var(--border);
-            border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;
-        }
-
-        .fab {
-            position: fixed;
-            bottom: 80px;
-            right: 20px;
-            width: 52px;
-            height: 52px;
-            border-radius: 50%;
-            background-color: var(--primary);
-            color: #FFFFFF;
-            border: none;
-            cursor: pointer;
-            font-size: 24px;
-            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-        }
-
-        .category-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 10px; border-bottom: 1px solid var(--border);
-        }
-
-        .photo-upload-container {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px;
-        }
-
-        .photo-preview {
-            width: 100%; height: 75px; border-radius: 6px; object-fit: cover; border: 1px solid var(--border);
-        }
-
-        .photo-add-btn {
-            height: 75px; border: 2px dashed var(--border); border-radius: 6px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: #F8FAFC; cursor: pointer; color: var(--text-muted); font-size: 11px; font-weight: 600;
-        }
-
-        .dash-grid {
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px;
-        }
-
-        .dash-kpi {
-            background-color: var(--surface); border: 1px solid var(--border); padding: 14px; border-radius: 8px;
-        }
-
-        .dash-kpi-title { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
-        .dash-kpi-value { font-size: 20px; font-weight: 700; color: var(--primary); margin-top: 4px; }
-
-        /* TOAST NOTIFICATION */
-        #toast-container {
-            position: fixed;
-            bottom: 76px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            align-items: center;
-            pointer-events: none;
-            width: 90%;
-            max-width: 400px;
-        }
-
-        .toast {
-            background-color: var(--primary);
-            color: #FFFFFF;
-            padding: 10px 16px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 500;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            animation: fadeInOut 2.5s ease forwards;
-            pointer-events: auto;
-            text-align: center;
-        }
-
-        .toast.success { background-color: #065F46; }
-        .toast.error { background-color: #991B1B; }
-
-        @keyframes fadeInOut {
-            0% { opacity: 0; transform: translateY(10px); }
-            15% { opacity: 1; transform: translateY(0); }
-            85% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-10px); }
-        }
-
-        .hidden { display: none !important; }
-        .screen { display: none; }
-        .screen.active { display: block; }
+        .badge-normal { background: #d1fae5; color: #065f46; }
+        .badge-extrapolou { background: #fee2e2; color: #991b1b; }
     </style>
 </head>
 <body>
-    <div class="app-wrapper">
-        <div class="mobile-view">
-            <!-- TOAST CONTAINER -->
-            <div id="toast-container"></div>
 
-            <div class="app-container">
+<div id="app-container">
 
-                <!-- HEADER SUPERIOR PRINCIPAL -->
-                <div class="header-bg">
-                    <div class="header-top">
-                        <div class="header-left">
-                            <button class="header-back hidden" id="header-back-btn" onclick="app.goHome()">←</button>
-                            <div>
-                                <h1 class="header-title" id="main-header-title">MEDI-O ENG</h1>
-                                <p class="header-subtitle" id="main-header-subtitle">Gestão & Medição de Obras</p>
-                            </div>
-                        </div>
-                        <div class="header-actions">
-                            <button class="icon-btn" title="Notificações">
-                                <svg viewBox="0 0 24 24"><path d="M12 22a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
-                                <span class="notification-dot"></span>
-                            </button>
-                            <button class="icon-btn" title="Opções">
-                                <svg viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+    <!-- 1. TELA DE ENTRADA (SPLASH / LOGIN) -->
+    <div id="screen-login" class="screen active">
+        <div class="login-logo-box">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L3 7V17L12 22L21 17V7L12 2Z" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 6V18" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M7 10L12 7L17 10" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <h1 class="login-title">Medi-<span>Eng</span></h1>
+        <div class="login-subtitle">Gestão Inteligente de Obras</div>
+        <div class="login-divider"></div>
+        <p class="login-desc">Controle medições, acompanhe o progresso, registre fotos e gerencie suas obras em um único lugar.</p>
+        
+        <button class="btn-full btn-primary" onclick="goToApp()">Entrar</button>
+        <button class="btn-full btn-outline" onclick="alert('Funcionalidade de cadastro simulada para MVP.')">Criar Conta</button>
+        
+        <div class="version-tag">Versão 2.0</div>
+    </div>
 
-                <!-- TELA 1: OBRAS (HOME) -->
-                <div id="screen-obras" class="screen active">
-                    <div class="content" style="padding-top: 16px;">
-                        <div id="obras-list"></div>
-                    </div>
-                </div>
-
-                <!-- TELA 2: DASHBOARD -->
-                <div id="screen-dashboard" class="screen">
-                    <div class="content" style="padding-top: 16px;">
-                        
-                        <!-- SELETOR DE ESCOPO DA DASHBOARD -->
-                        <div class="card" style="padding: 12px 16px; margin-bottom: 16px; background-color: #F1F5F9;">
-                            <label class="form-label" for="dash-obra-filtro" style="margin-bottom: 4px; font-size: 11px;">FILTRAR ANÁLISE DA DASHBOARD:</label>
-                            <select id="dash-obra-filtro" class="form-input" onchange="app.onDashFiltroChange()">
-                                <option value="todas">🌐 Visão Geral (Todas as Obras)</option>
-                            </select>
-                        </div>
-
-                        <div class="dash-grid">
-                            <div class="dash-kpi">
-                                <div class="dash-kpi-title" id="kpi-card-title-1">Obras Ativas</div>
-                                <div class="dash-kpi-value" id="kpi-obras-total">0</div>
-                            </div>
-                            <div class="dash-kpi">
-                                <div class="dash-kpi-title" id="kpi-card-title-2">Progresso Médio</div>
-                                <div class="dash-kpi-value" id="kpi-progresso-medio">0%</div>
-                            </div>
-                        </div>
-
-                        <!-- GRÁFICO 1: PROGRESSO DAS OBRAS / SERVIÇOS -->
-                        <div class="card">
-                            <h3 id="chart-title-1" style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">Progresso por Obra</h3>
-                            <div style="position: relative; height: 200px; width: 100%;">
-                                <canvas id="chartProgressoObras"></canvas>
-                            </div>
-                        </div>
-
-                        <!-- GRÁFICO 2: DISTRIBUIÇÃO DE CATEGORIAS -->
-                        <div class="card">
-                            <h3 id="chart-title-2" style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">Distribuição por Categoria</h3>
-                            <div style="position: relative; height: 200px; width: 100%;">
-                                <canvas id="chartCategoriasObras"></canvas>
-                            </div>
-                        </div>
-
-                        <div class="card">
-                            <h3 id="resumo-card-title" style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">Resumo do Portfólio</h3>
-                            <div id="dash-obras-resumo"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- TELA 3: CATEGORIAS & UNIDADES -->
-                <div id="screen-categorias" class="screen">
-                    <div class="content" style="padding-top: 16px;">
-                        <div class="card">
-                            <div class="tabs" style="margin-bottom: 12px;">
-                                <button class="tab-button active" id="tab-cat-obras" onclick="app.switchCatTab('obras')">TIPOS DE OBRA</button>
-                                <button class="tab-button" id="tab-cat-servicos" onclick="app.switchCatTab('servicos')">TIPOS DE SERVIÇO</button>
-                                <button class="tab-button" id="tab-cat-unidades" onclick="app.switchCatTab('unidades')">UNIDADES DE MEDIDA</button>
-                            </div>
-
-                            <div class="form-group" style="display: flex; gap: 8px;">
-                                <input type="text" class="form-input" id="nova-categoria-nome" placeholder="Novo item...">
-                                <button class="btn-primary" style="flex: 0 0 80px;" onclick="app.salvarCategoria()">Criar</button>
-                            </div>
-
-                            <h4 style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;" id="cat-lista-titulo">Lista de Itens:</h4>
-                            <div id="lista-categorias-gerenciar" style="border: 1px solid var(--border); border-radius: 6px; max-height: 240px; overflow-y: auto;"></div>
-                        </div>
-
-                        <!-- CARD DE BACKUP E DADOS -->
-                        <div class="card">
-                            <h3 class="card-title" style="font-size: 14px;">Gerenciamento de Dados (Backup)</h3>
-                            <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">Exporte ou restaure todos os dados do aplicativo para segurança local.</p>
-                            <div style="display: flex; gap: 8px;">
-                                <button class="btn-secondary" style="font-size: 11px; padding: 8px;" onclick="app.exportarDados()">Exportar JSON</button>
-                                <button class="btn-secondary" style="font-size: 11px; padding: 8px;" onclick="document.getElementById('input-import-json').click()">Importar JSON</button>
-                                <input type="file" id="input-import-json" accept=".json" class="hidden" onchange="app.importarDados(event)">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- TELA 4: HISTÓRICO GERAL -->
-                <div id="screen-historico-geral" class="screen">
-                    <div class="content" id="historico-geral-content" style="padding-top: 16px;"></div>
-                </div>
-
-                <!-- TELA DETALHES DA OBRA -->
-                <div id="screen-obra-detalhe" class="screen">
-                    <!-- CARD CORPORATIVO DE RESUMO DE PROGRESSO -->
-                    <div class="obra-summary-card">
-                        <div class="obra-summary-left">
-                            <div class="summary-title">PROGRESSO GERAL</div>
-                            <div class="summary-percent" id="obra-progress">0%</div>
-                            <div class="progress-bar-container">
-                                <div class="progress-fill-green" id="obra-progress-bar" style="width: 0%;"></div>
-                            </div>
-                            <div class="summary-dates">
-                                <div class="summary-date-item">
-                                    <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
-                                    <span id="obra-data-inicio">Início: --/--/----</span>
-                                </div>
-                                <div class="summary-date-item">
-                                    <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
-                                    <span id="obra-dias-decorridos">0 dias em andamento</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="obra-summary-right">
-                            <div class="stat-row">
-                                <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-                                <div><strong id="obra-stat-empreiteiros">0</strong> Empreiteiros</div>
-                            </div>
-                            <div class="stat-row">
-                                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 7h10v2H7zm0 4h10v2H7zm0 4h7v2H7z"/></svg>
-                                <div><strong id="obra-stat-servicos">0</strong> Serviços</div>
-                            </div>
-                            <div class="stat-row">
-                                <svg viewBox="0 0 24 24"><path d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm8 3a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 2a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/></svg>
-                                <div><strong id="obra-stat-fotos">0</strong> Fotos registradas</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="content" style="padding-top: 0;">
-                        <div id="servicos-content"></div>
-                    </div>
-                </div>
-
-                <!-- TELA HISTÓRICO DO SERVIÇO -->
-                <div id="screen-historico-servico" class="screen">
-                    <div class="content" id="historico-servico-content" style="padding-top: 16px;"></div>
-                </div>
-
-            </div>
-
-            <!-- BOTÃO FLUTUANTE (FAB) -->
-            <button class="fab" id="fab-add" onclick="app.handleFabClick()">+</button>
-
-            <!-- BOTTOM NAVIGATION BAR -->
-            <div class="bottom-nav">
-                <button class="nav-item active" id="nav-obras" onclick="app.switchNav('obras')">
-                    <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2zM5 5v14h14V5H5zm2 2h4v4H7V7zm6 0h4v4h-4V7zm-6 6h4v4H7v-4zm6 0h4v4h-4v-4z"/></svg>
-                    <span>Obras</span>
-                </button>
-                <button class="nav-item" id="nav-dashboard" onclick="app.switchNav('dashboard')">
-                    <svg viewBox="0 0 24 24"><path d="M5 9.2h3V19H5V9.2zM10.6 5h2.8v14h-2.8V5zm5.6 8H19v6h-2.8v-6z"/></svg>
-                    <span>Dashboard</span>
-                </button>
-                <button class="nav-item" id="nav-categorias" onclick="app.switchNav('categorias')">
-                    <svg viewBox="0 0 24 24"><path d="M12 2l-5.5 9h11zM12 22a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-7-9h6v6H5z"/></svg>
-                    <span>Categorias</span>
-                </button>
-                <button class="nav-item" id="nav-historico" onclick="app.switchNav('historico')">
-                    <svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6a7 7 0 1 1 7 7 6.97 6.97 0 0 1-5-2.14l-1.42 1.42A8.92 8.92 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.25 2.52.77-1.28-3.52-2.09V8z"/></svg>
-                    <span>Histórico</span>
-                </button>
-            </div>
+    <!-- 2. TELA DE OBRAS (HOME) -->
+    <div id="screen-obras" class="screen">
+        <div class="header-top">
+            <h2>Minhas Obras</h2>
+            <button class="btn-icon" onclick="openObraModal()">+</button>
+        </div>
+        <div id="lista-obras-container">
+            <!-- Renderizado via JS -->
         </div>
     </div>
 
-    <!-- MODAL NOVA OBRA -->
-    <div id="modal-nova-obra" class="modal hidden">
+    <!-- 3. TELA DE DETALHES DA OBRA -->
+    <div id="screen-detalhes" class="screen">
+        <button class="back-link" onclick="switchScreen('screen-obras')">← Voltar para Obras</button>
+        <div class="header-top">
+            <h2 id="detalhe-obra-nome">Nome da Obra</h2>
+            <button class="btn-icon" onclick="openServicoModal()">+</button>
+        </div>
+        
+        <!-- Card de Progresso Flutuante -->
+        <div class="card" style="background: var(--primary); color: white;">
+            <div style="font-size: 13px; opacity: 0.8;">Progresso Geral da Obra</div>
+            <div id="detalhe-obra-progresso-txt" style="font-size: 24px; font-weight: 700; margin: 4px 0;">0%</div>
+            <div class="progress-bar-container" style="background: rgba(255,255,255,0.2);">
+                <div id="detalhe-obra-progress-bar" class="progress-bar-fill" style="background: var(--success);"></div>
+            </div>
+        </div>
+
+        <h3 style="font-size: 16px; margin: 15px 0 10px 0;">Serviços Cadastrados</h3>
+        <div id="lista-servicos-container">
+            <!-- Renderizado via JS -->
+        </div>
+    </div>
+
+    <!-- 4. TELA DASHBOARD (ANALYTICS) -->
+    <div id="screen-dashboard" class="screen">
+        <div class="header-top">
+            <h2>Dashboard</h2>
+            <select id="dash-filtro-obra" class="form-control" style="width: 150px; padding: 6px;" onchange="renderDashboard()">
+                <option value="todas">Todas as Obras</option>
+            </select>
+        </div>
+
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <h4 id="kpi-1-title">Obras Ativas</h4>
+                <span id="kpi-1-val">0</span>
+            </div>
+            <div class="kpi-card">
+                <h4 id="kpi-2-title">Progresso Médio</h4>
+                <span id="kpi-2-val">0%</span>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="chartProgresso"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="chartCategorias"></canvas>
+        </div>
+    </div>
+
+    <!-- 5. TELA CATEGORIAS -->
+    <div id="screen-categorias" class="screen">
+        <div class="header-top">
+            <h2>Configurações & Categorias</h2>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">Tipos de Obra</div>
+            <div id="cat-obras-list" class="card-info">Residencial, Comercial, Industrial</div>
+            <button class="btn-full btn-outline" style="padding: 6px; font-size: 13px;" onclick="addCategoriaObra()">+ Adicionar Tipo</button>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Unidades de Medida</div>
+            <div id="cat-unidades-list" class="card-info">m², m³, m, un, kg</div>
+            <button class="btn-full btn-outline" style="padding: 6px; font-size: 13px;" onclick="addUnidadeMedida()">+ Adicionar Unidade</button>
+        </div>
+    </div>
+
+    <!-- 6. TELA HISTÓRICO GERAL -->
+    <div id="screen-historico" class="screen">
+        <div class="header-top">
+            <h2>Histórico de Medições</h2>
+        </div>
+        <div id="lista-historico-global">
+            <!-- Renderizado via JS -->
+        </div>
+    </div>
+
+    <!-- BOTTOM NAVIGATION -->
+    <nav class="bottom-nav" id="main-bottom-nav" style="display: none;">
+        <button class="nav-item active" onclick="switchTab('screen-obras', this)">
+            <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            Obras
+        </button>
+        <button class="nav-item" onclick="switchTab('screen-dashboard', this)">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+            Dashboard
+        </button>
+        <button class="nav-item" onclick="switchTab('screen-categorias', this)">
+            <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+            Categorias
+        </button>
+        <button class="nav-item" onclick="switchTab('screen-historico', this)">
+            <svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+            Histórico
+        </button>
+    </nav>
+
+    <!-- MODAL: NOVA OBRA -->
+    <div id="modal-obra" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2 style="margin: 0; font-size: 15px; font-weight: 600;">Nova Obra</h2>
-                <button class="modal-close" onclick="app.closeNovaObraModal()">✕</button>
+            <h3>Nova Obra</h3>
+            <div class="form-group" style="margin-top: 15px;">
+                <label>Nome da Obra</label>
+                <input type="text" id="input-obra-nome" class="form-control" placeholder="Ex: Residencial Boulevard">
             </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label class="form-label">Nome da Obra *</label>
-                    <input type="text" class="form-input" id="nova-obra-nome" placeholder="Ex: Residencial Alphaville">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Categoria da Obra *</label>
-                    <select class="form-input" id="nova-obra-categoria"></select>
-                </div>
-                <div class="button-group">
-                    <button class="btn-secondary" onclick="app.closeNovaObraModal()">Cancelar</button>
-                    <button class="btn-primary" onclick="app.salvarNovaObra()">Criar Obra</button>
-                </div>
+            <div class="form-group">
+                <label>Categoria</label>
+                <select id="input-obra-cat" class="form-control">
+                    <option value="Residencial">Residencial</option>
+                    <option value="Comercial">Comercial</option>
+                    <option value="Industrial">Industrial</option>
+                </select>
             </div>
+            <button class="btn-full btn-primary" onclick="salvarObra()">Salvar Obra</button>
+            <button class="btn-full btn-outline" onclick="closeModal('modal-obra')">Cancelar</button>
         </div>
     </div>
 
-    <!-- MODAL NOVO SERVIÇO -->
-    <div id="modal-novo-servico" class="modal hidden">
+    <!-- MODAL: NOVO SERVIÇO -->
+    <div id="modal-servico" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2 style="margin: 0; font-size: 15px; font-weight: 600;">Novo Serviço</h2>
-                <button class="modal-close" onclick="app.closeNovoServicoModal()">✕</button>
+            <h3>Novo Serviço</h3>
+            <div class="form-group" style="margin-top: 15px;">
+                <label>Nome do Serviço</label>
+                <input type="text" id="input-serv-nome" class="form-control" placeholder="Ex: Alvenaria Estrutural">
             </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label class="form-label">Nome do Serviço *</label>
-                    <input type="text" class="form-input" id="novo-servico-nome" placeholder="Ex: Pintura Externa">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Categoria do Serviço *</label>
-                    <select class="form-input" id="novo-servico-categoria"></select>
-                </div>
-                <div style="display: flex; gap: 12px;">
-                    <div class="form-group" style="flex: 2;">
-                        <label class="form-label">Meta Total *</label>
-                        <input type="number" class="form-input" id="novo-servico-meta" placeholder="0.00" step="0.01">
-                    </div>
-                    <div class="form-group" style="flex: 1;">
-                        <label class="form-label">Unidade *</label>
-                        <select class="form-input" id="novo-servico-unidade"></select>
-                    </div>
-                </div>
-                <div class="button-group">
-                    <button class="btn-secondary" onclick="app.closeNovoServicoModal()">Cancelar</button>
-                    <button class="btn-primary" onclick="app.salvarNovoServico()">Salvar Serviço</button>
-                </div>
+            <div class="form-group">
+                <label>Unidade de Medida</label>
+                <select id="input-serv-unidade" class="form-control">
+                    <option value="m²">m²</option>
+                    <option value="m³">m³</option>
+                    <option value="m">m</option>
+                    <option value="un">un</option>
+                </select>
             </div>
+            <div class="form-group">
+                <label>Meta Prevista</label>
+                <input type="number" id="input-serv-meta" class="form-control" placeholder="0.00">
+            </div>
+            <button class="btn-full btn-primary" onclick="salvarServico()">Salvar Serviço</button>
+            <button class="btn-full btn-outline" onclick="closeModal('modal-servico')">Cancelar</button>
         </div>
     </div>
 
-    <!-- MODAL MEDIÇÃO (REGISTRO) -->
-    <div id="modal-medicao" class="modal hidden">
+    <!-- MODAL: REGISTRAR MEDIÇÃO -->
+    <div id="modal-medicao" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2 style="margin: 0; font-size: 15px; font-weight: 600;">Registrar Medição</h2>
-                <button class="modal-close" onclick="app.closeMedicaoModal()">✕</button>
+            <h3>Registrar Medição</h3>
+            <div id="medicao-info-servico" style="font-size: 13px; color: var(--text-muted); margin: 10px 0;"></div>
+            
+            <div class="alert-box" id="medicao-alert">
+                ⚠️ Atenção: A quantidade informada ultrapassa a meta planejada para este serviço! Justificativa obrigatória.
             </div>
-            <div class="modal-body">
-                <div id="medicao-info" style="background-color: #F8FAFC; border: 1px solid var(--border); padding: 12px; border-radius: 6px; margin-bottom: 16px; font-size: 12px;"></div>
-                <div id="medicao-alert" class="alert-warning hidden">Atenção: A quantidade inserida ultrapassa a meta do serviço!</div>
 
-                <div class="form-group">
-                    <label class="form-label" id="label-medicao-qtd">Quantidade Realizada *</label>
-                    <input type="number" class="form-input" id="medicao-quantidade" placeholder="0.00" step="0.01" oninput="app.onQuantidadeChange()" onkeyup="app.onQuantidadeChange()">
-                </div>
-
-                <div style="display: flex; gap: 12px;">
-                    <div class="form-group" style="flex: 1;">
-                        <label class="form-label">Data *</label>
-                        <input type="date" class="form-input" id="medicao-data">
-                    </div>
-                    <div class="form-group" style="flex: 1;">
-                        <label class="form-label">Nº de Funcionários</label>
-                        <input type="number" class="form-input" id="medicao-equipe" placeholder="Ex: 5" min="1">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Evidências / Fotos de Campo</label>
-                    <input type="file" id="input-camera" accept="image/*" capture="environment" class="hidden" onchange="app.handleFotoUpload(event)">
-                    <input type="file" id="input-galeria" accept="image/*" multiple class="hidden" onchange="app.handleFotoUpload(event)">
-
-                    <div class="photo-upload-container" id="photo-container"></div>
-                </div>
-
-                <div id="medicao-justificativa-group" class="form-group hidden">
-                    <label class="form-label" style="color: var(--danger);">Justificativa de Extrapolação *</label>
-                    <textarea class="form-textarea" id="medicao-justificativa" placeholder="Informe o motivo da extrapolação..."></textarea>
-                </div>
-
-                <div class="button-group">
-                    <button class="btn-secondary" onclick="app.closeMedicaoModal()">Cancelar</button>
-                    <button class="btn-primary" onclick="app.salvarMedicao()">Salvar Medição</button>
-                </div>
+            <div class="form-group">
+                <label>Quantidade Executada</label>
+                <input type="number" id="input-med-qtd" class="form-control" placeholder="0.00" oninput="onQuantidadeChange()">
             </div>
+            <div class="form-group">
+                <label>Data</label>
+                <input type="date" id="input-med-data" class="form-control">
+            </div>
+            <div class="form-group" id="group-justificativa" style="display: none;">
+                <label>Justificativa da Extrapolação</label>
+                <textarea id="input-med-justificativa" class="form-control" placeholder="Explique o motivo..."></textarea>
+            </div>
+
+            <button class="btn-full btn-primary" onclick="salvarMedicao()">Confirmar Medição</button>
+            <button class="btn-full btn-outline" onclick="closeModal('modal-medicao')">Cancelar</button>
         </div>
     </div>
 
-    <!-- MODAL EDITAR MEDIÇÃO -->
-    <div id="modal-editar-medicao" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 style="margin: 0; font-size: 15px; font-weight: 600;">Editar Medição</h2>
-                <button class="modal-close" onclick="app.closeEditarMedicaoModal()">✕</button>
-            </div>
-            <div class="modal-body">
-                <div id="edit-medicao-info" style="background-color: #F8FAFC; border: 1px solid var(--border); padding: 12px; border-radius: 6px; margin-bottom: 16px; font-size: 12px;"></div>
-                <div id="edit-medicao-alert" class="alert-warning hidden">Atenção: A nova quantidade ultrapassa a meta do serviço!</div>
+</div>
 
-                <div class="form-group">
-                    <label class="form-label" id="label-edit-medicao-qtd">Quantidade Realizada *</label>
-                    <input type="number" class="form-input" id="edit-medicao-quantidade" placeholder="0.00" step="0.01" oninput="app.onEditQuantidadeChange()" onkeyup="app.onEditQuantidadeChange()">
+<script>
+    /* Estado Global & LocalStorage */
+    let localObras = JSON.parse(localStorage.getItem('medio_obras')) || [
+        { id: '1', name: 'Residencial Boulevard', category: 'Residencial', progress: 64 },
+        { id: '2', name: 'Centro Comercial Alpha', category: 'Comercial', progress: 45 }
+    ];
+
+    let localServicosPorObra = JSON.parse(localStorage.getItem('medio_servicos')) || {
+        '1': [
+            { id: 's1', name: 'Alvenaria Estrutural', unit: 'm²', meta: 500, executada: 330 },
+            { id: 's2', name: 'Concretagem', unit: 'm³', meta: 120, executada: 65 }
+        ],
+        '2': [
+            { id: 's3', name: 'Instalação Elétrica', unit: 'm', meta: 1000, executada: 450 }
+        ]
+    };
+
+    let localHistorico = JSON.parse(localStorage.getItem('medio_historico')) || {
+        's1': [
+            { id: 'm1', quantidade: 150, data: '2026-06-01', status: 'normal', justificativa: '' },
+            { id: 'm2', quantidade: 180, data: '2026-06-15', status: 'normal', justificativa: '' }
+        ]
+    };
+
+    let localCatObras = JSON.parse(localStorage.getItem('medio_cat_obras')) || ['Residencial', 'Comercial', 'Industrial'];
+    let localUnidades = JSON.parse(localStorage.getItem('medio_unidades')) || ['m²', 'm³', 'm', 'un', 'kg'];
+
+    let currentObraId = null;
+    let currentServicoId = null;
+    let chartProgressoInstancia = null;
+    let chartCategoriasInstancia = null;
+
+    function saveData() {
+        localStorage.setItem('medio_obras', JSON.stringify(localObras));
+        localStorage.setItem('medio_servicos', JSON.stringify(localServicosPorObra));
+        localStorage.setItem('medio_historico', JSON.stringify(localHistorico));
+        localStorage.setItem('medio_cat_obras', JSON.stringify(localCatObras));
+        localStorage.setItem('medio_unidades', JSON.stringify(localUnidades));
+    }
+
+    /* Transição de Telas de Entrada e Abas */
+    function goToApp() {
+        document.getElementById('screen-login').classList.remove('active');
+        document.getElementById('screen-obras').classList.add('active');
+        document.getElementById('main-bottom-nav').style.display = 'flex';
+        renderObras();
+        updateFiltroObraSelect();
+    }
+
+    function switchScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+    }
+
+    function switchTab(screenId, btnElement) {
+        switchScreen(screenId);
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        btnElement.classList.add('active');
+
+        if(screenId === 'screen-dashboard') renderDashboard();
+        if(screenId === 'screen-historico') renderHistoricoGlobal();
+        if(screenId === 'screen-obras') renderObras();
+    }
+
+    /* Renderização de Obras */
+    function renderObras() {
+        const container = document.getElementById('lista-obras-container');
+        container.innerHTML = '';
+
+        if(localObras.length === 0) {
+            container.innerHTML = '<p style="text-align:center; color:var(--text-muted); margin-top:20px;">Nenhuma obra cadastrada.</p>';
+            return;
+        }
+
+        localObras.forEach(obra => {
+            const servicos = localServicosPorObra[obra.id] || [];
+            let totalMeta = servicos.reduce((acc, s) => acc + s.meta, 0);
+            let totalExec = servicos.reduce((acc, s) => acc + s.executada, 0);
+            let prog = totalMeta > 0 ? Math.round((totalExec / totalMeta) * 100) : 0;
+            obra.progress = prog;
+
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.onclick = () => abrirDetalhesObra(obra.id);
+            card.innerHTML = `
+                <div class="card-title">${obra.name}</div>
+                <div class="card-info">Categoria: ${obra.category} | Serviços: ${servicos.length}</div>
+                <div class="progress-text">
+                    <span>Progresso Geral</span>
+                    <span>${prog}%</span>
                 </div>
-
-                <div style="display: flex; gap: 12px;">
-                    <div class="form-group" style="flex: 1;">
-                        <label class="form-label">Data *</label>
-                        <input type="date" class="form-input" id="edit-medicao-data">
-                    </div>
-                    <div class="form-group" style="flex: 1;">
-                        <label class="form-label">Nº de Funcionários</label>
-                        <input type="number" class="form-input" id="edit-medicao-equipe" placeholder="Ex: 5" min="1">
-                    </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" style="width: ${prog}%"></div>
                 </div>
+            `;
+            container.appendChild(card);
+        });
+        saveData();
+    }
 
-                <div id="edit-medicao-justificativa-group" class="form-group hidden">
-                    <label class="form-label" style="color: var(--danger);">Justificativa de Extrapolação *</label>
-                    <textarea class="form-textarea" id="edit-medicao-justificativa" placeholder="Informe o motivo da extrapolação..."></textarea>
+    function abrirDetalhesObra(obraId) {
+        currentObraId = obraId;
+        const obra = localObras.find(o => o.id === obraId);
+        if(!obra) return;
+
+        document.getElementById('detalhe-obra-nome').innerText = obra.name;
+        
+        const servicos = localServicosPorObra[obraId] || [];
+        let totalMeta = servicos.reduce((acc, s) => acc + s.meta, 0);
+        let totalExec = servicos.reduce((acc, s) => acc + s.executada, 0);
+        let prog = totalMeta > 0 ? Math.round((totalExec / totalMeta) * 100) : 0;
+
+        document.getElementById('detalhe-obra-progresso-txt').innerText = prog + '%';
+        document.getElementById('detalhe-obra-progress-bar').style.width = prog + '%';
+
+        renderServicos(obraId);
+        switchScreen('screen-detalhes');
+    }
+
+    function renderServicos(obraId) {
+        const container = document.getElementById('lista-servicos-container');
+        container.innerHTML = '';
+        const servicos = localServicosPorObra[obraId] || [];
+
+        if(servicos.length === 0) {
+            container.innerHTML = '<p style="text-align:center; color:var(--text-muted); margin-top:20px;">Nenhum serviço cadastrado.</p>';
+            return;
+        }
+
+        servicos.forEach(s => {
+            let prog = s.meta > 0 ? Math.round((s.executada / s.meta) * 100) : 0;
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div class="card-title" style="margin-bottom:2px;">${s.name}</div>
+                    <button class="btn-primary" style="padding:6px 12px; font-size:12px;" onclick="event.stopPropagation(); abrirModalMedicao('${s.id}')">Medir</button>
                 </div>
-
-                <div class="button-group">
-                    <button class="btn-secondary" onclick="app.closeEditarMedicaoModal()">Cancelar</button>
-                    <button class="btn-primary" onclick="app.salvarEdicaoMedicao()">Salvar Alterações</button>
+                <div class="card-info">Executado: ${s.executada} / ${s.meta} ${s.unit}</div>
+                <div class="progress-text">
+                    <span>Evolução</span>
+                    <span>${prog}%</span>
                 </div>
-            </div>
-        </div>
-    </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" style="width: ${prog > 100 ? 100 : prog}%"></div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
 
-    <script>
-        /* CAMADA DE PERSISTÊNCIA E VALIDAÇÃO (DB LAYER) */
-        const DB = {
-            KEYS: {
-                CAT_OBRAS: 'medio_cat_obras',
-                CAT_SERVICOS: 'medio_cat_servicos',
-                UNIDADES: 'medio_unidades',
-                OBRAS: 'medio_obras',
-                SERVICOS: 'medio_servicos',
-                HISTORICO: 'medio_historico'
+    /* Modais Manipulação */
+    function openObraModal() {
+        document.getElementById('input-obra-nome').value = '';
+        document.getElementById('modal-obra').classList.add('active');
+    }
+
+    function openServicoModal() {
+        document.getElementById('input-serv-nome').value = '';
+        document.getElementById('input-serv-meta').value = '';
+        document.getElementById('modal-servico').classList.add('active');
+    }
+
+    function abrirModalMedicao(servicoId) {
+        currentServicoId = servicoId;
+        const servicos = localServicosPorObra[currentObraId] || [];
+        const serv = servicos.find(s => s.id === servicoId);
+        if(!serv) return;
+
+        document.getElementById('medicao-info-servico').innerText = `Serviço: ${serv.name} (Meta: ${serv.meta} ${serv.unit} | Já Executado: ${serv.executada} ${serv.unit})`;
+        document.getElementById('input-med-qtd').value = '';
+        document.getElementById('input-med-justificativa').value = '';
+        document.getElementById('input-med-data').value = new Date().toISOString().split('T')[0];
+        document.getElementById('medicao-alert').style.display = 'none';
+        document.getElementById('group-justificativa').style.display = 'none';
+        
+        document.getElementById('modal-medicao').classList.add('active');
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.remove('active');
+    }
+
+    function onQuantidadeChange() {
+        const servicos = localServicosPorObra[currentObraId] || [];
+        const serv = servicos.find(s => s.id === currentServicoId);
+        const qtd = parseFloat(document.getElementById('input-med-qtd').value) || 0;
+
+        if(serv && (serv.executada + qtd > serv.meta)) {
+            document.getElementById('medicao-alert').style.display = 'block';
+            document.getElementById('group-justificativa').style.display = 'block';
+        } else {
+            document.getElementById('medicao-alert').style.display = 'none';
+            document.getElementById('group-justificativa').style.display = 'none';
+        }
+    }
+
+    /* Salvamentos CRUD */
+    function salvarObra() {
+        const nome = document.getElementById('input-obra-nome').value.trim();
+        const cat = document.getElementById('input-obra-cat').value;
+        if(!nome) { alert('Informe o nome da obra.'); return; }
+
+        const novaObra = { id: Date.now().toString(), name: nome, category: cat, progress: 0 };
+        localObras.push(novaObra);
+        localServicosPorObra[novaObra.id] = [];
+        saveData();
+        closeModal('modal-obra');
+        renderObras();
+        updateFiltroObraSelect();
+    }
+
+    function salvarServico() {
+        const nome = document.getElementById('input-serv-nome').value.trim();
+        const unidade = document.getElementById('input-serv-unidade').value;
+        const meta = parseFloat(document.getElementById('input-serv-meta').value);
+
+        if(!nome || isNaN(meta) || meta <= 0) { alert('Preencha os campos corretamente.'); return; }
+
+        if(!localServicosPorObra[currentObraId]) localServicosPorObra[currentObraId] = [];
+        
+        localServicosPorObra[currentObraId].push({
+            id: 's_' + Date.now(),
+            name: nome,
+            unit: unidade,
+            meta: meta,
+            executada: 0
+        });
+
+        saveData();
+        closeModal('modal-servico');
+        abrirDetalhesObra(currentObraId);
+    }
+
+    function salvarMedicao() {
+        const qtd = parseFloat(document.getElementById('input-med-qtd').value);
+        const data = document.getElementById('input-med-data').value;
+        const just = document.getElementById('input-med-justificativa').value.trim();
+
+        if(isNaN(qtd) || qtd <= 0) { alert('Informe uma quantidade válida.'); return; }
+
+        const servicos = localServicosPorObra[currentObraId];
+        const serv = servicos.find(s => s.id === currentServicoId);
+
+        let status = 'normal';
+        if((serv.executada + qtd) > serv.meta) {
+            if(!just) { alert('Justificativa obrigatória para valores acima da meta.'); return; }
+            status = 'extrapolou';
+        }
+
+        serv.executada += qtd;
+
+        if(!localHistorico[currentServicoId]) localHistorico[currentServicoId] = [];
+        localHistorico[currentServicoId].unshift({
+            id: 'm_' + Date.now(),
+            quantidade: qtd,
+            data: data,
+            status: status,
+            justificativa: just
+        });
+
+        saveData();
+        closeModal('modal-medicao');
+        abrirDetalhesObra(currentObraId);
+    }
+
+    /* Dashboard & Charts */
+    function updateFiltroObraSelect() {
+        const select = document.getElementById('dash-filtro-obra');
+        select.innerHTML = '<option value="todas">Todas as Obras</option>';
+        localObras.forEach(o => {
+            select.innerHTML += `<option value="${o.id}">${o.name}</option>`;
+        });
+    }
+
+    function renderDashboard() {
+        const filtro = document.getElementById('dash-filtro-obra').value;
+        
+        let kpi1Title = document.getElementById('kpi-1-title');
+        let kpi1Val = document.getElementById('kpi-1-val');
+        let kpi2Title = document.getElementById('kpi-2-title');
+        let kpi2Val = document.getElementById('kpi-2-val');
+
+        let labels = [];
+        let dataProg = [];
+
+        if(filtro === 'todas') {
+            kpi1Title.innerText = "Obras Ativas";
+            kpi1Val.innerText = localObras.length;
+            
+            let mediaTotal = 0;
+            localObras.forEach(o => {
+                const servs = localServicosPorObra[o.id] || [];
+                let tMeta = servs.reduce((a,b)=>a+b.meta,0);
+                let tExec = servs.reduce((a,b)=>a+b.executada,0);
+                let p = tMeta > 0 ? Math.round((tExec/tMeta)*100) : 0;
+                mediaTotal += p;
+
+                labels.push(o.name);
+                dataProg.push(p);
+            });
+            kpi2Title.innerText = "Progresso Médio";
+            kpi2Val.innerText = (localObras.length > 0 ? Math.round(mediaTotal / localObras.length) : 0) + '%';
+        } else {
+            const servs = localServicosPorObra[filtro] || [];
+            kpi1Title.innerText = "Serviços";
+            kpi1Val.innerText = servs.length;
+
+            let tMeta = servs.reduce((a,b)=>a+b.meta,0);
+            let tExec = servs.reduce((a,b)=>a+b.executada,0);
+            let pObra = tMeta > 0 ? Math.round((tExec/tMeta)*100) : 0;
+
+            kpi2Title.innerText = "Progresso da Obra";
+            kpi2Val.innerText = pObra + '%';
+
+            servs.forEach(s => {
+                labels.push(s.name);
+                dataProg.push(s.meta > 0 ? Math.round((s.executada/s.meta)*100) : 0);
+            });
+        }
+
+        // Gráfico de Barras
+        const ctx1 = document.getElementById('chartProgresso').getContext('2d');
+        if(chartProgressoInstancia) chartProgressoInstancia.destroy();
+        chartProgressoInstancia = new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Progresso (%)',
+                    data: dataProg,
+                    backgroundColor: '#10b981',
+                    borderRadius: 6
+                }]
             },
-
-            defaults: {
-                catObras: ['Residencial', 'Comercial', 'Industrial', 'Infraestrutura'],
-                catServicos: ['Alvenaria', 'Estrutura', 'Hidráulica', 'Elétrica', 'Acabamento', 'Pintura'],
-                unidades: ['m²', 'm', 'm³', 'km', 'un', 'kg', 'vb'],
-                obras: [{ id: 'demo1', name: 'Residencial Boulevard', category: 'Residencial', progress: 60 }],
-                servicos: {
-                    'demo1': [
-                        { id: 's1', name: 'Alvenaria Estrutural', category: 'Alvenaria', meta: 350, executada: 230, unit: 'm²' },
-                        { id: 's2', name: 'Concretagem de Pilares', category: 'Estrutura', meta: 280, executada: 150, unit: 'm³' }
-                    ]
-                },
-                historico: {
-                    's1': [{ id: 'm1', obraNome: 'Residencial Boulevard', servicoNome: 'Alvenaria Estrutural', unit: 'm²', data: '2026-01-10', quantidade: 100, status: 'normal' }],
-                    's2': [{ id: 'm2', obraNome: 'Residencial Boulevard', servicoNome: 'Concretagem de Pilares', unit: 'm³', data: '2026-01-15', quantidade: 50, status: 'normal' }]
-                }
-            },
-
-            get(key, defaultVal) {
-                try {
-                    const item = localStorage.getItem(key);
-                    return item ? JSON.parse(item) : defaultVal;
-                } catch (e) {
-                    console.error(`Erro ao ler ${key} do localStorage:`, e);
-                    return defaultVal;
-                }
-            },
-
-            set(key, value) {
-                try {
-                    localStorage.setItem(key, JSON.stringify(value));
-                } catch (e) {
-                    console.error(`Erro ao salvar ${key} no localStorage:`, e);
-                    app.showToast('Erro ao salvar dados localmente!', 'error');
-                }
-            },
-
-            limparOrfaosESincronizar() {
-                let servicos = this.get(this.KEYS.SERVICOS, this.defaults.servicos);
-                let historico = this.get(this.KEYS.HISTORICO, this.defaults.historico);
-                let obras = this.get(this.KEYS.OBRAS, this.defaults.obras);
-
-                const obraIdsValidos = new Set(obras.map(o => o.id));
-                const servicoIdsValidos = new Set();
-
-                // Remove serviços de obras excluídas
-                for (let obraId in servicos) {
-                    if (!obraIdsValidos.has(obraId)) {
-                        delete servicos[obraId];
-                    } else {
-                        servicos[obraId].forEach(s => servicoIdsValidos.add(s.id));
-                    }
-                }
-
-                // Remove histórico de serviços excluídos
-                for (let servId in historico) {
-                    if (!servicoIdsValidos.has(servId)) {
-                        delete historico[servId];
-                    }
-                }
-
-                this.set(this.KEYS.SERVICOS, servicos);
-                this.set(this.KEYS.HISTORICO, historico);
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { y: { beginAtZero: true, max: 100 } }
             }
-        };
+        });
 
-        // Inicializa e limpa eventuais órfãos no carregamento
-        DB.limparOrfaosESincronizar();
+        // Gráfico de Rosca (Categorias)
+        const ctx2 = document.getElementById('chartCategorias').getContext('2d');
+        if(chartCategoriasInstancia) chartCategoriasInstancia.destroy();
+        
+        let catCount = {};
+        localObras.forEach(o => { catCount[o.category] = (catCount[o.category] || 0) + 1; });
 
-        let localCategoriasObras = DB.get(DB.KEYS.CAT_OBRAS, DB.defaults.catObras);
-        let localCategoriasServicos = DB.get(DB.KEYS.CAT_SERVICOS, DB.defaults.catServicos);
-        let localUnidadesMedida = DB.get(DB.KEYS.UNIDADES, DB.defaults.unidades);
-        let activeCatTab = 'obras';
-
-        let localObras = DB.get(DB.KEYS.OBRAS, DB.defaults.obras);
-        let localServicosPorObra = DB.get(DB.KEYS.SERVICOS, DB.defaults.servicos);
-        let localHistorico = DB.get(DB.KEYS.HISTORICO, DB.defaults.historico);
-
-        let tempFotos = [];
-        let chartProgressoInstance = null;
-        let chartCategoriasInstance = null;
-
-        const app = {
-            currentNav: 'obras',
-            currentObra: null,
-            currentServico: null,
-            editingMedicao: null,
-
-            init() {
-                this.setDataToday();
-                this.renderObras(localObras);
-                this.popularFiltroObrasDashboard();
+        chartCategoriasInstancia = new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(catCount),
+                datasets: [{
+                    data: Object.values(catCount),
+                    backgroundColor: ['#0b1f3a', '#10b981', '#f59e0b', '#ef4444']
+                }]
             },
-
-            saveData() {
-                DB.set(DB.KEYS.CAT_OBRAS, localCategoriasObras);
-                DB.set(DB.KEYS.CAT_SERVICOS, localCategoriasServicos);
-                DB.set(DB.KEYS.UNIDADES, localUnidadesMedida);
-                DB.set(DB.KEYS.OBRAS, localObras);
-                DB.set(DB.KEYS.SERVICOS, localServicosPorObra);
-                DB.set(DB.KEYS.HISTORICO, localHistorico);
-            },
-
-            showToast(message, type = 'success') {
-                const container = document.getElementById('toast-container');
-                const toast = document.createElement('div');
-                toast.className = `toast ${type}`;
-                toast.textContent = message;
-                
-                container.appendChild(toast);
-                setTimeout(() => {
-                    toast.remove();
-                }, 2600);
-            },
-
-            setDataToday() {
-                const now = new Date();
-                const ano = now.getFullYear();
-                const mes = String(now.getMonth() + 1).padStart(2, '0');
-                const dia = String(now.getDate()).padStart(2, '0');
-                document.getElementById('medicao-data').value = `${ano}-${mes}-${dia}`;
-            },
-
-            switchNav(nav) {
-                this.currentNav = nav;
-                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-                document.getElementById(`nav-${nav}`).classList.add('active');
-
-                const btnBack = document.getElementById('header-back-btn');
-                btnBack.classList.add('hidden');
-
-                const title = document.getElementById('main-header-title');
-                const subtitle = document.getElementById('main-header-subtitle');
-
-                document.getElementById('fab-add').classList.remove('hidden');
-
-                if (nav === 'obras') {
-                    title.textContent = "MEDI-O ENG";
-                    subtitle.textContent = "Gestão & Medição de Obras";
-                    this.renderObras(localObras);
-                    this.showScreen('screen-obras');
-                } else if (nav === 'dashboard') {
-                    title.textContent = "Dashboard";
-                    subtitle.textContent = "Indicadores consolidados e analíticos";
-                    this.popularFiltroObrasDashboard();
-                    this.renderDashboard();
-                    this.showScreen('screen-dashboard');
-                } else if (nav === 'categorias') {
-                    title.textContent = "Categorias e Unidades";
-                    subtitle.textContent = "Gestão de Cadastros";
-                    this.switchCatTab(activeCatTab);
-                    this.showScreen('screen-categorias');
-                } else if (nav === 'historico') {
-                    title.textContent = "Histórico Geral";
-                    subtitle.textContent = "Linha do tempo de medições";
-                    this.renderHistoricoGeral();
-                    this.showScreen('screen-historico-geral');
-                }
-            },
-
-            handleFabClick() {
-                if (this.currentNav === 'obras') {
-                    this.openNovaObraModal();
-                } else if (this.currentObra && document.getElementById('screen-obra-detalhe').classList.contains('active')) {
-                    this.openNovoServicoModal();
-                } else {
-                    this.openNovaObraModal();
-                }
-            },
-
-            showScreen(screenId) {
-                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-                document.getElementById(screenId).classList.add('active');
-            },
-
-            goHome() {
-                this.currentObra = null;
-                this.switchNav('obras');
-            },
-
-            popularFiltroObrasDashboard() {
-                const select = document.getElementById('dash-obra-filtro');
-                const valorAtual = select ? select.value : 'todas';
-
-                let html = '<option value="todas">🌐 Visão Geral (Todas as Obras)</option>';
-                localObras.forEach(o => {
-                    html += `<option value="${o.id}">🏗️ ${o.name}</option>`;
-                });
-                select.innerHTML = html;
-
-                if (Array.from(select.options).some(opt => opt.value === valorAtual)) {
-                    select.value = valorAtual;
-                } else {
-                    select.value = 'todas';
-                }
-            },
-
-            onDashFiltroChange() {
-                this.renderDashboard();
-            },
-
-            renderObras(obras) {
-                const list = document.getElementById('obras-list');
-                if (!obras.length) {
-                    list.innerHTML = '<div class="card"><p style="text-align: center; color: var(--text-muted);">Nenhuma obra cadastrada.</p></div>';
-                    return;
-                }
-
-                list.innerHTML = obras.map(obra => {
-                    const servicos = localServicosPorObra[obra.id] || [];
-                    const categoriasServicos = Array.from(new Set(servicos.map(s => s.category)));
-
-                    const servicosBadgesHtml = categoriasServicos.length > 0
-                        ? categoriasServicos.map(cat => `<span class="badge">${cat}</span>`).join('')
-                        : `<span style="font-size: 11px; color: var(--text-muted); font-style: italic;">Nenhum serviço cadastrado</span>`;
-
-                    return `
-                        <div class="card" onclick="app.selectObra('${obra.id}', '${obra.name}')" style="cursor: pointer;">
-                            <div class="card-header-actions">
-                                <h3 class="card-title">${obra.name}</h3>
-                                <button class="btn-delete-card" onclick="app.removerObra('${obra.id}', event)">Excluir</button>
-                            </div>
-                            
-                            <div class="badge-container">
-                                <div class="badge-group">
-                                    <span class="badge badge-main">${obra.category}</span>
-                                </div>
-                                <div class="badge-group">
-                                    ${servicosBadgesHtml}
-                                </div>
-                            </div>
-
-                            <div style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center;">
-                                <span style="font-size: 11px; color: var(--text-muted);">Progresso Geral</span>
-                                <span style="font-size: 13px; font-weight: 700; color: var(--primary);">${obra.progress || 0}%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${obra.progress || 0}%;"></div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            },
-
-            selectObra(id, name) {
-                this.currentObra = { id, name };
-                
-                document.getElementById('main-header-title').textContent = name;
-                document.getElementById('main-header-subtitle').textContent = "Detalhamento da Obra";
-                document.getElementById('header-back-btn').classList.remove('hidden');
-
-                if (!localServicosPorObra[id]) {
-                    localServicosPorObra[id] = [];
-                }
-
-                this.renderServicos(localServicosPorObra[id]);
-                this.recalcularProgressoEContagemDias(id);
-                this.showScreen('screen-obra-detalhe');
-            },
-
-            removerObra(id, event) {
-                if (event) event.stopPropagation();
-                const obra = localObras.find(o => o.id === id);
-                if (!obra) return;
-
-                if (confirm(`Tem certeza de que deseja excluir permanentemente a obra "${obra.name}"?`)) {
-                    if (localServicosPorObra[id]) {
-                        localServicosPorObra[id].forEach(serv => {
-                            delete localHistorico[serv.id];
-                        });
-                        delete localServicosPorObra[id];
-                    }
-
-                    localObras = localObras.filter(o => o.id !== id);
-                    this.saveData();
-                    this.renderObras(localObras);
-                    this.popularFiltroObrasDashboard();
-                    this.showToast('Obra excluída com sucesso!', 'success');
-                }
-            },
-
-            recalcularProgressoEContagemDias(obraId) {
-                const servicos = localServicosPorObra[obraId] || [];
-                let percentualGeral = 0;
-
-                if (servicos.length > 0) {
-                    const totalMeta = servicos.reduce((acc, s) => acc + (s.meta || 0), 0);
-                    const totalExecutado = servicos.reduce((acc, s) => acc + (s.executada || 0), 0);
-                    percentualGeral = totalMeta > 0 ? Math.min(100, Math.round((totalExecutado / totalMeta) * 100)) : 0;
-                }
-
-                document.getElementById('obra-progress').textContent = percentualGeral + '%';
-                document.getElementById('obra-progress-bar').style.width = percentualGeral + '%';
-
-                const obra = localObras.find(o => o.id === obraId);
-                if (obra) {
-                    obra.progress = percentualGeral;
-                    this.saveData();
-                }
-
-                let todasMedicoesObra = [];
-                let totalFotosCount = 0;
-
-                servicos.forEach(s => {
-                    if (localHistorico[s.id]) {
-                        todasMedicoesObra = todasMedicoesObra.concat(localHistorico[s.id]);
-                        localHistorico[s.id].forEach(m => {
-                            if (m.fotos) totalFotosCount += m.fotos.length;
-                        });
-                    }
-                });
-
-                const categoriasUnicas = new Set(servicos.map(s => s.category));
-                const totalEmpreiteiros = servicos.length > 0 ? (categoriasUnicas.size || 1) : 0;
-
-                document.getElementById('obra-stat-empreiteiros').textContent = totalEmpreiteiros;
-                document.getElementById('obra-stat-servicos').textContent = servicos.length;
-                document.getElementById('obra-stat-fotos').textContent = totalFotosCount;
-
-                const elInicio = document.getElementById('obra-data-inicio');
-                const elDias = document.getElementById('obra-dias-decorridos');
-
-                if (todasMedicoesObra.length === 0) {
-                    elInicio.textContent = 'Início: --/--/----';
-                    elDias.textContent = 'Aguardando 1ª medição';
-                    return;
-                }
-
-                todasMedicoesObra.sort((a, b) => a.data.localeCompare(b.data));
-
-                const [ano, mes, dia] = todasMedicoesObra[0].data.split('-').map(Number);
-                const primeiraMedicao = new Date(ano, mes - 1, dia);
-
-                const diaFmt = String(primeiraMedicao.getDate()).padStart(2, '0');
-                const mesFmt = String(primeiraMedicao.getMonth() + 1).padStart(2, '0');
-                const anoFmt = primeiraMedicao.getFullYear();
-
-                elInicio.textContent = `Início: ${diaFmt}/${mesFmt}/${anoFmt}`;
-
-                const hoje = new Date();
-                hoje.setHours(0, 0, 0, 0);
-
-                if (percentualGeral >= 100) {
-                    const [uAno, uMes, uDia] = todasMedicoesObra[todasMedicoesObra.length - 1].data.split('-').map(Number);
-                    const ultimaMedicao = new Date(uAno, uMes - 1, uDia);
-                    const diffTime = Math.abs(ultimaMedicao - primeiraMedicao);
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-                    elDias.textContent = `${diffDays} dias em andamento`;
-                } else {
-                    const diffTime = Math.abs(hoje - primeiraMedicao);
-                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
-                    elDias.textContent = `${diffDays} dias em andamento`;
-                }
-            },
-
-            renderDashboard() {
-                const obraIdSelecionada = document.getElementById('dash-obra-filtro').value;
-                const containerResumo = document.getElementById('dash-obras-resumo');
-
-                const kpiTitle1 = document.getElementById('kpi-card-title-1');
-                const kpiTitle2 = document.getElementById('kpi-card-title-2');
-                const chartTitle1 = document.getElementById('chart-title-1');
-                const chartTitle2 = document.getElementById('chart-title-2');
-                const resumoTitle = document.getElementById('resumo-card-title');
-
-                if (obraIdSelecionada === 'todas') {
-                    kpiTitle1.textContent = 'Obras Ativas';
-                    document.getElementById('kpi-obras-total').textContent = localObras.length;
-                    
-                    let somaProgresso = localObras.reduce((acc, o) => acc + (o.progress || 0), 0);
-                    let media = localObras.length ? Math.round(somaProgresso / localObras.length) : 0;
-                    kpiTitle2.textContent = 'Progresso Médio';
-                    document.getElementById('kpi-progresso-medio').textContent = media + '%';
-
-                    chartTitle1.textContent = 'Progresso por Obra';
-                    chartTitle2.textContent = 'Distribuição por Categoria';
-                    resumoTitle.textContent = 'Resumo do Portfólio';
-
-                    if (!localObras.length) {
-                        containerResumo.innerHTML = '<p style="font-size: 12px; color: var(--text-muted);">Sem dados de obras para exibir.</p>';
-                    } else {
-                        containerResumo.innerHTML = localObras.map(o => `
-                            <div style="margin-bottom: 12px;">
-                                <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600;">
-                                    <span>${o.name}</span>
-                                    <span>${o.progress || 0}%</span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: ${o.progress || 0}%;"></div>
-                                </div>
-                            </div>
-                        `).join('');
-                    }
-
-                    this.renderChartsGlobal();
-
-                } else {
-                    const obraRef = localObras.find(o => o.id === obraIdSelecionada);
-                    const servicos = localServicosPorObra[obraIdSelecionada] || [];
-
-                    kpiTitle1.textContent = 'Serviços Cadastrados';
-                    document.getElementById('kpi-obras-total').textContent = servicos.length;
-
-                    let totalMeta = servicos.reduce((acc, s) => acc + (s.meta || 0), 0);
-                    let totalExec = servicos.reduce((acc, s) => acc + (s.executada || 0), 0);
-                    let progObra = totalMeta > 0 ? Math.min(100, Math.round((totalExec / totalMeta) * 100)) : (obraRef ? obraRef.progress || 0 : 0);
-
-                    kpiTitle2.textContent = 'Progresso da Obra';
-                    document.getElementById('kpi-progresso-medio').textContent = progObra + '%';
-
-                    chartTitle1.textContent = 'Evolução dos Serviços';
-                    chartTitle2.textContent = 'Serviços por Categoria';
-                    resumoTitle.textContent = `Detalhamento - ${obraRef ? obraRef.name : ''}`;
-
-                    if (!servicos.length) {
-                        containerResumo.innerHTML = '<p style="font-size: 12px; color: var(--text-muted);">Nenhum serviço cadastrado nesta obra.</p>';
-                    } else {
-                        containerResumo.innerHTML = servicos.map(s => {
-                            const pct = s.meta > 0 ? Math.min(100, Math.round((s.executada / s.meta) * 100)) : 0;
-                            return `
-                                <div style="margin-bottom: 12px;">
-                                    <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600;">
-                                        <span>${s.name} (${s.executada}/${s.meta} ${s.unit || 'm²'})</span>
-                                        <span>${pct}%</span>
-                                    </div>
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: ${pct}%;"></div>
-                                    </div>
-                                </div>
-                            `;
-                        }).join('');
-                    }
-
-                    this.renderChartsObraEspecifica(servicos);
-                }
-            },
-
-            renderChartsGlobal() {
-                const nomesObras = localObras.map(o => o.name);
-                const progressosObras = localObras.map(o => o.progress || 0);
-
-                const ctxProgresso = document.getElementById('chartProgressoObras').getContext('2d');
-                if (chartProgressoInstance) chartProgressoInstance.destroy();
-                chartProgressoInstance = new Chart(ctxProgresso, {
-                    type: 'bar',
-                    data: {
-                        labels: nomesObras.length ? nomesObras : ['Nenhuma obra'],
-                        datasets: [{
-                            label: 'Progresso (%)',
-                            data: progressosObras.length ? progressosObras : [0],
-                            backgroundColor: '#10B981',
-                            borderRadius: 4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: { y: { beginAtZero: true, max: 100 } }
-                    }
-                });
-
-                const contagemCategorias = {};
-                localObras.forEach(o => {
-                    contagemCategorias[o.category] = (contagemCategorias[o.category] || 0) + 1;
-                });
-
-                const labelsCategorias = Object.keys(contagemCategorias);
-                const dadosCategorias = Object.values(contagemCategorias);
-
-                const ctxCategorias = document.getElementById('chartCategoriasObras').getContext('2d');
-                if (chartCategoriasInstance) chartCategoriasInstance.destroy();
-                chartCategoriasInstance = new Chart(ctxCategorias, {
-                    type: 'doughnut',
-                    data: {
-                        labels: labelsCategorias.length ? labelsCategorias : ['Nenhuma'],
-                        datasets: [{
-                            data: dadosCategorias.length ? dadosCategorias : [1],
-                            backgroundColor: ['#0F172A', '#10B981', '#F59E0B', '#EF4444', '#64748B']
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: { boxWidth: 12, font: { size: 10 } }
-                            }
-                        }
-                    }
-                });
-            },
-
-            renderChartsObraEspecifica(servicos) {
-                const nomesServicos = servicos.map(s => s.name);
-                const percentuaisServicos = servicos.map(s => s.meta > 0 ? Math.min(100, Math.round((s.executada / s.meta) * 100)) : 0);
-
-                const ctxProgresso = document.getElementById('chartProgressoObras').getContext('2d');
-                if (chartProgressoInstance) chartProgressoInstance.destroy();
-                chartProgressoInstance = new Chart(ctxProgresso, {
-                    type: 'bar',
-                    data: {
-                        labels: nomesServicos.length ? nomesServicos : ['Sem serviços'],
-                        datasets: [{
-                            label: 'Executado (%)',
-                            data: percentuaisServicos.length ? percentuaisServicos : [0],
-                            backgroundColor: '#2563EB',
-                            borderRadius: 4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: { y: { beginAtZero: true, max: 100 } }
-                    }
-                });
-
-                const contagemCatServicos = {};
-                servicos.forEach(s => {
-                    contagemCatServicos[s.category] = (contagemCatServicos[s.category] || 0) + 1;
-                });
-
-                const labelsCatServ = Object.keys(contagemCatServicos);
-                const dadosCatServ = Object.values(contagemCatServicos);
-
-                const ctxCategorias = document.getElementById('chartCategoriasObras').getContext('2d');
-                if (chartCategoriasInstance) chartCategoriasInstance.destroy();
-                chartCategoriasInstance = new Chart(ctxCategorias, {
-                    type: 'doughnut',
-                    data: {
-                        labels: labelsCatServ.length ? labelsCatServ : ['Nenhum'],
-                        datasets: [{
-                            data: dadosCatServ.length ? dadosCatServ : [1],
-                            backgroundColor: ['#2563EB', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#64748B']
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: { boxWidth: 12, font: { size: 10 } }
-                            }
-                        }
-                    }
-                });
-            },
-
-            switchCatTab(tab) {
-                activeCatTab = tab;
-                document.getElementById('tab-cat-obras').classList.toggle('active', tab === 'obras');
-                document.getElementById('tab-cat-servicos').classList.toggle('active', tab === 'servicos');
-                document.getElementById('tab-cat-unidades').classList.toggle('active', tab === 'unidades');
-                
-                const titleMap = {
-                    obras: 'Categorias de Obras:',
-                    servicos: 'Categorias de Serviços:',
-                    unidades: 'Unidades de Medida Disponíveis:'
-                };
-                document.getElementById('cat-lista-titulo').textContent = titleMap[tab];
-                this.renderListaCategorias();
-            },
-
-            salvarCategoria() {
-                const input = document.getElementById('nova-categoria-nome');
-                const val = input.value.trim();
-                if (!val) return;
-
-                let targetList = activeCatTab === 'obras' ? localCategoriasObras : (activeCatTab === 'servicos' ? localCategoriasServicos : localUnidadesMedida);
-
-                if (!targetList.includes(val)) {
-                    targetList.push(val);
-                    input.value = '';
-                    this.saveData();
-                    this.renderListaCategorias();
-                    this.showToast('Item adicionado com sucesso!');
-                } else {
-                    this.showToast('Este item já existe!', 'error');
-                }
-            },
-
-            removerCategoria(nome) {
-                if (confirm(`Deseja remover "${nome}" da lista?`)) {
-                    if (activeCatTab === 'obras') {
-                        localCategoriasObras = localCategoriasObras.filter(c => c !== nome);
-                    } else if (activeCatTab === 'servicos') {
-                        localCategoriasServicos = localCategoriasServicos.filter(c => c !== nome);
-                    } else {
-                        localUnidadesMedida = localUnidadesMedida.filter(u => u !== nome);
-                    }
-                    this.saveData();
-                    this.renderListaCategorias();
-                    this.showToast('Item removido!');
-                }
-            },
-
-            renderListaCategorias() {
-                const container = document.getElementById('lista-categorias-gerenciar');
-                let targetList = activeCatTab === 'obras' ? localCategoriasObras : (activeCatTab === 'servicos' ? localCategoriasServicos : localUnidadesMedida);
-
-                if (!targetList.length) {
-                    container.innerHTML = '<p style="padding: 10px; font-size: 12px; color: var(--text-muted);">Nenhum item cadastrado.</p>';
-                    return;
-                }
-                container.innerHTML = targetList.map(cat => `
-                    <div class="category-item">
-                        <span style="font-size: 13px; font-weight: 500;">${cat}</span>
-                        <button onclick="app.removerCategoria('${cat}')" style="background:none; border:none; color: var(--danger); cursor:pointer; font-size: 12px;">Remover</button>
-                    </div>
-                `).join('');
-            },
-
-            exportarDados() {
-                const dadosCompletos = {
-                    obras: localObras,
-                    servicos: localServicosPorObra,
-                    historico: localHistorico,
-                    catObras: localCategoriasObras,
-                    catServicos: localCategoriasServicos,
-                    unidades: localUnidadesMedida,
-                    versao: '1.1',
-                    dataExportacao: new Date().toISOString()
-                };
-
-                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dadosCompletos, null, 2));
-                const downloadAnchor = document.createElement('a');
-                downloadAnchor.setAttribute("href", dataStr);
-                downloadAnchor.setAttribute("download", `backup_medio_eng_${new Date().toISOString().slice(0,10)}.json`);
-                document.body.appendChild(downloadAnchor);
-                downloadAnchor.click();
-                downloadAnchor.remove();
-                this.showToast('Backup exportado com sucesso!');
-            },
-
-            importarDados(event) {
-                const file = event.target.files[0];
-                if (!file) return;
-
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    try {
-                        const parsed = JSON.parse(e.target.result);
-                        if (parsed.obras && parsed.servicos && parsed.historico) {
-                            localObras = parsed.obras;
-                            localServicosPorObra = parsed.servicos;
-                            localHistorico = parsed.historico;
-                            if (parsed.catObras) localCategoriasObras = parsed.catObras;
-                            if (parsed.catServicos) localCategoriasServicos = parsed.catServicos;
-                            if (parsed.unidades) localUnidadesMedida = parsed.unidades;
-
-                            this.saveData();
-                            this.renderObras(localObras);
-                            this.popularFiltroObrasDashboard();
-                            this.showToast('Backup importado com sucesso!');
-                        } else {
-                            this.showToast('Arquivo de backup inválido.', 'error');
-                        }
-                    } catch (err) {
-                        this.showToast('Erro ao processar arquivo JSON.', 'error');
-                    }
-                    event.target.value = '';
-                };
-                reader.readAsText(file);
-            },
-
-            preencherSelect(selectId, lista) {
-                const select = document.getElementById(selectId);
-                select.innerHTML = lista.map(c => `<option value="${c}">${c}</option>`).join('');
-            },
-
-            renderServicos(servicos) {
-                const container = document.getElementById('servicos-content');
-                
-                if (!servicos || servicos.length === 0) {
-                    container.innerHTML = `
-                        <div class="card" style="text-align: center; padding: 24px 16px;">
-                            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px;">Nenhum serviço cadastrado nesta obra.</p>
-                            <button class="btn-primary" style="padding: 8px 16px; font-size: 12px;" onclick="app.openNovoServicoModal()">+ Adicionar Serviço</button>
-                        </div>
-                    `;
-                    return;
-                }
-
-                const htmlServicos = servicos.map(s => {
-                    const unit = s.unit || 'm²';
-                    const pct = s.meta > 0 ? Math.min(100, Math.round((s.executada / s.meta) * 100)) : 0;
-                    return `
-                        <div class="card">
-                            <div class="card-header-actions">
-                                <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 6px;">${s.name}</h4>
-                                <button class="btn-delete-card" onclick="app.removerServico('${s.id}')">Excluir</button>
-                            </div>
-                            <span class="badge">${s.category}</span>
-                            <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-top: 10px;">
-                                <span>Meta: ${s.meta} ${unit}</span>
-                                <span>Executado: ${s.executada} ${unit}</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${pct}%;"></div>
-                            </div>
-                            <div class="action-buttons">
-                                <button onclick="app.openMedicaoModal('${s.id}', '${s.name}', ${s.meta}, ${s.executada}, '${unit}')">Medir</button>
-                                <button onclick="app.openHistoricoServico('${s.id}')">Histórico</button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-
-                container.innerHTML = htmlServicos + `
-                    <button class="btn-secondary" style="width: 100%; margin-top: 8px;" onclick="app.openNovoServicoModal()">+ Adicionar Outro Serviço</button>
-                `;
-            },
-
-            removerServico(servicoId) {
-                const servico = localServicosPorObra[this.currentObra.id].find(s => s.id === servicoId);
-                const nomeServico = servico ? servico.name : 'este serviço';
-
-                if (confirm(`Confirma a exclusão do serviço:\n"${nomeServico}" e todo seu histórico?`)) {
-                    localServicosPorObra[this.currentObra.id] = localServicosPorObra[this.currentObra.id].filter(s => s.id !== servicoId);
-                    delete localHistorico[servicoId];
-                    this.saveData();
-                    this.renderServicos(localServicosPorObra[this.currentObra.id]);
-                    this.recalcularProgressoEContagemDias(this.currentObra.id);
-                    this.showToast('Serviço excluído!');
-                }
-            },
-
-            openNovoServicoModal() {
-                this.preencherSelect('novo-servico-categoria', localCategoriasServicos);
-                this.preencherSelect('novo-servico-unidade', localUnidadesMedida);
-                document.getElementById('novo-servico-nome').value = '';
-                document.getElementById('novo-servico-meta').value = '';
-                document.getElementById('modal-novo-servico').classList.remove('hidden');
-            },
-
-            closeNovoServicoModal() {
-                document.getElementById('modal-novo-servico').classList.add('hidden');
-            },
-
-            salvarNovoServico() {
-                const nome = document.getElementById('novo-servico-nome').value.trim();
-                const categoria = document.getElementById('novo-servico-categoria').value;
-                const unidade = document.getElementById('novo-servico-unidade').value;
-                const meta = parseFloat(document.getElementById('novo-servico-meta').value);
-
-                if (!nome || !categoria || !unidade || isNaN(meta) || meta <= 0) {
-                    this.showToast('Preencha os campos obrigatórios e uma meta válida.', 'error');
-                    return;
-                }
-
-                const novoServico = {
-                    id: 'serv_' + Date.now() + '_' + Math.floor(Math.random()*1000),
-                    name: nome,
-                    category: categoria,
-                    unit: unidade,
-                    meta: meta,
-                    executada: 0
-                };
-
-                localServicosPorObra[this.currentObra.id].push(novoServico);
-                this.saveData();
-                this.renderServicos(localServicosPorObra[this.currentObra.id]);
-                this.recalcularProgressoEContagemDias(this.currentObra.id);
-                this.closeNovoServicoModal();
-                this.showToast('Serviço cadastrado com sucesso!');
-            },
-
-            openNovaObraModal() {
-                this.preencherSelect('nova-obra-categoria', localCategoriasObras);
-                document.getElementById('modal-nova-obra').classList.remove('hidden');
-            },
-
-            closeNovaObraModal() {
-                document.getElementById('modal-nova-obra').classList.add('hidden');
-            },
-
-            salvarNovaObra() {
-                const nome = document.getElementById('nova-obra-nome').value.trim();
-                const categoria = document.getElementById('nova-obra-categoria').value;
-
-                if (!nome || !categoria) {
-                    this.showToast('Preencha o nome e categoria da obra.', 'error');
-                    return;
-                }
-
-                const novaObra = {
-                    id: 'obra_' + Date.now() + '_' + Math.floor(Math.random()*1000),
-                    name: nome,
-                    category: categoria,
-                    progress: 0
-                };
-
-                localObras.unshift(novaObra);
-                localServicosPorObra[novaObra.id] = [];
-                
-                this.saveData();
-                this.renderObras(localObras);
-                this.popularFiltroObrasDashboard();
-                document.getElementById('nova-obra-nome').value = '';
-                this.closeNovaObraModal();
-                this.showToast('Obra criada com sucesso!');
-                this.selectObra(novaObra.id, novaObra.name);
-            },
-
-            openMedicaoModal(servicoId, servicoName, meta, executada, unit = 'm²') {
-                this.currentServico = { id: servicoId, name: servicoName, meta, executada, unit };
-                tempFotos = [];
-                
-                const pct = meta > 0 ? Math.round((executada / meta) * 100) : 0;
-                
-                document.getElementById('label-medicao-qtd').textContent = `Quantidade Realizada (${unit}) *`;
-                document.getElementById('medicao-info').innerHTML = `
-                    <strong>${servicoName}</strong><br>
-                    Meta: ${meta} ${unit} | Executado Atual: ${executada} ${unit} (${pct}%)
-                `;
-                document.getElementById('medicao-quantidade').value = '';
-                document.getElementById('medicao-equipe').value = '';
-                document.getElementById('medicao-justificativa').value = '';
-                this.setDataToday();
-                document.getElementById('medicao-alert').classList.add('hidden');
-                document.getElementById('medicao-justificativa-group').classList.add('hidden');
-                this.renderFotosPreview();
-                document.getElementById('modal-medicao').classList.remove('hidden');
-            },
-
-            closeMedicaoModal() {
-                document.getElementById('modal-medicao').classList.add('hidden');
-            },
-
-            onQuantidadeChange() {
-                const input = document.getElementById('medicao-quantidade');
-                if (!input || !this.currentServico) return;
-                
-                const qtdDigitada = parseFloat(input.value) || 0;
-                const meta = this.currentServico.meta;
-                const executada = this.currentServico.executada;
-
-                const extrapolado = (executada + qtdDigitada > meta) || (qtdDigitada > meta);
-
-                const alertBox = document.getElementById('medicao-alert');
-                const groupJustificativa = document.getElementById('medicao-justificativa-group');
-
-                if (extrapolado) {
-                    alertBox.classList.remove('hidden');
-                    groupJustificativa.classList.remove('hidden');
-                } else {
-                    alertBox.classList.add('hidden');
-                    groupJustificativa.classList.add('hidden');
-                }
-            },
-
-            handleFotoUpload(event) {
-                const files = event.target.files;
-                if (!files || !files.length) return;
-
-                Array.from(files).forEach(file => {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        tempFotos.push(e.target.result);
-                        this.renderFotosPreview();
-                    };
-                    reader.readAsDataURL(file);
-                });
-                event.target.value = '';
-            },
-
-            renderFotosPreview() {
-                const container = document.getElementById('photo-container');
-                const addBtnsHtml = `
-                    <div class="photo-add-btn" onclick="document.getElementById('input-camera').click()">
-                        <span>Câmera</span>
-                    </div>
-                    <div class="photo-add-btn" onclick="document.getElementById('input-galeria').click()">
-                        <span>Galeria</span>
-                    </div>
-                `;
-
-                const photosHtml = tempFotos.map((src, index) => `
-                    <div style="position: relative;">
-                        <img src="${src}" class="photo-preview">
-                        <button onclick="app.removerFoto(${index})" style="position: absolute; top: 2px; right: 2px; background: rgba(239, 68, 68, 0.8); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 10px; cursor: pointer;">✕</button>
-                    </div>
-                `).join('');
-
-                container.innerHTML = addBtnsHtml + photosHtml;
-            },
-
-            removerFoto(index) {
-                tempFotos.splice(index, 1);
-                this.renderFotosPreview();
-            },
-
-            salvarMedicao() {
-                const qtd = parseFloat(document.getElementById('medicao-quantidade').value);
-                const equipe = parseInt(document.getElementById('medicao-equipe').value) || null;
-
-                if (!qtd || qtd <= 0) {
-                    this.showToast('Informe uma quantidade válida.', 'error');
-                    return;
-                }
-
-                const extrapolou = (this.currentServico.executada + qtd > this.currentServico.meta) || (qtd > this.currentServico.meta);
-                const justificativa = document.getElementById('medicao-justificativa').value;
-
-                if (extrapolou && !justificativa.trim()) {
-                    this.showToast('A meta foi excedida! É obrigatório preencher a justificativa.', 'error');
-                    return;
-                }
-
-                const servicos = localServicosPorObra[this.currentObra.id];
-                const s = servicos.find(item => item.id === this.currentServico.id);
-                if (s) {
-                    s.executada += qtd;
-                }
-
-                if (!localHistorico[this.currentServico.id]) {
-                    localHistorico[this.currentServico.id] = [];
-                }
-
-                localHistorico[this.currentServico.id].unshift({
-                    id: 'med_' + Date.now() + '_' + Math.floor(Math.random()*1000),
-                    obraNome: this.currentObra.name,
-                    servicoNome: this.currentServico.name,
-                    unit: this.currentServico.unit || 'm²',
-                    data: document.getElementById('medicao-data').value,
-                    quantidade: qtd,
-                    equipe: equipe,
-                    fotos: [...tempFotos],
-                    status: extrapolou ? 'extrapolou' : 'normal',
-                    justificativa: extrapolou ? justificativa : null
-                });
-
-                this.saveData();
-                this.showToast('Medição registrada com sucesso!');
-                this.closeMedicaoModal();
-                this.renderServicos(servicos);
-                this.recalcularProgressoEContagemDias(this.currentObra.id);
-            },
-
-            openEditarMedicaoModal(servicoId, medicaoId) {
-                let medicao = null;
-                let targetServicoId = servicoId;
-
-                if (!targetServicoId) {
-                    for (const sId in localHistorico) {
-                        const m = localHistorico[sId].find(x => x.id === medicaoId);
-                        if (m) {
-                            medicao = m;
-                            targetServicoId = sId;
-                            break;
-                        }
-                    }
-                } else {
-                    medicao = (localHistorico[targetServicoId] || []).find(m => m.id === medicaoId);
-                }
-
-                if (!medicao) {
-                    this.showToast('Medição não encontrada.', 'error');
-                    return;
-                }
-
-                let servicoRef = null;
-                let obraRefId = null;
-
-                for (const oId in localServicosPorObra) {
-                    const found = localServicosPorObra[oId].find(s => s.id === targetServicoId);
-                    if (found) {
-                        servicoRef = found;
-                        obraRefId = oId;
-                        break;
-                    }
-                }
-
-                this.editingMedicao = {
-                    medicao,
-                    servicoId: targetServicoId,
-                    servicoRef,
-                    obraRefId
-                };
-
-                const unit = medicao.unit || (servicoRef ? servicoRef.unit : 'm²');
-                const meta = servicoRef ? servicoRef.meta : 0;
-
-                document.getElementById('label-edit-medicao-qtd').textContent = `Quantidade Realizada (${unit}) *`;
-                document.getElementById('edit-medicao-info').innerHTML = `
-                    <strong>${medicao.obraNome} - ${medicao.servicoNome}</strong><br>
-                    Meta do Serviço: ${meta} ${unit}
-                `;
-                document.getElementById('edit-medicao-quantidade').value = medicao.quantidade;
-                document.getElementById('edit-medicao-data').value = medicao.data;
-                document.getElementById('edit-medicao-equipe').value = medicao.equipe || '';
-                document.getElementById('edit-medicao-justificativa').value = medicao.justificativa || '';
-
-                this.onEditQuantidadeChange();
-                document.getElementById('modal-editar-medicao').classList.remove('hidden');
-            },
-
-            closeEditarMedicaoModal() {
-                document.getElementById('modal-editar-medicao').classList.add('hidden');
-                this.editingMedicao = null;
-            },
-
-            onEditQuantidadeChange() {
-                if (!this.editingMedicao) return;
-
-                const input = document.getElementById('edit-medicao-quantidade');
-                const novaQtd = parseFloat(input.value) || 0;
-                const { medicao, servicoRef, servicoId } = this.editingMedicao;
-
-                if (!servicoRef) return;
-
-                const somaOutrasMedicoes = (localHistorico[servicoId] || [])
-                    .filter(m => m.id !== medicao.id)
-                    .reduce((acc, m) => acc + (m.quantidade || 0), 0);
-
-                const totalExecutadoPrevisto = somaOutrasMedicoes + novaQtd;
-                const extrapolou = totalExecutadoPrevisto > servicoRef.meta;
-
-                const alertBox = document.getElementById('edit-medicao-alert');
-                const groupJustificativa = document.getElementById('edit-medicao-justificativa-group');
-
-                if (extrapolou) {
-                    alertBox.classList.remove('hidden');
-                    groupJustificativa.classList.remove('hidden');
-                } else {
-                    alertBox.classList.add('hidden');
-                    groupJustificativa.classList.add('hidden');
-                }
-            },
-
-            salvarEdicaoMedicao() {
-                if (!this.editingMedicao) return;
-
-                const novaQtd = parseFloat(document.getElementById('edit-medicao-quantidade').value);
-                const novaData = document.getElementById('edit-medicao-data').value;
-                const novaEquipe = parseInt(document.getElementById('edit-medicao-equipe').value) || null;
-                const novaJustificativa = document.getElementById('edit-medicao-justificativa').value;
-
-                if (!novaQtd || novaQtd <= 0 || !novaData) {
-                    this.showToast('Informe uma quantidade e data válidas.', 'error');
-                    return;
-                }
-
-                const { medicao, servicoId, servicoRef, obraRefId } = this.editingMedicao;
-
-                let extrapolou = false;
-                if (servicoRef) {
-                    const somaOutrasMedicoes = (localHistorico[servicoId] || [])
-                        .filter(m => m.id !== medicao.id)
-                        .reduce((acc, m) => acc + (m.quantidade || 0), 0);
-
-                    const totalExecutadoPrevisto = somaOutrasMedicoes + novaQtd;
-                    extrapolou = totalExecutadoPrevisto > servicoRef.meta;
-
-                    if (extrapolou && !novaJustificativa.trim()) {
-                        this.showToast('A meta do serviço foi excedida! É obrigatório preencher a justificativa.', 'error');
-                        return;
-                    }
-
-                    servicoRef.executada = totalExecutadoPrevisto;
-                }
-
-                medicao.quantidade = novaQtd;
-                medicao.data = novaData;
-                medicao.equipe = novaEquipe;
-                medicao.status = extrapolou ? 'extrapolou' : 'normal';
-                medicao.justificativa = extrapolou ? novaJustificativa : null;
-
-                this.saveData();
-                this.showToast('Medição alterada com sucesso!');
-                this.closeEditarMedicaoModal();
-
-                if (obraRefId) {
-                    this.recalcularProgressoEContagemDias(obraRefId);
-                }
-
-                if (document.getElementById('screen-historico-servico').classList.contains('active')) {
-                    this.renderHistoricoServico();
-                } else if (document.getElementById('screen-historico-geral').classList.contains('active')) {
-                    this.renderHistoricoGeral();
-                } else if (document.getElementById('screen-obra-detalhe').classList.contains('active')) {
-                    this.renderServicos(localServicosPorObra[obraRefId] || []);
-                }
-            },
-
-            openHistoricoServico(servicoId) {
-                this.currentServico = { id: servicoId };
-                document.getElementById('header-back-btn').classList.remove('hidden');
-                this.showScreen('screen-historico-servico');
-                this.renderHistoricoServico();
-            },
-
-            renderHistoricoServico() {
-                const container = document.getElementById('historico-servico-content');
-                const list = localHistorico[this.currentServico.id] || [];
-
-                if (!list.length) {
-                    container.innerHTML = '<div class="card"><p style="text-align: center; color: var(--text-muted);">Nenhuma medição cadastrada neste serviço.</p></div>';
-                    return;
-                }
-
-                container.innerHTML = list.map(med => this.buildCardHistorico(med, false, this.currentServico.id)).join('');
-            },
-
-            renderHistoricoGeral() {
-                const container = document.getElementById('historico-geral-content');
-                let todasMedicoes = [];
-
-                Object.keys(localHistorico).forEach(servId => {
-                    localHistorico[servId].forEach(med => {
-                        todasMedicoes.push({ ...med, _servicoId: servId });
-                    });
-                });
-
-                if (!todasMedicoes.length) {
-                    container.innerHTML = '<div class="card"><p style="text-align: center; color: var(--text-muted);">Nenhuma medição registrada até o momento.</p></div>';
-                    return;
-                }
-
-                todasMedicoes.sort((a, b) => b.data.localeCompare(a.data));
-
-                container.innerHTML = todasMedicoes.map(med => this.buildCardHistorico(med, true, med._servicoId)).join('');
-            },
-
-            buildCardHistorico(med, showContext = false, servicoId = null) {
-                const unit = med.unit || 'm²';
-                const [ano, mes, dia] = med.data.split('-');
-                const dataFmt = `${dia}/${mes}/${ano}`;
-                const sId = servicoId || this.currentServico?.id || '';
-
-                return `
-                    <div class="card">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                            <div>
-                                ${showContext ? `<p style="font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase;">${med.obraNome} - ${med.servicoNome}</p>` : ''}
-                                <h4 style="font-size: 13px; font-weight: 600; color: var(--text-muted); margin-top: 2px;">Data: ${dataFmt}</h4>
-                                <p style="font-size: 16px; font-weight: 700; color: var(--primary); margin-top: 4px;">${med.quantidade} ${unit}</p>
-                                ${med.equipe ? `<p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Equipe: <strong>${med.equipe} func.</strong></p>` : ''}
-                            </div>
-                            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
-                                <span class="badge ${med.status === 'extrapolou' ? 'badge-warning' : ''}">
-                                    ${med.status === 'extrapolou' ? 'Excedeu Meta' : 'Normal'}
-                                </span>
-                                <button class="btn-edit-card" onclick="app.openEditarMedicaoModal('${sId}', '${med.id}')">Editar</button>
-                            </div>
-                        </div>
-
-                        ${med.fotos && med.fotos.length ? `
-                            <div style="display: flex; gap: 6px; overflow-x: auto; margin-top: 10px; padding-bottom: 4px;">
-                                ${med.fotos.map(f => `<img src="${f}" style="width: 60px; height: 60px; border-radius: 4px; object-fit: cover; border: 1px solid var(--border);">`).join('')}
-                            </div>
-                        ` : ''}
-
-                        ${med.justificativa ? `<p style="margin-top: 8px; font-size: 11px; color: var(--danger); background: #FEF2F2; padding: 6px; border-radius: 4px;"><strong>Justificativa:</strong> ${med.justificativa}</p>` : ''}
-                    </div>
-                `;
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
             }
-        };
+        });
+    }
 
-        app.init();
-    </script>
+    /* Histórico Global */
+    function renderHistoricoGlobal() {
+        const container = document.getElementById('lista-historico-global');
+        container.innerHTML = '';
+        let totalMedicoes = 0;
+
+        Object.keys(localHistorico).forEach(sId => {
+            localHistorico[sId].forEach(m => {
+                totalMedicoes++;
+                const badgeClass = m.status === 'extrapolou' ? 'badge-extrapolou' : 'badge-normal';
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-weight:600; font-size:14px;">Data: ${m.data}</span>
+                        <span class="badge ${badgeClass}">${m.status.toUpperCase()}</span>
+                    </div>
+                    <div class="card-info" style="margin-top:6px;">Quantidade: <strong>${m.quantidade}</strong></div>
+                    ${m.justificativa ? `<div style="font-size:12px; color:var(--danger);">Justificativa: ${m.justificativa}</div>` : ''}
+                `;
+                container.appendChild(card);
+            });
+        });
+
+        if(totalMedicoes === 0) {
+            container.innerHTML = '<p style="text-align:center; color:var(--text-muted); margin-top:20px;">Nenhuma medição registrada.</p>';
+        }
+    }
+
+    function addCategoriaObra() {
+        const nova = prompt('Nome do novo tipo de obra:');
+        if(nova && !localCatObras.includes(nova)) {
+            localCatObras.push(nova);
+            document.getElementById('cat-obras-list').innerText = localCatObras.join(', ');
+            saveData();
+        }
+    }
+
+    function addUnidadeMedida() {
+        const nova = prompt('Nova unidade de medida:');
+        if(nova && !localUnidades.includes(nova)) {
+            localUnidades.push(nova);
+            document.getElementById('cat-unidades-list').innerText = localUnidades.join(', ');
+            saveData();
+        }
+    }
+</script>
+
 </body>
 </html>
