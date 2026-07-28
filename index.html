@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MEDI-O ENG - Gestão e Medição de Obras</title>
+    <!-- Incluindo Chart.js para os gráficos da Dashboard -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -587,6 +589,22 @@
                             </div>
                         </div>
 
+                        <!-- GRÁFICO 1: PROGRESSO DAS OBRAS -->
+                        <div class="card">
+                            <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">Progresso por Obra</h3>
+                            <div style="position: relative; height: 200px; width: 100%;">
+                                <canvas id="chartProgressoObras"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- GRÁFICO 2: DISTRIBUIÇÃO DE CATEGORIAS -->
+                        <div class="card">
+                            <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">Distribuição por Categoria</h3>
+                            <div style="position: relative; height: 200px; width: 100%;">
+                                <canvas id="chartCategoriasObras"></canvas>
+                            </div>
+                        </div>
+
                         <div class="card">
                             <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">Resumo do Portfólio</h3>
                             <div id="dash-obras-resumo"></div>
@@ -872,6 +890,8 @@
         let localHistorico = JSON.parse(localStorage.getItem('medio_historico')) || defaultHistorico;
 
         let tempFotos = [];
+        let chartProgressoInstance = null;
+        let chartCategoriasInstance = null;
 
         const app = {
             currentNav: 'obras',
@@ -1135,6 +1155,78 @@
                         </div>
                     </div>
                 `).join('');
+
+                this.renderCharts();
+            },
+
+            renderCharts() {
+                const nomesObras = localObras.map(o => o.name);
+                const progressosObras = localObras.map(o => o.progress || 0);
+
+                // Gráfico 1: Progresso por Obra (Barras)
+                const ctxProgresso = document.getElementById('chartProgressoObras').getContext('2d');
+                if (chartProgressoInstance) {
+                    chartProgressoInstance.destroy();
+                }
+                chartProgressoInstance = new Chart(ctxProgresso, {
+                    type: 'bar',
+                    data: {
+                        labels: nomesObras,
+                        datasets: [{
+                            label: 'Progresso (%)',
+                            data: progressosObras,
+                            backgroundColor: '#10B981',
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100
+                            }
+                        }
+                    }
+                });
+
+                // Gráfico 2: Distribuição por Categoria (Rosca)
+                const contagemCategorias = {};
+                localObras.forEach(o => {
+                    contagemCategorias[o.category] = (contagemCategorias[o.category] || 0) + 1;
+                });
+
+                const labelsCategorias = Object.keys(contagemCategorias);
+                const dadosCategorias = Object.values(contagemCategorias);
+
+                const ctxCategorias = document.getElementById('chartCategoriasObras').getContext('2d');
+                if (chartCategoriasInstance) {
+                    chartCategoriasInstance.destroy();
+                }
+                chartCategoriasInstance = new Chart(ctxCategorias, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labelsCategorias.length ? labelsCategorias : ['Nenhuma'],
+                        datasets: [{
+                            data: dadosCategorias.length ? dadosCategorias : [1],
+                            backgroundColor: ['#0F172A', '#10B981', '#F59E0B', '#EF4444', '#64748B']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { boxWidth: 12, font: { size: 10 } }
+                            }
+                        }
+                    }
+                });
             },
 
             switchCatTab(tab) {
