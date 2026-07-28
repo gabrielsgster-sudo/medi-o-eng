@@ -537,6 +537,12 @@
         </div>
 
         <div class="card">
+            <div class="card-title">Categorias de Serviços</div>
+            <div id="cat-servicos-list" class="card-info">Estrutural, Alvenaria, Instalações, Acabamento</div>
+            <button class="btn-full btn-outline" style="padding: 6px; font-size: 13px;" onclick="addCategoriaServico()">+ Adicionar Categoria</button>
+        </div>
+
+        <div class="card">
             <div class="card-title">Unidades de Medida</div>
             <div id="cat-unidades-list" class="card-info">m², m³, m, un, kg</div>
             <button class="btn-full btn-outline" style="padding: 6px; font-size: 13px;" onclick="addUnidadeMedida()">+ Adicionar Unidade</button>
@@ -675,6 +681,7 @@
     };
 
     let localCatObras = JSON.parse(localStorage.getItem('medio_cat_obras')) || ['Residencial', 'Comercial', 'Industrial'];
+    let localCatServicos = JSON.parse(localStorage.getItem('medio_cat_servicos')) || ['Estrutural', 'Alvenaria', 'Instalações', 'Acabamento'];
     let localUnidades = JSON.parse(localStorage.getItem('medio_unidades')) || ['m²', 'm³', 'm', 'un', 'kg'];
 
     let currentObraId = null;
@@ -687,8 +694,22 @@
         localStorage.setItem('medio_servicos', JSON.stringify(localServicosPorObra));
         localStorage.setItem('medio_historico', JSON.stringify(localHistorico));
         localStorage.setItem('medio_cat_obras', JSON.stringify(localCatObras));
+        localStorage.setItem('medio_cat_servicos', JSON.stringify(localCatServicos));
         localStorage.setItem('medio_unidades', JSON.stringify(localUnidades));
     }
+
+    /* Carregar listas salvas ao iniciar */
+    window.addEventListener('DOMContentLoaded', () => {
+        if(document.getElementById('cat-obras-list')) {
+            document.getElementById('cat-obras-list').innerText = localCatObras.join(', ');
+        }
+        if(document.getElementById('cat-servicos-list')) {
+            document.getElementById('cat-servicos-list').innerText = localCatServicos.join(', ');
+        }
+        if(document.getElementById('cat-unidades-list')) {
+            document.getElementById('cat-unidades-list').innerText = localUnidades.join(', ');
+        }
+    });
 
     /* Transição de Telas de Entrada e Abas */
     function goToApp() {
@@ -1049,6 +1070,15 @@
         if(nova && !localCatObras.includes(nova)) {
             localCatObras.push(nova);
             document.getElementById('cat-obras-list').innerText = localCatObras.join(', ');
+            saveData();
+        }
+    }
+
+    function addCategoriaServico() {
+        const nova = prompt('Nome da nova categoria de serviço:');
+        if(nova && !localCatServicos.includes(nova)) {
+            localCatServicos.push(nova);
+            document.getElementById('cat-servicos-list').innerText = localCatServicos.join(', ');
             saveData();
         }
     }
