@@ -536,6 +536,48 @@
         .dash-kpi-title { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
         .dash-kpi-value { font-size: 20px; font-weight: 700; color: var(--primary); margin-top: 4px; }
 
+        /* TOAST NOTIFICATION */
+        #toast-container {
+            position: fixed;
+            bottom: 76px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+            pointer-events: none;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .toast {
+            background-color: var(--primary);
+            color: #FFFFFF;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: fadeInOut 2.5s ease forwards;
+            pointer-events: auto;
+            text-align: center;
+        }
+
+        .toast.success { background-color: #065F46; }
+        .toast.error { background-color: #991B1B; }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(10px); }
+            15% { opacity: 1; transform: translateY(0); }
+            85% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-10px); }
+        }
+
         .hidden { display: none !important; }
         .screen { display: none; }
         .screen.active { display: block; }
@@ -544,6 +586,9 @@
 <body>
     <div class="app-wrapper">
         <div class="mobile-view">
+            <!-- TOAST CONTAINER -->
+            <div id="toast-container"></div>
+
             <div class="app-container">
 
                 <!-- HEADER SUPERIOR PRINCIPAL -->
@@ -637,7 +682,18 @@
                             </div>
 
                             <h4 style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;" id="cat-lista-titulo">Lista de Itens:</h4>
-                            <div id="lista-categorias-gerenciar" style="border: 1px solid var(--border); border-radius: 6px; max-height: 300px; overflow-y: auto;"></div>
+                            <div id="lista-categorias-gerenciar" style="border: 1px solid var(--border); border-radius: 6px; max-height: 240px; overflow-y: auto;"></div>
+                        </div>
+
+                        <!-- CARD DE BACKUP E DADOS -->
+                        <div class="card">
+                            <h3 class="card-title" style="font-size: 14px;">Gerenciamento de Dados (Backup)</h3>
+                            <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">Exporte ou restaure todos os dados do aplicativo para segurança local.</p>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn-secondary" style="font-size: 11px; padding: 8px;" onclick="app.exportarDados()">Exportar JSON</button>
+                                <button class="btn-secondary" style="font-size: 11px; padding: 8px;" onclick="document.getElementById('input-import-json').click()">Importar JSON</button>
+                                <input type="file" id="input-import-json" accept=".json" class="hidden" onchange="app.importarDados(event)">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -660,7 +716,7 @@
                             <div class="summary-dates">
                                 <div class="summary-date-item">
                                     <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
-                                    <span id="obra-data-inicio">Início: 10/01/2026</span>
+                                    <span id="obra-data-inicio">Início: --/--/----</span>
                                 </div>
                                 <div class="summary-date-item">
                                     <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
@@ -869,34 +925,93 @@
     </div>
 
     <script>
-        const defaultCategoriasObras = ['Residencial', 'Comercial', 'Industrial', 'Infraestrutura'];
-        const defaultCategoriasServicos = ['Alvenaria', 'Estrutura', 'Hidráulica', 'Elétrica', 'Acabamento', 'Pintura'];
-        const defaultUnidadesMedida = ['m²', 'm', 'm³', 'km', 'un', 'kg', 'vb'];
+        /* CAMADA DE PERSISTÊNCIA E VALIDAÇÃO (DB LAYER) */
+        const DB = {
+            KEYS: {
+                CAT_OBRAS: 'medio_cat_obras',
+                CAT_SERVICOS: 'medio_cat_servicos',
+                UNIDADES: 'medio_unidades',
+                OBRAS: 'medio_obras',
+                SERVICOS: 'medio_servicos',
+                HISTORICO: 'medio_historico'
+            },
 
-        const defaultObras = [
-            { id: 'demo1', name: 'Residencial Boulevard', category: 'Residencial', progress: 60 }
-        ];
+            defaults: {
+                catObras: ['Residencial', 'Comercial', 'Industrial', 'Infraestrutura'],
+                catServicos: ['Alvenaria', 'Estrutura', 'Hidráulica', 'Elétrica', 'Acabamento', 'Pintura'],
+                unidades: ['m²', 'm', 'm³', 'km', 'un', 'kg', 'vb'],
+                obras: [{ id: 'demo1', name: 'Residencial Boulevard', category: 'Residencial', progress: 60 }],
+                servicos: {
+                    'demo1': [
+                        { id: 's1', name: 'Alvenaria Estrutural', category: 'Alvenaria', meta: 350, executada: 230, unit: 'm²' },
+                        { id: 's2', name: 'Concretagem de Pilares', category: 'Estrutura', meta: 280, executada: 150, unit: 'm³' }
+                    ]
+                },
+                historico: {
+                    's1': [{ id: 'm1', obraNome: 'Residencial Boulevard', servicoNome: 'Alvenaria Estrutural', unit: 'm²', data: '2026-01-10', quantidade: 100, status: 'normal' }],
+                    's2': [{ id: 'm2', obraNome: 'Residencial Boulevard', servicoNome: 'Concretagem de Pilares', unit: 'm³', data: '2026-01-15', quantidade: 50, status: 'normal' }]
+                }
+            },
 
-        const defaultServicosPorObra = {
-            'demo1': [
-                { id: 's1', name: 'Alvenaria Estrutural', category: 'Alvenaria', meta: 350, executada: 230, unit: 'm²' },
-                { id: 's2', name: 'Concretagem de Pilares', category: 'Estrutura', meta: 280, executada: 150, unit: 'm³' }
-            ]
+            get(key, defaultVal) {
+                try {
+                    const item = localStorage.getItem(key);
+                    return item ? JSON.parse(item) : defaultVal;
+                } catch (e) {
+                    console.error(`Erro ao ler ${key} do localStorage:`, e);
+                    return defaultVal;
+                }
+            },
+
+            set(key, value) {
+                try {
+                    localStorage.setItem(key, JSON.stringify(value));
+                } catch (e) {
+                    console.error(`Erro ao salvar ${key} no localStorage:`, e);
+                    app.showToast('Erro ao salvar dados localmente!', 'error');
+                }
+            },
+
+            limparOrfaosESincronizar() {
+                let servicos = this.get(this.KEYS.SERVICOS, this.defaults.servicos);
+                let historico = this.get(this.KEYS.HISTORICO, this.defaults.historico);
+                let obras = this.get(this.KEYS.OBRAS, this.defaults.obras);
+
+                const obraIdsValidos = new Set(obras.map(o => o.id));
+                const servicoIdsValidos = new Set();
+
+                // Remove serviços de obras excluídas
+                for (let obraId in servicos) {
+                    if (!obraIdsValidos.has(obraId)) {
+                        delete servicos[obraId];
+                    } else {
+                        servicos[obraId].forEach(s => servicoIdsValidos.add(s.id));
+                    }
+                }
+
+                // Remove histórico de serviços excluídos
+                for (let servId in historico) {
+                    if (!servicoIdsValidos.has(servId)) {
+                        delete historico[servId];
+                    }
+                }
+
+                this.set(this.KEYS.SERVICOS, servicos);
+                this.set(this.KEYS.HISTORICO, historico);
+            }
         };
 
-        const defaultHistorico = {
-            's1': [{ id: 'm1', obraNome: 'Residencial Boulevard', servicoNome: 'Alvenaria Estrutural', unit: 'm²', data: '2026-01-10', quantidade: 100, status: 'normal' }],
-            's2': [{ id: 'm2', obraNome: 'Residencial Boulevard', servicoNome: 'Concretagem de Pilares', unit: 'm³', data: '2026-01-15', quantidade: 50, status: 'normal' }]
-        };
+        // Inicializa e limpa eventuais órfãos no carregamento
+        DB.limparOrfaosESincronizar();
 
-        let localCategoriasObras = JSON.parse(localStorage.getItem('medio_cat_obras')) || defaultCategoriasObras;
-        let localCategoriasServicos = JSON.parse(localStorage.getItem('medio_cat_servicos')) || defaultCategoriasServicos;
-        let localUnidadesMedida = JSON.parse(localStorage.getItem('medio_unidades')) || defaultUnidadesMedida;
+        let localCategoriasObras = DB.get(DB.KEYS.CAT_OBRAS, DB.defaults.catObras);
+        let localCategoriasServicos = DB.get(DB.KEYS.CAT_SERVICOS, DB.defaults.catServicos);
+        let localUnidadesMedida = DB.get(DB.KEYS.UNIDADES, DB.defaults.unidades);
         let activeCatTab = 'obras';
 
-        let localObras = JSON.parse(localStorage.getItem('medio_obras')) || defaultObras;
-        let localServicosPorObra = JSON.parse(localStorage.getItem('medio_servicos')) || defaultServicosPorObra;
-        let localHistorico = JSON.parse(localStorage.getItem('medio_historico')) || defaultHistorico;
+        let localObras = DB.get(DB.KEYS.OBRAS, DB.defaults.obras);
+        let localServicosPorObra = DB.get(DB.KEYS.SERVICOS, DB.defaults.servicos);
+        let localHistorico = DB.get(DB.KEYS.HISTORICO, DB.defaults.historico);
 
         let tempFotos = [];
         let chartProgressoInstance = null;
@@ -915,12 +1030,24 @@
             },
 
             saveData() {
-                localStorage.setItem('medio_cat_obras', JSON.stringify(localCategoriasObras));
-                localStorage.setItem('medio_cat_servicos', JSON.stringify(localCategoriasServicos));
-                localStorage.setItem('medio_unidades', JSON.stringify(localUnidadesMedida));
-                localStorage.setItem('medio_obras', JSON.stringify(localObras));
-                localStorage.setItem('medio_servicos', JSON.stringify(localServicosPorObra));
-                localStorage.setItem('medio_historico', JSON.stringify(localHistorico));
+                DB.set(DB.KEYS.CAT_OBRAS, localCategoriasObras);
+                DB.set(DB.KEYS.CAT_SERVICOS, localCategoriasServicos);
+                DB.set(DB.KEYS.UNIDADES, localUnidadesMedida);
+                DB.set(DB.KEYS.OBRAS, localObras);
+                DB.set(DB.KEYS.SERVICOS, localServicosPorObra);
+                DB.set(DB.KEYS.HISTORICO, localHistorico);
+            },
+
+            showToast(message, type = 'success') {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
+                
+                container.appendChild(toast);
+                setTimeout(() => {
+                    toast.remove();
+                }, 2600);
             },
 
             setDataToday() {
@@ -998,7 +1125,6 @@
                 });
                 select.innerHTML = html;
 
-                // Restaura seleção anterior se ainda existir
                 if (Array.from(select.options).some(opt => opt.value === valorAtual)) {
                     select.value = valorAtual;
                 } else {
@@ -1074,9 +1200,7 @@
                 const obra = localObras.find(o => o.id === id);
                 if (!obra) return;
 
-                const confirmacao = confirm(`CONFIRMAÇÃO DE EXCLUSÃO\n\nTem certeza de que deseja excluir permanentemente a obra:\n"${obra.name}"?\n\nEsta ação removerá todos os serviços e histórico de medições vinculados.`);
-                
-                if (confirmacao) {
+                if (confirm(`Tem certeza de que deseja excluir permanentemente a obra "${obra.name}"?`)) {
                     if (localServicosPorObra[id]) {
                         localServicosPorObra[id].forEach(serv => {
                             delete localHistorico[serv.id];
@@ -1088,6 +1212,7 @@
                     this.saveData();
                     this.renderObras(localObras);
                     this.popularFiltroObrasDashboard();
+                    this.showToast('Obra excluída com sucesso!', 'success');
                 }
             },
 
@@ -1176,7 +1301,6 @@
                 const resumoTitle = document.getElementById('resumo-card-title');
 
                 if (obraIdSelecionada === 'todas') {
-                    // MODO GLOBAL
                     kpiTitle1.textContent = 'Obras Ativas';
                     document.getElementById('kpi-obras-total').textContent = localObras.length;
                     
@@ -1208,7 +1332,6 @@
                     this.renderChartsGlobal();
 
                 } else {
-                    // MODO OBRA ESPECÍFICA
                     const obraRef = localObras.find(o => o.id === obraIdSelecionada);
                     const servicos = localServicosPorObra[obraIdSelecionada] || [];
 
@@ -1253,11 +1376,8 @@
                 const nomesObras = localObras.map(o => o.name);
                 const progressosObras = localObras.map(o => o.progress || 0);
 
-                // Gráfico 1: Progresso por Obra (Barras)
                 const ctxProgresso = document.getElementById('chartProgressoObras').getContext('2d');
-                if (chartProgressoInstance) {
-                    chartProgressoInstance.destroy();
-                }
+                if (chartProgressoInstance) chartProgressoInstance.destroy();
                 chartProgressoInstance = new Chart(ctxProgresso, {
                     type: 'bar',
                     data: {
@@ -1272,19 +1392,11 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                max: 100
-                            }
-                        }
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true, max: 100 } }
                     }
                 });
 
-                // Gráfico 2: Distribuição por Categoria (Rosca)
                 const contagemCategorias = {};
                 localObras.forEach(o => {
                     contagemCategorias[o.category] = (contagemCategorias[o.category] || 0) + 1;
@@ -1294,9 +1406,7 @@
                 const dadosCategorias = Object.values(contagemCategorias);
 
                 const ctxCategorias = document.getElementById('chartCategoriasObras').getContext('2d');
-                if (chartCategoriasInstance) {
-                    chartCategoriasInstance.destroy();
-                }
+                if (chartCategoriasInstance) chartCategoriasInstance.destroy();
                 chartCategoriasInstance = new Chart(ctxCategorias, {
                     type: 'doughnut',
                     data: {
@@ -1323,11 +1433,8 @@
                 const nomesServicos = servicos.map(s => s.name);
                 const percentuaisServicos = servicos.map(s => s.meta > 0 ? Math.min(100, Math.round((s.executada / s.meta) * 100)) : 0);
 
-                // Gráfico 1: Progresso dos Serviços da Obra Selecionada (Barras)
                 const ctxProgresso = document.getElementById('chartProgressoObras').getContext('2d');
-                if (chartProgressoInstance) {
-                    chartProgressoInstance.destroy();
-                }
+                if (chartProgressoInstance) chartProgressoInstance.destroy();
                 chartProgressoInstance = new Chart(ctxProgresso, {
                     type: 'bar',
                     data: {
@@ -1342,19 +1449,11 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                max: 100
-                            }
-                        }
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true, max: 100 } }
                     }
                 });
 
-                // Gráfico 2: Serviços por Categoria na Obra Selecionada (Rosca)
                 const contagemCatServicos = {};
                 servicos.forEach(s => {
                     contagemCatServicos[s.category] = (contagemCatServicos[s.category] || 0) + 1;
@@ -1364,9 +1463,7 @@
                 const dadosCatServ = Object.values(contagemCatServicos);
 
                 const ctxCategorias = document.getElementById('chartCategoriasObras').getContext('2d');
-                if (chartCategoriasInstance) {
-                    chartCategoriasInstance.destroy();
-                }
+                if (chartCategoriasInstance) chartCategoriasInstance.destroy();
                 chartCategoriasInstance = new Chart(ctxCategorias, {
                     type: 'doughnut',
                     data: {
@@ -1401,7 +1498,6 @@
                     unidades: 'Unidades de Medida Disponíveis:'
                 };
                 document.getElementById('cat-lista-titulo').textContent = titleMap[tab];
-                
                 this.renderListaCategorias();
             },
 
@@ -1417,8 +1513,9 @@
                     input.value = '';
                     this.saveData();
                     this.renderListaCategorias();
+                    this.showToast('Item adicionado com sucesso!');
                 } else {
-                    alert('Este item já existe!');
+                    this.showToast('Este item já existe!', 'error');
                 }
             },
 
@@ -1433,6 +1530,7 @@
                     }
                     this.saveData();
                     this.renderListaCategorias();
+                    this.showToast('Item removido!');
                 }
             },
 
@@ -1450,6 +1548,59 @@
                         <button onclick="app.removerCategoria('${cat}')" style="background:none; border:none; color: var(--danger); cursor:pointer; font-size: 12px;">Remover</button>
                     </div>
                 `).join('');
+            },
+
+            exportarDados() {
+                const dadosCompletos = {
+                    obras: localObras,
+                    servicos: localServicosPorObra,
+                    historico: localHistorico,
+                    catObras: localCategoriasObras,
+                    catServicos: localCategoriasServicos,
+                    unidades: localUnidadesMedida,
+                    versao: '1.1',
+                    dataExportacao: new Date().toISOString()
+                };
+
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dadosCompletos, null, 2));
+                const downloadAnchor = document.createElement('a');
+                downloadAnchor.setAttribute("href", dataStr);
+                downloadAnchor.setAttribute("download", `backup_medio_eng_${new Date().toISOString().slice(0,10)}.json`);
+                document.body.appendChild(downloadAnchor);
+                downloadAnchor.click();
+                downloadAnchor.remove();
+                this.showToast('Backup exportado com sucesso!');
+            },
+
+            importarDados(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const parsed = JSON.parse(e.target.result);
+                        if (parsed.obras && parsed.servicos && parsed.historico) {
+                            localObras = parsed.obras;
+                            localServicosPorObra = parsed.servicos;
+                            localHistorico = parsed.historico;
+                            if (parsed.catObras) localCategoriasObras = parsed.catObras;
+                            if (parsed.catServicos) localCategoriasServicos = parsed.catServicos;
+                            if (parsed.unidades) localUnidadesMedida = parsed.unidades;
+
+                            this.saveData();
+                            this.renderObras(localObras);
+                            this.popularFiltroObrasDashboard();
+                            this.showToast('Backup importado com sucesso!');
+                        } else {
+                            this.showToast('Arquivo de backup inválido.', 'error');
+                        }
+                    } catch (err) {
+                        this.showToast('Erro ao processar arquivo JSON.', 'error');
+                    }
+                    event.target.value = '';
+                };
+                reader.readAsText(file);
             },
 
             preencherSelect(selectId, lista) {
@@ -1510,6 +1661,7 @@
                     this.saveData();
                     this.renderServicos(localServicosPorObra[this.currentObra.id]);
                     this.recalcularProgressoEContagemDias(this.currentObra.id);
+                    this.showToast('Serviço excluído!');
                 }
             },
 
@@ -1532,12 +1684,12 @@
                 const meta = parseFloat(document.getElementById('novo-servico-meta').value);
 
                 if (!nome || !categoria || !unidade || isNaN(meta) || meta <= 0) {
-                    alert('Preencha o nome, categoria, unidade e uma meta válida.');
+                    this.showToast('Preencha os campos obrigatórios e uma meta válida.', 'error');
                     return;
                 }
 
                 const novoServico = {
-                    id: 'serv_' + Date.now(),
+                    id: 'serv_' + Date.now() + '_' + Math.floor(Math.random()*1000),
                     name: nome,
                     category: categoria,
                     unit: unidade,
@@ -1550,6 +1702,7 @@
                 this.renderServicos(localServicosPorObra[this.currentObra.id]);
                 this.recalcularProgressoEContagemDias(this.currentObra.id);
                 this.closeNovoServicoModal();
+                this.showToast('Serviço cadastrado com sucesso!');
             },
 
             openNovaObraModal() {
@@ -1566,12 +1719,12 @@
                 const categoria = document.getElementById('nova-obra-categoria').value;
 
                 if (!nome || !categoria) {
-                    alert('Preencha o nome da obra e selecione uma categoria.');
+                    this.showToast('Preencha o nome e categoria da obra.', 'error');
                     return;
                 }
 
                 const novaObra = {
-                    id: 'obra_' + Date.now(),
+                    id: 'obra_' + Date.now() + '_' + Math.floor(Math.random()*1000),
                     name: nome,
                     category: categoria,
                     progress: 0
@@ -1585,6 +1738,7 @@
                 this.popularFiltroObrasDashboard();
                 document.getElementById('nova-obra-nome').value = '';
                 this.closeNovaObraModal();
+                this.showToast('Obra criada com sucesso!');
                 this.selectObra(novaObra.id, novaObra.name);
             },
 
@@ -1681,7 +1835,7 @@
                 const equipe = parseInt(document.getElementById('medicao-equipe').value) || null;
 
                 if (!qtd || qtd <= 0) {
-                    alert('Informe uma quantidade válida.');
+                    this.showToast('Informe uma quantidade válida.', 'error');
                     return;
                 }
 
@@ -1689,7 +1843,7 @@
                 const justificativa = document.getElementById('medicao-justificativa').value;
 
                 if (extrapolou && !justificativa.trim()) {
-                    alert('A meta foi excedida! É obrigatório preencher a justificativa.');
+                    this.showToast('A meta foi excedida! É obrigatório preencher a justificativa.', 'error');
                     return;
                 }
 
@@ -1704,7 +1858,7 @@
                 }
 
                 localHistorico[this.currentServico.id].unshift({
-                    id: 'med_' + Date.now(),
+                    id: 'med_' + Date.now() + '_' + Math.floor(Math.random()*1000),
                     obraNome: this.currentObra.name,
                     servicoNome: this.currentServico.name,
                     unit: this.currentServico.unit || 'm²',
@@ -1717,13 +1871,12 @@
                 });
 
                 this.saveData();
-                alert('Medição registrada com sucesso!');
+                this.showToast('Medição registrada com sucesso!');
                 this.closeMedicaoModal();
                 this.renderServicos(servicos);
                 this.recalcularProgressoEContagemDias(this.currentObra.id);
             },
 
-            /* FUNCIONALIDADES DE EDIÇÃO DE MEDIÇÃO */
             openEditarMedicaoModal(servicoId, medicaoId) {
                 let medicao = null;
                 let targetServicoId = servicoId;
@@ -1742,7 +1895,7 @@
                 }
 
                 if (!medicao) {
-                    alert('Medição não encontrada.');
+                    this.showToast('Medição não encontrada.', 'error');
                     return;
                 }
 
@@ -1824,7 +1977,7 @@
                 const novaJustificativa = document.getElementById('edit-medicao-justificativa').value;
 
                 if (!novaQtd || novaQtd <= 0 || !novaData) {
-                    alert('Informe uma quantidade e data válidas.');
+                    this.showToast('Informe uma quantidade e data válidas.', 'error');
                     return;
                 }
 
@@ -1840,7 +1993,7 @@
                     extrapolou = totalExecutadoPrevisto > servicoRef.meta;
 
                     if (extrapolou && !novaJustificativa.trim()) {
-                        alert('A meta do serviço foi excedida! É obrigatório preencher a justificativa.');
+                        this.showToast('A meta do serviço foi excedida! É obrigatório preencher a justificativa.', 'error');
                         return;
                     }
 
@@ -1854,7 +2007,7 @@
                 medicao.justificativa = extrapolou ? novaJustificativa : null;
 
                 this.saveData();
-                alert('Medição alterada com sucesso!');
+                this.showToast('Medição alterada com sucesso!');
                 this.closeEditarMedicaoModal();
 
                 if (obraRefId) {
@@ -1911,10 +2064,8 @@
 
             buildCardHistorico(med, showContext = false, servicoId = null) {
                 const unit = med.unit || 'm²';
-                
                 const [ano, mes, dia] = med.data.split('-');
                 const dataFmt = `${dia}/${mes}/${ano}`;
-
                 const sId = servicoId || this.currentServico?.id || '';
 
                 return `
@@ -1929,7 +2080,7 @@
                             <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
                                 <span class="badge ${med.status === 'extrapolou' ? 'badge-warning' : ''}">
                                     ${med.status === 'extrapolou' ? 'Excedeu Meta' : 'Normal'}
-                                }</span>
+                                </span>
                                 <button class="btn-edit-card" onclick="app.openEditarMedicaoModal('${sId}', '${med.id}')">Editar</button>
                             </div>
                         </div>
