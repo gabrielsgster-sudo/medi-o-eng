@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MEDI-O ENG v2.3 - Gestão e Medição de Obras</title>
+    <title>MEDI-O ENG - Gestão e Medição de Obras</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -95,7 +95,6 @@
             padding-bottom: 90px;
         }
 
-        /* PAINEL FIXO DE PROGRESSO E DIAS (STICKY) */
         .sticky-progress-panel {
             position: sticky;
             top: 57px;
@@ -116,7 +115,6 @@
             font-weight: 600;
         }
 
-        /* BOTTOM NAVIGATION BAR */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -149,10 +147,14 @@
             transition: color 0.2s ease;
         }
 
-        .nav-item .icon { font-size: 18px; }
+        .nav-item svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
         .nav-item.active { color: var(--primary); }
 
-        /* CARDS & COMPONENTS */
         .card {
             background-color: var(--surface);
             border: 1px solid var(--border);
@@ -266,7 +268,6 @@
             gap: 4px;
         }
 
-        /* MODAIS */
         .modal {
             position: fixed;
             inset: 0;
@@ -410,7 +411,7 @@
         <div class="mobile-view">
             <div class="app-container">
 
-                <!-- HEADER COMPARTILHADO -->
+                <!-- HEADER -->
                 <div class="header">
                     <div class="header-left">
                         <button class="header-back hidden" id="header-back-btn" onclick="app.goHome()">←</button>
@@ -443,7 +444,7 @@
                         </div>
 
                         <div class="card">
-                            <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">📊 Resumo do Portfólio</h3>
+                            <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">Resumo do Portfólio</h3>
                             <div id="dash-obras-resumo"></div>
                         </div>
                     </div>
@@ -477,7 +478,6 @@
 
                 <!-- TELA DETALHES DA OBRA -->
                 <div id="screen-obra-detalhe" class="screen">
-                    <!-- PAINEL FIXO DO PROGRESSO GERAL DA OBRA (STICKY) -->
                     <div class="sticky-progress-panel">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <span style="font-size: 13px; font-weight: 700; color: var(--primary);">PROGRESSO GERAL</span>
@@ -487,7 +487,7 @@
                             <div class="progress-fill" id="obra-progress-bar" style="width: 0%;"></div>
                         </div>
                         <div class="progress-meta-row">
-                            <span id="obra-data-inicio">⏱️ Início: --/--/----</span>
+                            <span id="obra-data-inicio">Início: --/--/----</span>
                             <span id="obra-dias-decorridos" style="color: var(--primary); font-weight: 700;">Aguardando 1ª medição</span>
                         </div>
                     </div>
@@ -507,22 +507,22 @@
             <!-- BOTÃO FLUTUANTE (FAB) -->
             <button class="fab" id="fab-add" onclick="app.handleFabClick()">+</button>
 
-            <!-- BOTTOM NAVIGATION BAR -->
+            <!-- BOTTOM NAVIGATION BAR COM ÍCONES VETORIAIS SVG -->
             <div class="bottom-nav">
                 <button class="nav-item active" id="nav-obras" onclick="app.switchNav('obras')">
-                    <span class="icon">🏗️</span>
+                    <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2zM5 5v14h14V5H5zm2 2h4v4H7V7zm6 0h4v4h-4V7zm-6 6h4v4H7v-4zm6 0h4v4h-4v-4z"/></svg>
                     <span>Obras</span>
                 </button>
                 <button class="nav-item" id="nav-dashboard" onclick="app.switchNav('dashboard')">
-                    <span class="icon">📊</span>
+                    <svg viewBox="0 0 24 24"><path d="M5 9.2h3V19H5V9.2zM10.6 5h2.8v14h-2.8V5zm5.6 8H19v6h-2.8v-6z"/></svg>
                     <span>Dashboard</span>
                 </button>
                 <button class="nav-item" id="nav-categorias" onclick="app.switchNav('categorias')">
-                    <span class="icon">🏷️</span>
+                    <svg viewBox="0 0 24 24"><path d="M12 2l-5.5 9h11zM12 22a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-7-9h6v6H5z"/></svg>
                     <span>Categorias</span>
                 </button>
                 <button class="nav-item" id="nav-historico" onclick="app.switchNav('historico')">
-                    <span class="icon">📋</span>
+                    <svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6a7 7 0 1 1 7 7 6.97 6.97 0 0 1-5-2.14l-1.42 1.42A8.92 8.92 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.25 2.52.77-1.28-3.52-2.09V8z"/></svg>
                     <span>Histórico</span>
                 </button>
             </div>
@@ -596,7 +596,7 @@
             </div>
             <div class="modal-body">
                 <div id="medicao-info" style="background-color: #F8FAFC; border: 1px solid var(--border); padding: 12px; border-radius: 6px; margin-bottom: 16px; font-size: 12px;"></div>
-                <div id="medicao-alert" class="alert-warning hidden">⚠ Atenção: A quantidade inserida ultrapassa a meta do serviço!</div>
+                <div id="medicao-alert" class="alert-warning hidden">Atenção: A quantidade inserida ultrapassa a meta do serviço!</div>
 
                 <div class="form-group">
                     <label class="form-label" id="label-medicao-qtd">Quantidade Realizada *</label>
@@ -624,7 +624,7 @@
 
                 <div id="medicao-justificativa-group" class="form-group hidden">
                     <label class="form-label" style="color: var(--danger);">Justificativa de Extrapolação *</label>
-                    <textarea class="form-textarea" id="medicao-justificativa" placeholder="Informe o motivo..."></textarea>
+                    <textarea class="form-textarea" id="medicao-justificativa" placeholder="Informe o motivo da extrapolação..."></textarea>
                 </div>
 
                 <div class="button-group">
@@ -636,7 +636,6 @@
     </div>
 
     <script>
-        // DADOS PADRÃO DE INICIALIZAÇÃO
         const defaultCategoriasObras = ['Residencial', 'Comercial', 'Industrial', 'Infraestrutura'];
         const defaultCategoriasServicos = ['Alvenaria', 'Estrutura', 'Hidráulica', 'Elétrica', 'Acabamento', 'Pintura'];
         const defaultUnidadesMedida = ['m²', 'm', 'm³', 'km', 'un', 'kg', 'vb'];
@@ -657,7 +656,6 @@
             's2': [{ obraNome: 'Residencial Boulevard', servicoNome: 'Concretagem de Pilares', unit: 'm³', data: '2026-01-15', quantidade: 50, status: 'normal' }]
         };
 
-        // VARIÁVEIS CARREGADAS DO LOCALSTORAGE
         let localCategoriasObras = JSON.parse(localStorage.getItem('medio_cat_obras')) || defaultCategoriasObras;
         let localCategoriasServicos = JSON.parse(localStorage.getItem('medio_cat_servicos')) || defaultCategoriasServicos;
         let localUnidadesMedida = JSON.parse(localStorage.getItem('medio_unidades')) || defaultUnidadesMedida;
@@ -679,7 +677,6 @@
                 this.renderObras(localObras);
             },
 
-            // MÉTODO PARA SALVAR ESTADO NO LOCALSTORAGE
             saveData() {
                 localStorage.setItem('medio_cat_obras', JSON.stringify(localCategoriasObras));
                 localStorage.setItem('medio_cat_servicos', JSON.stringify(localCategoriasServicos));
@@ -750,7 +747,6 @@
                 this.switchNav('obras');
             },
 
-            // --- TELA OBRAS ---
             renderObras(obras) {
                 const list = document.getElementById('obras-list');
                 if (!obras.length) {
@@ -762,7 +758,7 @@
                     <div class="card" onclick="app.selectObra('${obra.id}', '${obra.name}')" style="cursor: pointer;">
                         <div class="card-header-actions">
                             <h3 class="card-title">${obra.name}</h3>
-                            <button class="btn-delete-card" onclick="app.removerObra('${obra.id}', event)">🗑 Excluir</button>
+                            <button class="btn-delete-card" onclick="app.removerObra('${obra.id}', event)">Excluir</button>
                         </div>
                         <span class="badge">${obra.category}</span>
                         <div style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center;">
@@ -797,11 +793,9 @@
                 const obra = localObras.find(o => o.id === id);
                 if (!obra) return;
 
-                // CONFIRMAÇÃO DE EXCLUSÃO
-                const confirmacao = confirm(`⚠️ CONFIRMAÇÃO DE EXCLUSÃO\n\nTem certeza de que deseja excluir permanentemente a obra:\n"${obra.name}"?\n\nEsta ação removerá todos os serviços e histórico de medições vinculados.`);
+                const confirmacao = confirm(`CONFIRMAÇÃO DE EXCLUSÃO\n\nTem certeza de que deseja excluir permanentemente a obra:\n"${obra.name}"?\n\nEsta ação removerá todos os serviços e histórico de medições vinculados.`);
                 
                 if (confirmacao) {
-                    // Remover serviços e histórico associados
                     if (localServicosPorObra[id]) {
                         localServicosPorObra[id].forEach(serv => {
                             delete localHistorico[serv.id];
@@ -810,12 +804,11 @@
                     }
 
                     localObras = localObras.filter(o => o.id !== id);
-                    this.saveData(); // Persiste no LocalStorage
+                    this.saveData();
                     this.renderObras(localObras);
                 }
             },
 
-            // --- CÁLCULO DE PROGRESSO E DIAS CORRIDOS ---
             recalcularProgressoEContagemDias(obraId) {
                 const servicos = localServicosPorObra[obraId] || [];
                 let percentualGeral = 0;
@@ -846,7 +839,7 @@
                 const elDias = document.getElementById('obra-dias-decorridos');
 
                 if (todasMedicoesObra.length === 0) {
-                    elInicio.textContent = '⏱️ Início: --/--/----';
+                    elInicio.textContent = 'Início: --/--/----';
                     elDias.textContent = 'Aguardando 1ª medição';
                     return;
                 }
@@ -856,22 +849,21 @@
                 const primeiraMedicao = new Date(todasMedicoesObra[0].data + 'T00:00:00');
                 const dataFormatada = primeiraMedicao.toLocaleDateString('pt-BR');
                 
-                elInicio.textContent = `⏱️ Início: ${dataFormatada}`;
+                elInicio.textContent = `Início: ${dataFormatada}`;
 
                 if (percentualGeral >= 100) {
                     const ultimaMedicao = new Date(todasMedicoesObra[todasMedicoesObra.length - 1].data + 'T00:00:00');
                     const diffTime = Math.abs(ultimaMedicao - primeiraMedicao);
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-                    elDias.textContent = `🎉 Obra concluída em ${diffDays} dias!`;
+                    elDias.textContent = `Obra concluída em ${diffDays} dias!`;
                 } else {
                     const hoje = new Date();
                     const diffTime = Math.abs(hoje - primeiraMedicao);
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                    elDias.textContent = `📅 ${diffDays} dias em andamento`;
+                    elDias.textContent = `${diffDays} dias em andamento`;
                 }
             },
 
-            // --- DASHBOARD ---
             renderDashboard() {
                 document.getElementById('kpi-obras-total').textContent = localObras.length;
                 
@@ -898,7 +890,6 @@
                 `).join('');
             },
 
-            // --- CATEGORIAS & UNIDADES ---
             switchCatTab(tab) {
                 activeCatTab = tab;
                 document.getElementById('tab-cat-obras').classList.toggle('active', tab === 'obras');
@@ -925,7 +916,7 @@
                 if (!targetList.includes(val)) {
                     targetList.push(val);
                     input.value = '';
-                    this.saveData(); // Persiste no LocalStorage
+                    this.saveData();
                     this.renderListaCategorias();
                 } else {
                     alert('Este item já existe!');
@@ -941,7 +932,7 @@
                     } else {
                         localUnidadesMedida = localUnidadesMedida.filter(u => u !== nome);
                     }
-                    this.saveData(); // Persiste no LocalStorage
+                    this.saveData();
                     this.renderListaCategorias();
                 }
             },
@@ -967,7 +958,6 @@
                 select.innerHTML = lista.map(c => `<option value="${c}">${c}</option>`).join('');
             },
 
-            // --- SERVIÇOS ---
             renderServicos(servicos) {
                 const container = document.getElementById('servicos-content');
                 
@@ -988,7 +978,7 @@
                         <div class="card">
                             <div class="card-header-actions">
                                 <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 6px;">${s.name}</h4>
-                                <button class="btn-delete-card" onclick="app.removerServico('${s.id}')">🗑 Excluir</button>
+                                <button class="btn-delete-card" onclick="app.removerServico('${s.id}')">Excluir</button>
                             </div>
                             <span class="badge">${s.category}</span>
                             <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-top: 10px;">
@@ -999,8 +989,8 @@
                                 <div class="progress-fill" style="width: ${pct}%;"></div>
                             </div>
                             <div class="action-buttons">
-                                <button onclick="app.openMedicaoModal('${s.id}', '${s.name}', ${s.meta}, ${s.executada}, '${unit}')">📏 Medir</button>
-                                <button onclick="app.openHistoricoServico('${s.id}')">📋 Histórico</button>
+                                <button onclick="app.openMedicaoModal('${s.id}', '${s.name}', ${s.meta}, ${s.executada}, '${unit}')">Medir</button>
+                                <button onclick="app.openHistoricoServico('${s.id}')">Histórico</button>
                             </div>
                         </div>
                     `;
@@ -1015,10 +1005,10 @@
                 const servico = localServicosPorObra[this.currentObra.id].find(s => s.id === servicoId);
                 const nomeServico = servico ? servico.name : 'este serviço';
 
-                if (confirm(`⚠️ Confirma a exclusão do serviço:\n"${nomeServico}" e todo seu histórico?`)) {
+                if (confirm(`Confirma a exclusão do serviço:\n"${nomeServico}" e todo seu histórico?`)) {
                     localServicosPorObra[this.currentObra.id] = localServicosPorObra[this.currentObra.id].filter(s => s.id !== servicoId);
                     delete localHistorico[servicoId];
-                    this.saveData(); // Persiste no LocalStorage
+                    this.saveData();
                     this.renderServicos(localServicosPorObra[this.currentObra.id]);
                     this.recalcularProgressoEContagemDias(this.currentObra.id);
                 }
@@ -1057,7 +1047,7 @@
                 };
 
                 localServicosPorObra[this.currentObra.id].push(novoServico);
-                this.saveData(); // Persiste no LocalStorage
+                this.saveData();
                 this.renderServicos(localServicosPorObra[this.currentObra.id]);
                 this.recalcularProgressoEContagemDias(this.currentObra.id);
                 this.closeNovoServicoModal();
@@ -1091,14 +1081,13 @@
                 localObras.unshift(novaObra);
                 localServicosPorObra[novaObra.id] = [];
                 
-                this.saveData(); // Persiste no LocalStorage
+                this.saveData();
                 this.renderObras(localObras);
                 document.getElementById('nova-obra-nome').value = '';
                 this.closeNovaObraModal();
                 this.selectObra(novaObra.id, novaObra.name);
             },
 
-            // --- MEDIÇÃO ---
             openMedicaoModal(servicoId, servicoName, meta, executada, unit = 'm²') {
                 this.currentServico = { id: servicoId, name: servicoName, meta, executada, unit };
                 tempFotos = [];
@@ -1164,11 +1153,9 @@
                 const container = document.getElementById('photo-container');
                 const addBtnsHtml = `
                     <div class="photo-add-btn" onclick="document.getElementById('input-camera').click()">
-                        <span style="font-size: 20px;">📸</span>
                         <span>Câmera</span>
                     </div>
                     <div class="photo-add-btn" onclick="document.getElementById('input-galeria').click()">
-                        <span style="font-size: 20px;">🖼️</span>
                         <span>Galeria</span>
                     </div>
                 `;
@@ -1227,14 +1214,13 @@
                     justificativa: extrapolou ? justificativa : null
                 });
 
-                this.saveData(); // Persiste no LocalStorage
-                alert('✅ Medição registrada com sucesso!');
+                this.saveData();
+                alert('Medição registrada com sucesso!');
                 this.closeMedicaoModal();
                 this.renderServicos(servicos);
                 this.recalcularProgressoEContagemDias(this.currentObra.id);
             },
 
-            // --- HISTÓRICOS ---
             openHistoricoServico(servicoId) {
                 this.currentServico = { id: servicoId };
                 document.getElementById('header-back-btn').classList.remove('hidden');
@@ -1281,7 +1267,7 @@
                                 ${showContext ? `<p style="font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase;">${med.obraNome} - ${med.servicoNome}</p>` : ''}
                                 <h4 style="font-size: 13px; font-weight: 600; color: var(--text-muted); margin-top: 2px;">Data: ${med.data}</h4>
                                 <p style="font-size: 16px; font-weight: 700; color: var(--primary); margin-top: 4px;">${med.quantidade} ${unit}</p>
-                                ${med.equipe ? `<p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">👷 Equipe: <strong>${med.equipe} func.</strong></p>` : ''}
+                                ${med.equipe ? `<p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Equipe: <strong>${med.equipe} func.</strong></p>` : ''}
                             </div>
                             <span class="badge ${med.status === 'extrapolou' ? 'badge-warning' : ''}">
                                 ${med.status === 'extrapolou' ? 'Excedeu Meta' : 'Normal'}
