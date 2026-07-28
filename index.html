@@ -35,14 +35,14 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            min-height: 100dvh;
+            overflow: hidden;
         }
 
         #app-container {
             width: 100%;
             max-width: 480px;
-            height: 100vh;
-            max-height: 900px;
+            height: 100dvh;
             background-color: var(--card-bg);
             display: flex;
             flex-direction: column;
@@ -56,6 +56,10 @@
                 border-radius: 24px;
                 border: 1px solid var(--border);
                 height: 85vh;
+                max-height: 900px;
+            }
+            body {
+                overflow: auto;
             }
         }
 
@@ -256,19 +260,21 @@
             margin-top: 4px;
         }
 
-        /* Bottom Navigation - Fixada absoluta na base do container do app */
+        /* Bottom Navigation - Fixada na base da tela */
         .bottom-nav {
-            position: absolute;
+            position: fixed;
             bottom: 0;
-            left: 0;
+            left: 50%;
+            transform: translateX(-50%);
             width: 100%;
+            max-width: 480px;
             height: 70px;
             background: white;
             border-top: 1px solid var(--border);
             display: flex;
             justify-content: space-around;
             align-items: center;
-            z-index: 100;
+            z-index: 1000;
         }
 
         .nav-item {
@@ -305,7 +311,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.5);
-            z-index: 200;
+            z-index: 2000;
             justify-content: center;
             align-items: flex-end;
         }
@@ -547,26 +553,6 @@
         </div>
     </div>
 
-    <!-- BOTTOM NAVIGATION (Fixa Absoluta no Rodapé do App) -->
-    <nav class="bottom-nav" id="main-bottom-nav" style="display: none;">
-        <button class="nav-item active" onclick="switchTab('screen-obras', this)">
-            <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-            Obras
-        </button>
-        <button class="nav-item" onclick="switchTab('screen-dashboard', this)">
-            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
-            Dashboard
-        </button>
-        <button class="nav-item" onclick="switchTab('screen-categorias', this)">
-            <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
-            Categorias
-        </button>
-        <button class="nav-item" onclick="switchTab('screen-historico', this)">
-            <svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
-            Histórico
-        </button>
-    </nav>
-
     <!-- MODAL: NOVA OBRA -->
     <div id="modal-obra" class="modal">
         <div class="modal-content">
@@ -643,6 +629,26 @@
     </div>
 
 </div>
+
+<!-- BOTTOM NAVIGATION (Fixa na tela independente do scroll) -->
+<nav class="bottom-nav" id="main-bottom-nav" style="display: none;">
+    <button class="nav-item active" onclick="switchTab('screen-obras', this)">
+        <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        Obras
+    </button>
+    <button class="nav-item" onclick="switchTab('screen-dashboard', this)">
+        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+        Dashboard
+    </button>
+    <button class="nav-item" onclick="switchTab('screen-categorias', this)">
+        <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+        Categorias
+    </button>
+    <button class="nav-item" onclick="switchTab('screen-historico', this)">
+        <svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+        Histórico
+    </button>
+</nav>
 
 <script>
     /* Estado Global & LocalStorage */
