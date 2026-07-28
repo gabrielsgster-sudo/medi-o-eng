@@ -82,10 +82,26 @@
             padding: 2px 6px;
         }
 
-        .header-title {
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-logo-icon {
+            width: 28px;
+            height: 28px;
+        }
+
+        .header-logo-text {
             font-size: 18px;
-            font-weight: 700;
-            letter-spacing: -0.01em;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+        }
+
+        .header-logo-text span {
+            color: #00b050;
         }
 
         .header-subtitle {
@@ -676,19 +692,23 @@
                     <div class="header-top">
                         <div class="header-left">
                             <button class="header-back hidden" id="header-back-btn" onclick="app.goHome()">←</button>
-                            <div>
-                                <h1 class="header-title" id="main-header-title">MEDI-O ENG</h1>
-                                <p class="header-subtitle" id="main-header-subtitle">Gestão & Medição de Obras</p>
+                            <div class="header-brand" id="main-header-brand-container">
+                                <svg class="header-logo-icon" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M100 20L170 60V140L100 180L30 140V60L100 20Z" fill="#0b1c30" stroke="#ffffff" stroke-width="4"/>
+                                    <path d="M70 110V130" stroke="white" stroke-width="10" stroke-linecap="round"/>
+                                    <path d="M100 80V130" stroke="#00b050" stroke-width="10" stroke-linecap="round"/>
+                                    <path d="M130 65V130" stroke="#00b050" stroke-width="10" stroke-linecap="round"/>
+                                    <path d="M90 120L115 95L145 125" stroke="white" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <div>
+                                    <h1 class="header-title" id="main-header-title" style="display:none;">MEDI-O ENG</h1>
+                                    <div class="header-logo-text" id="main-header-logo-text">Medi<span>-Eng</span></div>
+                                    <p class="header-subtitle" id="main-header-subtitle">Gestão & Medição de Obras</p>
+                                </div>
                             </div>
                         </div>
                         <div class="header-actions">
-                            <button class="icon-btn" title="Notificações">
-                                <svg viewBox="0 0 24 24"><path d="M12 22a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
-                                <span class="notification-dot"></span>
-                            </button>
-                            <button class="icon-btn" title="Opções">
-                                <svg viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
-                            </button>
+                            <!-- Ações extras, se necessário, ou mantidas vazias conforme solicitado -->
                         </div>
                     </div>
                 </div>
@@ -1088,26 +1108,31 @@
 
                 const title = document.getElementById('main-header-title');
                 const subtitle = document.getElementById('main-header-subtitle');
+                const brandContainer = document.getElementById('main-header-brand-container');
 
                 if (nav === 'obras') {
                     title.textContent = "MEDI-O ENG";
                     subtitle.textContent = "Gestão & Medição de Obras";
+                    brandContainer.style.display = 'flex';
                     this.renderObras(localObras);
                     this.showScreen('screen-obras');
                 } else if (nav === 'dashboard') {
                     title.textContent = "Dashboard";
                     subtitle.textContent = "Indicadores consolidados e analíticos";
+                    brandContainer.style.display = 'flex';
                     this.popularFiltroObrasDashboard();
                     this.renderDashboard();
                     this.showScreen('screen-dashboard');
                 } else if (nav === 'categorias') {
                     title.textContent = "Categorias e Unidades";
                     subtitle.textContent = "Gestão de Cadastros";
+                    brandContainer.style.display = 'flex';
                     this.switchCatTab(activeCatTab);
                     this.showScreen('screen-categorias');
                 } else if (nav === 'historico') {
                     title.textContent = "Histórico Geral";
                     subtitle.textContent = "Linha do tempo de medições";
+                    brandContainer.style.display = 'flex';
                     this.renderHistoricoGeral();
                     this.showScreen('screen-historico-geral');
                 }
