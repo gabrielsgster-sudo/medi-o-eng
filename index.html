@@ -412,7 +412,7 @@
         </div>
     </div>
 
-    <!-- MODAL GERENCIAR CATEGORIAS -->
+    <!-- MODAL GERENCIAR CATEGORIAS (COM ABAS SEPARADAS) -->
     <div id="modal-categorias" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
@@ -420,17 +420,23 @@
                 <button class="modal-close" onclick="app.closeGerenciarCategoriasModal()">✕</button>
             </div>
             <div class="modal-body">
+                <div class="tabs" style="margin-bottom: 12px;">
+                    <button class="tab-button active" id="tab-cat-obras" onclick="app.switchCatTab('obras')">TIPOS DE OBRA</button>
+                    <button class="tab-button" id="tab-cat-servicos" onclick="app.switchCatTab('servicos')">SERVIÇOS</button>
+                </div>
+
                 <div class="form-group" style="display: flex; gap: 8px;">
                     <input type="text" class="form-input" id="nova-categoria-nome" placeholder="Nome da nova categoria...">
                     <button class="btn-primary" style="flex: 0 0 80px;" onclick="app.salvarCategoria()">Criar</button>
                 </div>
-                <h4 style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;">Categorias Existentes:</h4>
+
+                <h4 style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;" id="cat-lista-titulo">Categorias de Obras:</h4>
                 <div id="lista-categorias-gerenciar" style="border: 1px solid var(--border); border-radius: 6px; max-height: 200px; overflow-y: auto;"></div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL NOVO SERVIÇO (COM SELECT DE CATEGORIAS) -->
+    <!-- MODAL NOVO SERVIÇO -->
     <div id="modal-novo-servico" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
@@ -443,7 +449,7 @@
                     <input type="text" class="form-input" id="novo-servico-nome" placeholder="Ex: Pintura Externa">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Categoria *</label>
+                    <label class="form-label">Categoria do Serviço *</label>
                     <select class="form-input" id="novo-servico-categoria"></select>
                 </div>
                 <div class="form-group">
@@ -514,8 +520,11 @@
     </div>
 
     <script>
-        // LEQUE DE CATEGORIAS CUSTOMIZÁVEL
-        let localCategorias = ['Alvenaria', 'Estrutura', 'Hidráulica', 'Elétrica', 'Acabamento', 'Residencial', 'Comercial'];
+        // LISTAS DE CATEGORIAS SEPARADAS
+        let localCategoriasObras = ['Residencial', 'Comercial', 'Industrial', 'Infraestrutura'];
+        let localCategoriasServicos = ['Alvenaria', 'Estrutura', 'Hidráulica', 'Elétrica', 'Acabamento', 'Pintura'];
+
+        let activeCatTab = 'obras'; // 'obras' ou 'servicos'
 
         let localObras = [
             { id: 'demo1', name: 'Residencial Boulevard', category: 'Residencial', progress: 64 }
@@ -546,7 +555,7 @@
 
             // --- CATEGORIAS DINÂMICAS ---
             openGerenciarCategoriasModal() {
-                this.renderListaCategorias();
+                this.switchCatTab('obras');
                 document.getElementById('modal-categorias').classList.remove('hidden');
             },
 
@@ -554,13 +563,26 @@
                 document.getElementById('modal-categorias').classList.add('hidden');
             },
 
+            switchCatTab(tab) {
+                activeCatTab = tab;
+                document.getElementById('tab-cat-obras').classList.toggle('active', tab === 'obras');
+                document.getElementById('tab-cat-servicos').classList.toggle('active', tab === 'servicos');
+                
+                document.getElementById('cat-lista-titulo').textContent = 
+                    tab === 'obras' ? 'Categorias de Obras:' : 'Categorias de Serviços:';
+                
+                this.renderListaCategorias();
+            },
+
             salvarCategoria() {
                 const input = document.getElementById('nova-categoria-nome');
                 const val = input.value.trim();
                 if (!val) return;
 
-                if (!localCategorias.includes(val)) {
-                    localCategorias.push(val);
+                const targetList = activeCatTab === 'obras' ? localCategoriasObras : localCategoriasServicos;
+
+                if (!targetList.includes(val)) {
+                    targetList.push(val);
                     input.value = '';
                     this.renderListaCategorias();
                 } else {
@@ -569,17 +591,23 @@
             },
 
             removerCategoria(nome) {
-                localCategorias = localCategorias.filter(c => c !== nome);
+                if (activeCatTab === 'obras') {
+                    localCategoriasObras = localCategoriasObras.filter(c => c !== nome);
+                } else {
+                    localCategoriasServicos = localCategoriasServicos.filter(c => c !== nome);
+                }
                 this.renderListaCategorias();
             },
 
             renderListaCategorias() {
                 const container = document.getElementById('lista-categorias-gerenciar');
-                if (!localCategorias.length) {
-                    container.innerHTML = '<p style="padding: 10px; font-size: 12px; color: var(--text-muted);">Nenhuma categoria cadastrada.</p>';
+                const targetList = activeCatTab === 'obras' ? localCategoriasObras : localCategoriasServicos;
+
+                if (!targetList.length) {
+                    container.innerHTML = '<p style="padding: 10px; font-size: 12px; color: var(--text-muted);">Nenhuma categoria cadastrada nesta aba.</p>';
                     return;
                 }
-                container.innerHTML = localCategorias.map(cat => `
+                container.innerHTML = targetList.map(cat => `
                     <div class="category-item">
                         <span style="font-size: 13px; font-weight: 500;">${cat}</span>
                         <button onclick="app.removerCategoria('${cat}')" style="background:none; border:none; color: var(--danger); cursor:pointer; font-size: 12px;">Remover</button>
@@ -587,13 +615,13 @@
                 `).join('');
             },
 
-            preencherSelectCategorias(selectId) {
+            preencherSelect(selectId, lista) {
                 const select = document.getElementById(selectId);
-                if (!localCategorias.length) {
-                    select.innerHTML = '<option value="">Crie uma categoria primeiro em "🏷 Categorias"</option>';
+                if (!lista.length) {
+                    select.innerHTML = '<option value="">Cadastre uma categoria em "🏷 Categorias"</option>';
                     return;
                 }
-                select.innerHTML = localCategorias.map(c => `<option value="${c}">${c}</option>`).join('');
+                select.innerHTML = lista.map(c => `<option value="${c}">${c}</option>`).join('');
             },
 
             // --- OBRAS ---
@@ -674,7 +702,7 @@
             },
 
             openNovoServicoModal() {
-                this.preencherSelectCategorias('novo-servico-categoria');
+                this.preencherSelect('novo-servico-categoria', localCategoriasServicos);
                 document.getElementById('novo-servico-nome').value = '';
                 document.getElementById('novo-servico-meta').value = '';
                 document.getElementById('modal-novo-servico').classList.remove('hidden');
@@ -709,7 +737,7 @@
             },
 
             openNovaObraModal() {
-                this.preencherSelectCategorias('nova-obra-categoria');
+                this.preencherSelect('nova-obra-categoria', localCategoriasObras);
                 document.getElementById('modal-nova-obra').classList.remove('hidden');
             },
 
