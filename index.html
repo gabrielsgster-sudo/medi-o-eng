@@ -333,6 +333,37 @@
 
         .category-item:last-child { border-bottom: none; }
 
+        /* Estilos para Upload/Preview de Fotos */
+        .photo-upload-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .photo-preview {
+            width: 100%;
+            height: 75px;
+            border-radius: 6px;
+            object-fit: cover;
+            border: 1px solid var(--border);
+        }
+
+        .photo-add-btn {
+            height: 75px;
+            border: 2px dashed var(--border);
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #F8FAFC;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 600;
+        }
+
         .hidden { display: none !important; }
         .screen { display: none; }
         .screen.active { display: block; }
@@ -412,7 +443,7 @@
         </div>
     </div>
 
-    <!-- MODAL GERENCIAR CATEGORIAS (COM ABAS SEPARADAS) -->
+    <!-- MODAL GERENCIAR CATEGORIAS -->
     <div id="modal-categorias" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
@@ -488,7 +519,7 @@
         </div>
     </div>
 
-    <!-- MODAL MEDIÇÃO -->
+    <!-- MODAL MEDIÇÃO (ATUALIZADO COM FOTOS E FUNCIONÁRIOS) -->
     <div id="modal-medicao" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
@@ -503,14 +534,36 @@
                     <label class="form-label">Quantidade Realizada (m²) *</label>
                     <input type="number" class="form-input" id="medicao-quantidade" placeholder="0.00" step="0.01" oninput="app.onQuantidadeChange()" onkeyup="app.onQuantidadeChange()">
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Data *</label>
-                    <input type="date" class="form-input" id="medicao-data">
+
+                <div style="display: flex; gap: 12px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label">Data *</label>
+                        <input type="date" class="form-input" id="medicao-data">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label">Nº de Funcionários</label>
+                        <input type="number" class="form-input" id="medicao-equipe" placeholder="Ex: 5" min="1">
+                    </div>
                 </div>
+
+                <!-- CAMPO DE ANEXO/CAPTURA DE FOTOS -->
+                <div class="form-group">
+                    <label class="form-label">Evidências / Fotos de Campo</label>
+                    <input type="file" id="input-fotos" accept="image/*" multiple capture="environment" class="hidden" onchange="app.handleFotoUpload(event)">
+                    
+                    <div class="photo-upload-container" id="photo-container">
+                        <div class="photo-add-btn" onclick="document.getElementById('input-fotos').click()">
+                            <span style="font-size: 20px;">📷</span>
+                            <span>Anexar Foto</span>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="medicao-justificativa-group" class="form-group hidden">
                     <label class="form-label" style="color: var(--danger);">Justificativa de Extrapolação *</label>
                     <textarea class="form-textarea" id="medicao-justificativa" placeholder="Informe o motivo..."></textarea>
                 </div>
+
                 <div class="button-group">
                     <button class="btn-secondary" onclick="app.closeMedicaoModal()">Cancelar</button>
                     <button class="btn-primary" onclick="app.salvarMedicao()">Salvar Medição</button>
@@ -520,11 +573,10 @@
     </div>
 
     <script>
-        // LISTAS DE CATEGORIAS SEPARADAS
         let localCategoriasObras = ['Residencial', 'Comercial', 'Industrial', 'Infraestrutura'];
         let localCategoriasServicos = ['Alvenaria', 'Estrutura', 'Hidráulica', 'Elétrica', 'Acabamento', 'Pintura'];
 
-        let activeCatTab = 'obras'; // 'obras' ou 'servicos'
+        let activeCatTab = 'obras';
 
         let localObras = [
             { id: 'demo1', name: 'Residencial Boulevard', category: 'Residencial', progress: 64 }
@@ -538,6 +590,7 @@
         };
 
         let localHistorico = {};
+        let tempFotos = []; // Guarda as imagens em Base64 para a medição atual
 
         const app = {
             currentObra: null,
@@ -553,7 +606,7 @@
                 document.getElementById('medicao-data').value = today;
             },
 
-            // --- CATEGORIAS DINÂMICAS ---
+            // --- CATEGORIAS ---
             openGerenciarCategoriasModal() {
                 this.switchCatTab('obras');
                 document.getElementById('modal-categorias').classList.remove('hidden');
@@ -788,6 +841,45 @@
                 if (obra) obra.progress = percentualGeral;
             },
 
+            // --- PROCESSAMENTO DE FOTOS ---
+            handleFotoUpload(event) {
+                const files = event.target.files;
+                if (!files || !files.length) return;
+
+                Array.from(files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        tempFotos.push(e.target.result);
+                        this.renderFotosPreview();
+                    };
+                    reader.readAsDataURL(file);
+                });
+            },
+
+            renderFotosPreview() {
+                const container = document.getElementById('photo-container');
+                const addBtnHtml = `
+                    <div class="photo-add-btn" onclick="document.getElementById('input-fotos').click()">
+                        <span style="font-size: 20px;">📷</span>
+                        <span>Anexar Foto</span>
+                    </div>
+                `;
+
+                const photosHtml = tempFotos.map((src, index) => `
+                    <div style="position: relative;">
+                        <img src="${src}" class="photo-preview">
+                        <button onclick="app.removerFoto(${index})" style="position: absolute; top: 2px; right: 2px; background: rgba(239, 68, 68, 0.8); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 10px; cursor: pointer;">✕</button>
+                    </div>
+                `).join('');
+
+                container.innerHTML = addBtnHtml + photosHtml;
+            },
+
+            removerFoto(index) {
+                tempFotos.splice(index, 1);
+                this.renderFotosPreview();
+            },
+
             onQuantidadeChange() {
                 const input = document.getElementById('medicao-quantidade');
                 if (!input || !this.currentServico) return;
@@ -812,6 +904,8 @@
 
             openMedicaoModal(servicoId, servicoName, meta, executada) {
                 this.currentServico = { id: servicoId, name: servicoName, meta, executada };
+                tempFotos = []; // Limpa fotos anteriores
+                
                 const pct = meta > 0 ? Math.round((executada / meta) * 100) : 0;
                 
                 document.getElementById('medicao-info').innerHTML = `
@@ -819,9 +913,11 @@
                     Meta: ${meta} m² | Executado Atual: ${executada} m² (${pct}%)
                 `;
                 document.getElementById('medicao-quantidade').value = '';
+                document.getElementById('medicao-equipe').value = '';
                 document.getElementById('medicao-justificativa').value = '';
                 document.getElementById('medicao-alert').classList.add('hidden');
                 document.getElementById('medicao-justificativa-group').classList.add('hidden');
+                this.renderFotosPreview();
                 document.getElementById('modal-medicao').classList.remove('hidden');
             },
 
@@ -831,6 +927,8 @@
 
             salvarMedicao() {
                 const qtd = parseFloat(document.getElementById('medicao-quantidade').value);
+                const equipe = parseInt(document.getElementById('medicao-equipe').value) || null;
+
                 if (!qtd || qtd <= 0) {
                     alert('Informe uma quantidade válida.');
                     return;
@@ -857,6 +955,8 @@
                 localHistorico[this.currentServico.id].unshift({
                     data: document.getElementById('medicao-data').value,
                     quantidade: qtd,
+                    equipe: equipe,
+                    fotos: [...tempFotos],
                     status: extrapolou ? 'extrapolou' : 'normal',
                     justificativa: extrapolou ? justificativa : null
                 });
@@ -887,12 +987,20 @@
                         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                             <div>
                                 <h4 style="font-size: 14px; font-weight: 600;">Data: ${med.data}</h4>
-                                <p style="font-size: 15px; font-weight: 700; color: var(--primary); margin-top: 6px;">${med.quantidade} m²</p>
+                                <p style="font-size: 15px; font-weight: 700; color: var(--primary); margin-top: 4px;">${med.quantidade} m²</p>
+                                ${med.equipe ? `<p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">👷 Equipe: <strong>${med.equipe} func.</strong></p>` : ''}
                             </div>
                             <span class="badge ${med.status === 'extrapolou' ? 'status-extrapolou' : 'status-normal'}">
                                 ${med.status === 'extrapolou' ? 'Excedeu Meta' : 'Normal'}
                             </span>
                         </div>
+
+                        ${med.fotos && med.fotos.length ? `
+                            <div style="display: flex; gap: 6px; overflow-x: auto; margin-top: 10px; padding-bottom: 4px;">
+                                ${med.fotos.map(f => `<img src="${f}" style="width: 60px; height: 60px; border-radius: 4px; object-fit: cover; border: 1px solid var(--border);">`).join('')}
+                            </div>
+                        ` : ''}
+
                         ${med.justificativa ? `<p style="margin-top: 8px; font-size: 11px; color: var(--danger); background: #FEF2F2; padding: 6px; border-radius: 4px;"><strong>Justificativa:</strong> ${med.justificativa}</p>` : ''}
                     </div>
                 `).join('');
