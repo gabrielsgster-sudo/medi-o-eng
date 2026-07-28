@@ -50,7 +50,7 @@
             flex: 1;
             overflow-y: auto;
             position: relative;
-            padding-bottom: 70px; /* Garante espaço para a barra fixa inferior não cobrir o conteúdo */
+            padding-bottom: 70px;
         }
 
         /* HEADER FIXO */
@@ -569,19 +569,32 @@
                     </div>
                 </div>
 
-                <!-- TELA 1: OBRAS (HOME) COM IMAGEM DE DESTAQUE -->
-                <div id="screen-obras" class="screen active">
+                <!-- TELA 0: PÁGINA INICIAL (HOME DO APLICATIVO COM A IMAGEM DE DESTAQUE) -->
+                <div id="screen-home-principal" class="screen active">
                     <div class="content" style="padding-top: 16px;">
-                        
-                        <!-- IMAGEM DA PÁGINA INICIAL -->
                         <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 16px;">
-                            <img src="https://images.unsplash.com/photo-1541888946425-d0fbb18f773c?auto=format&fit=crop&w=800&q=80" alt="Gestão de Obras" style="width: 100%; height: 160px; object-fit: cover; display: block;">
-                            <div style="padding: 12px 16px; background-color: var(--surface);">
-                                <h3 style="font-size: 14px; font-weight: 700; color: var(--primary);">Bem-vindo ao MEDI-O ENG</h3>
-                                <p style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Controle e medição inteligente de campo em tempo real.</p>
+                            <img src="https://images.unsplash.com/photo-1541888946425-d0fbb18f773c?auto=format&fit=crop&w=800&q=80" alt="Gestão de Obras" style="width: 100%; height: 180px; object-fit: cover; display: block;">
+                            <div style="padding: 16px; background-color: var(--surface);">
+                                <h3 style="font-size: 16px; font-weight: 700; color: var(--primary);">MEDI-O ENG</h3>
+                                <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Sistema profissional de controle, medição e acompanhamento de campo em tempo real.</p>
                             </div>
                         </div>
 
+                        <div class="card" style="cursor: pointer; background: var(--primary); color: white;" onclick="app.switchNav('obras')">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <h4 style="font-size: 15px; font-weight: 700;">Acessar Obras</h4>
+                                    <p style="font-size: 11px; color: #94A3B8; margin-top: 2px;">Gerencie suas obras e serviços ativos</p>
+                                </div>
+                                <span style="font-size: 20px;">→</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TELA 1: LISTAGEM DE OBRAS -->
+                <div id="screen-obras" class="screen">
+                    <div class="content" style="padding-top: 16px;">
                         <div id="obras-list"></div>
                     </div>
                 </div>
@@ -713,7 +726,11 @@
 
             <!-- BOTTOM NAVIGATION BAR FIXO -->
             <div class="bottom-nav">
-                <button class="nav-item active" id="nav-obras" onclick="app.switchNav('obras')">
+                <button class="nav-item active" id="nav-home" onclick="app.switchNav('home')">
+                    <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                    <span>Início</span>
+                </button>
+                <button class="nav-item" id="nav-obras" onclick="app.switchNav('obras')">
                     <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2zM5 5v14h14V5H5zm2 2h4v4H7V7zm6 0h4v4h-4V7zm-6 6h4v4H7v-4zm6 0h4v4h-4v-4z"/></svg>
                     <span>Obras</span>
                 </button>
@@ -914,7 +931,7 @@
         let chartCategoriasInstance = null;
 
         const app = {
-            currentNav: 'obras',
+            currentNav: 'home',
             currentObra: null,
             currentServico: null,
             editingMedicao: null,
@@ -945,7 +962,8 @@
             switchNav(nav) {
                 this.currentNav = nav;
                 document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-                document.getElementById(`nav-${nav}`).classList.add('active');
+                const navEl = document.getElementById(`nav-${nav}`);
+                if (navEl) navEl.classList.add('active');
 
                 const btnBack = document.getElementById('header-back-btn');
                 btnBack.classList.add('hidden');
@@ -955,9 +973,13 @@
 
                 document.getElementById('fab-add').classList.remove('hidden');
 
-                if (nav === 'obras') {
+                if (nav === 'home') {
                     title.textContent = "MEDI-O ENG";
                     subtitle.textContent = "Gestão & Medição de Obras";
+                    this.showScreen('screen-home-principal');
+                } else if (nav === 'obras') {
+                    title.textContent = "Lista de Obras";
+                    subtitle.textContent = "Gerenciamento de canteiros";
                     this.renderObras(localObras);
                     this.showScreen('screen-obras');
                 } else if (nav === 'dashboard') {
@@ -980,7 +1002,7 @@
             },
 
             handleFabClick() {
-                if (this.currentNav === 'obras') {
+                if (this.currentNav === 'obras' || this.currentNav === 'home') {
                     this.openNovaObraModal();
                 } else if (this.currentObra && document.getElementById('screen-obra-detalhe').classList.contains('active')) {
                     this.openNovoServicoModal();
@@ -996,7 +1018,7 @@
 
             goHome() {
                 this.currentObra = null;
-                this.switchNav('obras');
+                this.switchNav('home');
             },
 
             popularFiltroObrasDashboard() {
@@ -1009,7 +1031,6 @@
                 });
                 select.innerHTML = html;
 
-                // Restaura seleção anterior se ainda existir
                 if (Array.from(select.options).some(opt => opt.value === valorAtual)) {
                     select.value = valorAtual;
                 } else {
@@ -1024,7 +1045,7 @@
             renderObras(obras) {
                 const list = document.getElementById('obras-list');
                 if (!obras.length) {
-                    list.innerHTML = '<div class="card"><p style="text-align: center; color: var(--text-muted);">Nenhuma obra cadastrada.</p></div>';
+                    list.innerHTML = '<div class="card"><p style="text-align: center; color: var::text-muted;">Nenhuma obra cadastrada.</p></div>';
                     return;
                 }
 
@@ -1187,7 +1208,6 @@
                 const resumoTitle = document.getElementById('resumo-card-title');
 
                 if (obraIdSelecionada === 'todas') {
-                    // MODO GLOBAL
                     kpiTitle1.textContent = 'Obras Ativas';
                     document.getElementById('kpi-obras-total').textContent = localObras.length;
                     
@@ -1219,7 +1239,6 @@
                     this.renderChartsGlobal();
 
                 } else {
-                    // MODO OBRA ESPECÍFICA
                     const obraRef = localObras.find(o => o.id === obraIdSelecionada);
                     const servicos = localServicosPorObra[obraIdSelecionada] || [];
 
@@ -1264,7 +1283,6 @@
                 const nomesObras = localObras.map(o => o.name);
                 const progressosObras = localObras.map(o => o.progress || 0);
 
-                // Gráfico 1: Progresso por Obra (Barras)
                 const ctxProgresso = document.getElementById('chartProgressoObras').getContext('2d');
                 if (chartProgressoInstance) {
                     chartProgressoInstance.destroy();
@@ -1295,7 +1313,6 @@
                     }
                 });
 
-                // Gráfico 2: Distribuição por Categoria (Rosca)
                 const contagemCategorias = {};
                 localObras.forEach(o => {
                     contagemCategorias[o.category] = (contagemCategorias[o.category] || 0) + 1;
@@ -1334,7 +1351,6 @@
                 const nomesServicos = servicos.map(s => s.name);
                 const percentuaisServicos = servicos.map(s => s.meta > 0 ? Math.min(100, Math.round((s.executada / s.meta) * 100)) : 0);
 
-                // Gráfico 1: Progresso dos Serviços da Obra Selecionada (Barras)
                 const ctxProgresso = document.getElementById('chartProgressoObras').getContext('2d');
                 if (chartProgressoInstance) {
                     chartProgressoInstance.destroy();
@@ -1365,7 +1381,6 @@
                     }
                 });
 
-                // Gráfico 2: Serviços por Categoria na Obra Selecionada (Rosca)
                 const contagemCatServicos = {};
                 servicos.forEach(s => {
                     contagemCatServicos[s.category] = (contagemCatServicos[s.category] || 0) + 1;
@@ -1734,7 +1749,6 @@
                 this.recalcularProgressoEContagemDias(this.currentObra.id);
             },
 
-            /* FUNCIONALIDADES DE EDIÇÃO DE MEDIÇÃO */
             openEditarMedicaoModal(servicoId, medicaoId) {
                 let medicao = null;
                 let targetServicoId = servicoId;
