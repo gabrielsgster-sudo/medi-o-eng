@@ -50,7 +50,7 @@
             flex: 1;
             overflow-y: auto;
             position: relative;
-            padding-bottom: 70px;
+            padding-bottom: 70px; /* Espaço para a barra inferior fixa */
         }
 
         /* HEADER FIXO */
@@ -222,7 +222,7 @@
             padding-bottom: 90px;
         }
 
-        /* BOTTOM NAV FIXO */
+        /* BOTTOM NAV */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -537,6 +537,100 @@
         .dash-kpi-title { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
         .dash-kpi-value { font-size: 20px; font-weight: 700; color: var(--primary); margin-top: 4px; }
 
+        /* ESTILOS DA NOVA TELA INICIAL (SPLIT / LANDING) */
+        .welcome-screen-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 100%;
+            padding: 30px 24px;
+            background: #ffffff;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .welcome-screen-container::before {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 100%;
+            height: 40%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 300" opacity="0.05"><path d="M450,150 L350,150 L350,80 L330,80 L330,150 L250,150 L230,100 L210,150 L50,150 L50,170 L450,170 Z" fill="%23000"/></svg>');
+            background-repeat: no-repeat;
+            background-position: bottom right;
+            pointer-events: none;
+        }
+
+        .welcome-top {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            margin-top: 10px;
+            z-index: 2;
+        }
+
+        .welcome-logo-icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 10px;
+        }
+
+        .welcome-logo-text {
+            font-size: 30px;
+            font-weight: 800;
+            color: #0b1c30;
+            letter-spacing: -0.5px;
+        }
+
+        .welcome-logo-text span {
+            color: #00b050;
+        }
+
+        .welcome-logo-tagline {
+            font-size: 10px;
+            font-weight: 700;
+            color: #555555;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        .welcome-divider {
+            width: 40px;
+            height: 3px;
+            background-color: #00b050;
+            border-radius: 2px;
+            margin: 16px 0 20px 0;
+        }
+
+        .welcome-description {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #4a5568;
+            padding: 0 10px;
+            max-width: 320px;
+        }
+
+        .welcome-bottom {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 2;
+            margin-top: 20px;
+        }
+
+        .welcome-version {
+            font-size: 11px;
+            color: #a0aec0;
+            text-align: center;
+            margin-top: 10px;
+        }
+
         .hidden { display: none !important; }
         .screen { display: none; }
         .screen.active { display: block; }
@@ -547,8 +641,38 @@
         <div class="mobile-view">
             <div class="app-container">
 
-                <!-- HEADER SUPERIOR PRINCIPAL -->
-                <div class="header-bg">
+                <!-- TELA 0: NOVA PELA INICIAL (LANDING / BEM-VINDO) -->
+                <div id="screen-welcome" class="screen active">
+                    <div class="welcome-screen-container">
+                        <div class="welcome-top">
+                            <!-- Logotipo idêntico ao modelo da imagem enviada -->
+                            <svg class="welcome-logo-icon" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M100 20L170 60V140L100 180L30 140V60L100 20Z" fill="#0b1c30" stroke="#0b1c30" stroke-width="4"/>
+                                <path d="M70 110V130" stroke="white" stroke-width="10" stroke-linecap="round"/>
+                                <path d="M100 80V130" stroke="#00b050" stroke-width="10" stroke-linecap="round"/>
+                                <path d="M130 65V130" stroke="#00b050" stroke-width="10" stroke-linecap="round"/>
+                                <path d="M90 120L115 95L145 125" stroke="white" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <div class="welcome-logo-text">Medi<span>-Eng</span></div>
+                            <div class="welcome-logo-tagline">Gestão Inteligente de Obras</div>
+
+                            <div class="welcome-divider"></div>
+
+                            <p class="welcome-description">
+                                Controle medições, acompanhe o progresso, registre fotos e gerencie suas obras em um único lugar.
+                            </p>
+                        </div>
+
+                        <div class="welcome-bottom">
+                            <button class="btn-primary" style="background-color: #0b1c30;" onclick="app.entrarApp()">Entrar</button>
+                            <button class="btn-secondary" onclick="app.entrarApp()">Criar Conta</button>
+                            <div class="welcome-version">Versão 2.0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HEADER SUPERIOR PRINCIPAL (Exibido nas telas internas) -->
+                <div class="header-bg hidden" id="main-header-bar">
                     <div class="header-top">
                         <div class="header-left">
                             <button class="header-back hidden" id="header-back-btn" onclick="app.goHome()">←</button>
@@ -569,30 +693,7 @@
                     </div>
                 </div>
 
-                <!-- TELA 0: PÁGINA INICIAL (HOME DO APLICATIVO COM A IMAGEM DE DESTAQUE) -->
-                <div id="screen-home-principal" class="screen active">
-                    <div class="content" style="padding-top: 16px;">
-                        <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 16px;">
-                            <img src="https://images.unsplash.com/photo-1541888946425-d0fbb18f773c?auto=format&fit=crop&w=800&q=80" alt="Gestão de Obras" style="width: 100%; height: 180px; object-fit: cover; display: block;">
-                            <div style="padding: 16px; background-color: var(--surface);">
-                                <h3 style="font-size: 16px; font-weight: 700; color: var(--primary);">MEDI-O ENG</h3>
-                                <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Sistema profissional de controle, medição e acompanhamento de campo em tempo real.</p>
-                            </div>
-                        </div>
-
-                        <div class="card" style="cursor: pointer; background: var(--primary); color: white;" onclick="app.switchNav('obras')">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <div>
-                                    <h4 style="font-size: 15px; font-weight: 700;">Acessar Obras</h4>
-                                    <p style="font-size: 11px; color: #94A3B8; margin-top: 2px;">Gerencie suas obras e serviços ativos</p>
-                                </div>
-                                <span style="font-size: 20px;">→</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- TELA 1: LISTAGEM DE OBRAS -->
+                <!-- TELA 1: OBRAS (HOME) -->
                 <div id="screen-obras" class="screen">
                     <div class="content" style="padding-top: 16px;">
                         <div id="obras-list"></div>
@@ -722,15 +823,11 @@
             </div>
 
             <!-- BOTÃO FLUTUANTE (FAB) -->
-            <button class="fab" id="fab-add" onclick="app.handleFabClick()">+</button>
+            <button class="fab hidden" id="fab-add" onclick="app.handleFabClick()">+</button>
 
-            <!-- BOTTOM NAVIGATION BAR FIXO -->
-            <div class="bottom-nav">
-                <button class="nav-item active" id="nav-home" onclick="app.switchNav('home')">
-                    <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-                    <span>Início</span>
-                </button>
-                <button class="nav-item" id="nav-obras" onclick="app.switchNav('obras')">
+            <!-- BOTTOM NAVIGATION BAR (FIXA E OCULTA NA TELA DE BEM-VINDO) -->
+            <div class="bottom-nav hidden" id="main-bottom-nav">
+                <button class="nav-item active" id="nav-obras" onclick="app.switchNav('obras')">
                     <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2zM5 5v14h14V5H5zm2 2h4v4H7V7zm6 0h4v4h-4V7zm-6 6h4v4H7v-4zm6 0h4v4h-4v-4z"/></svg>
                     <span>Obras</span>
                 </button>
@@ -931,7 +1028,7 @@
         let chartCategoriasInstance = null;
 
         const app = {
-            currentNav: 'home',
+            currentNav: 'welcome',
             currentObra: null,
             currentServico: null,
             editingMedicao: null,
@@ -959,11 +1056,32 @@
                 document.getElementById('medicao-data').value = `${ano}-${mes}-${dia}`;
             },
 
+            entrarApp() {
+                this.switchNav('obras');
+            },
+
             switchNav(nav) {
                 this.currentNav = nav;
                 document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-                const navEl = document.getElementById(`nav-${nav}`);
-                if (navEl) navEl.classList.add('active');
+                
+                const bottomNav = document.getElementById('main-bottom-nav');
+                const headerBar = document.getElementById('main-header-bar');
+                const fabBtn = document.getElementById('fab-add');
+
+                if (nav === 'welcome') {
+                    bottomNav.classList.add('hidden');
+                    headerBar.classList.add('hidden');
+                    fabBtn.classList.add('hidden');
+                    this.showScreen('screen-welcome');
+                    return;
+                } else {
+                    bottomNav.classList.remove('hidden');
+                    headerBar.classList.remove('hidden');
+                    fabBtn.classList.remove('hidden');
+                    if (document.getElementById(`nav-${nav}`)) {
+                        document.getElementById(`nav-${nav}`).classList.add('active');
+                    }
+                }
 
                 const btnBack = document.getElementById('header-back-btn');
                 btnBack.classList.add('hidden');
@@ -971,15 +1089,9 @@
                 const title = document.getElementById('main-header-title');
                 const subtitle = document.getElementById('main-header-subtitle');
 
-                document.getElementById('fab-add').classList.remove('hidden');
-
-                if (nav === 'home') {
+                if (nav === 'obras') {
                     title.textContent = "MEDI-O ENG";
                     subtitle.textContent = "Gestão & Medição de Obras";
-                    this.showScreen('screen-home-principal');
-                } else if (nav === 'obras') {
-                    title.textContent = "Lista de Obras";
-                    subtitle.textContent = "Gerenciamento de canteiros";
                     this.renderObras(localObras);
                     this.showScreen('screen-obras');
                 } else if (nav === 'dashboard') {
@@ -1002,7 +1114,7 @@
             },
 
             handleFabClick() {
-                if (this.currentNav === 'obras' || this.currentNav === 'home') {
+                if (this.currentNav === 'obras') {
                     this.openNovaObraModal();
                 } else if (this.currentObra && document.getElementById('screen-obra-detalhe').classList.contains('active')) {
                     this.openNovoServicoModal();
@@ -1018,7 +1130,7 @@
 
             goHome() {
                 this.currentObra = null;
-                this.switchNav('home');
+                this.switchNav('obras');
             },
 
             popularFiltroObrasDashboard() {
@@ -1045,7 +1157,7 @@
             renderObras(obras) {
                 const list = document.getElementById('obras-list');
                 if (!obras.length) {
-                    list.innerHTML = '<div class="card"><p style="text-align: center; color: var::text-muted;">Nenhuma obra cadastrada.</p></div>';
+                    list.innerHTML = '<div class="card"><p style="text-align: center; color: var(--text-muted);">Nenhuma obra cadastrada.</p></div>';
                     return;
                 }
 
