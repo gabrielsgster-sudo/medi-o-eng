@@ -519,7 +519,7 @@
         </div>
     </div>
 
-    <!-- MODAL MEDIÇÃO (ATUALIZADO COM FOTOS E FUNCIONÁRIOS) -->
+    <!-- MODAL MEDIÇÃO (AJUSTADO PARA ABRIR CÂMERA E GALERIA) -->
     <div id="modal-medicao" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
@@ -546,10 +546,10 @@
                     </div>
                 </div>
 
-                <!-- CAMPO DE ANEXO/CAPTURA DE FOTOS -->
+                <!-- CAMPO DE ANEXO DE FOTOS (CÂMERA + GALERIA) -->
                 <div class="form-group">
                     <label class="form-label">Evidências / Fotos de Campo</label>
-                    <input type="file" id="input-fotos" accept="image/*" multiple capture="environment" class="hidden" onchange="app.handleFotoUpload(event)">
+                    <input type="file" id="input-fotos" accept="image/*" multiple class="hidden" onchange="app.handleFotoUpload(event)">
                     
                     <div class="photo-upload-container" id="photo-container">
                         <div class="photo-add-btn" onclick="document.getElementById('input-fotos').click()">
@@ -590,7 +590,7 @@
         };
 
         let localHistorico = {};
-        let tempFotos = []; // Guarda as imagens em Base64 para a medição atual
+        let tempFotos = [];
 
         const app = {
             currentObra: null,
@@ -904,7 +904,7 @@
 
             openMedicaoModal(servicoId, servicoName, meta, executada) {
                 this.currentServico = { id: servicoId, name: servicoName, meta, executada };
-                tempFotos = []; // Limpa fotos anteriores
+                tempFotos = [];
                 
                 const pct = meta > 0 ? Math.round((executada / meta) * 100) : 0;
                 
