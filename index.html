@@ -59,14 +59,14 @@
             }
         }
 
-        /* Telas - Ocupam o espaço restante e rolam de forma independente */
+        /* Telas - Ocupam o espaço e rolam internamente, deixando espaço no fim para a barra fixa */
         .screen {
             display: none;
             flex: 1;
             flex-direction: column;
             overflow-y: auto;
             padding: 20px;
-            /* Removemos o padding-bottom daqui para o scroll funcionar direito com a barra fixa */
+            padding-bottom: 90px; /* Garante que o último card não fique escondido atrás da barra */
         }
 
         .screen.active {
@@ -256,9 +256,11 @@
             margin-top: 4px;
         }
 
-        /* Bottom Navigation - Fixa no rodapé do container flex */
+        /* Bottom Navigation - Fixada absoluta na base do container do app */
         .bottom-nav {
-            flex-shrink: 0;
+            position: absolute;
+            bottom: 0;
+            left: 0;
             width: 100%;
             height: 70px;
             background: white;
@@ -545,7 +547,7 @@
         </div>
     </div>
 
-    <!-- BOTTOM NAVIGATION (Fixa no fluxo do container) -->
+    <!-- BOTTOM NAVIGATION (Fixa Absoluta no Rodapé do App) -->
     <nav class="bottom-nav" id="main-bottom-nav" style="display: none;">
         <button class="nav-item active" onclick="switchTab('screen-obras', this)">
             <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
