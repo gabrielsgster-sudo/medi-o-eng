@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MEDI-O ENG v2.2 - Gestão e Medição de Obras</title>
+    <title>MEDI-O ENG v2.3 - Gestão e Medição de Obras</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -636,27 +636,36 @@
     </div>
 
     <script>
-        let localCategoriasObras = ['Residencial', 'Comercial', 'Industrial', 'Infraestrutura'];
-        let localCategoriasServicos = ['Alvenaria', 'Estrutura', 'Hidráulica', 'Elétrica', 'Acabamento', 'Pintura'];
-        let localUnidadesMedida = ['m²', 'm', 'm³', 'km', 'un', 'kg', 'vb'];
-        let activeCatTab = 'obras';
+        // DADOS PADRÃO DE INICIALIZAÇÃO
+        const defaultCategoriasObras = ['Residencial', 'Comercial', 'Industrial', 'Infraestrutura'];
+        const defaultCategoriasServicos = ['Alvenaria', 'Estrutura', 'Hidráulica', 'Elétrica', 'Acabamento', 'Pintura'];
+        const defaultUnidadesMedida = ['m²', 'm', 'm³', 'km', 'un', 'kg', 'vb'];
 
-        let localObras = [
+        const defaultObras = [
             { id: 'demo1', name: 'Residencial Boulevard', category: 'Residencial', progress: 60 }
         ];
 
-        let localServicosPorObra = {
+        const defaultServicosPorObra = {
             'demo1': [
                 { id: 's1', name: 'Alvenaria Estrutural', category: 'Alvenaria', meta: 350, executada: 230, unit: 'm²' },
                 { id: 's2', name: 'Concretagem de Pilares', category: 'Estrutura', meta: 280, executada: 150, unit: 'm³' }
             ]
         };
 
-        // Dados de teste com histórico para inicializar datas
-        let localHistorico = {
+        const defaultHistorico = {
             's1': [{ obraNome: 'Residencial Boulevard', servicoNome: 'Alvenaria Estrutural', unit: 'm²', data: '2026-01-10', quantidade: 100, status: 'normal' }],
             's2': [{ obraNome: 'Residencial Boulevard', servicoNome: 'Concretagem de Pilares', unit: 'm³', data: '2026-01-15', quantidade: 50, status: 'normal' }]
         };
+
+        // VARIÁVEIS CARREGADAS DO LOCALSTORAGE
+        let localCategoriasObras = JSON.parse(localStorage.getItem('medio_cat_obras')) || defaultCategoriasObras;
+        let localCategoriasServicos = JSON.parse(localStorage.getItem('medio_cat_servicos')) || defaultCategoriasServicos;
+        let localUnidadesMedida = JSON.parse(localStorage.getItem('medio_unidades')) || defaultUnidadesMedida;
+        let activeCatTab = 'obras';
+
+        let localObras = JSON.parse(localStorage.getItem('medio_obras')) || defaultObras;
+        let localServicosPorObra = JSON.parse(localStorage.getItem('medio_servicos')) || defaultServicosPorObra;
+        let localHistorico = JSON.parse(localStorage.getItem('medio_historico')) || defaultHistorico;
 
         let tempFotos = [];
 
@@ -668,6 +677,16 @@
             init() {
                 this.setDataToday();
                 this.renderObras(localObras);
+            },
+
+            // MÉTODO PARA SALVAR ESTADO NO LOCALSTORAGE
+            saveData() {
+                localStorage.setItem('medio_cat_obras', JSON.stringify(localCategoriasObras));
+                localStorage.setItem('medio_cat_servicos', JSON.stringify(localCategoriasServicos));
+                localStorage.setItem('medio_unidades', JSON.stringify(localUnidadesMedida));
+                localStorage.setItem('medio_obras', JSON.stringify(localObras));
+                localStorage.setItem('medio_servicos', JSON.stringify(localServicosPorObra));
+                localStorage.setItem('medio_historico', JSON.stringify(localHistorico));
             },
 
             setDataToday() {
@@ -778,9 +797,20 @@
                 const obra = localObras.find(o => o.id === id);
                 if (!obra) return;
 
-                if (confirm(`Tem certeza que deseja excluir a obra "${obra.name}"?`)) {
+                // CONFIRMAÇÃO DE EXCLUSÃO
+                const confirmacao = confirm(`⚠️ CONFIRMAÇÃO DE EXCLUSÃO\n\nTem certeza de que deseja excluir permanentemente a obra:\n"${obra.name}"?\n\nEsta ação removerá todos os serviços e histórico de medições vinculados.`);
+                
+                if (confirmacao) {
+                    // Remover serviços e histórico associados
+                    if (localServicosPorObra[id]) {
+                        localServicosPorObra[id].forEach(serv => {
+                            delete localHistorico[serv.id];
+                        });
+                        delete localServicosPorObra[id];
+                    }
+
                     localObras = localObras.filter(o => o.id !== id);
-                    delete localServicosPorObra[id];
+                    this.saveData(); // Persiste no LocalStorage
                     this.renderObras(localObras);
                 }
             },
@@ -800,9 +830,11 @@
                 document.getElementById('obra-progress-bar').style.width = percentualGeral + '%';
 
                 const obra = localObras.find(o => o.id === obraId);
-                if (obra) obra.progress = percentualGeral;
+                if (obra) {
+                    obra.progress = percentualGeral;
+                    this.saveData();
+                }
 
-                // Buscar todas as medições dos serviços desta obra específica
                 let todasMedicoesObra = [];
                 servicos.forEach(s => {
                     if (localHistorico[s.id]) {
@@ -819,7 +851,6 @@
                     return;
                 }
 
-                // Ordena por data (mais antiga para mais recente)
                 todasMedicoesObra.sort((a, b) => new Date(a.data) - new Date(b.data));
                 
                 const primeiraMedicao = new Date(todasMedicoesObra[0].data + 'T00:00:00');
@@ -894,6 +925,7 @@
                 if (!targetList.includes(val)) {
                     targetList.push(val);
                     input.value = '';
+                    this.saveData(); // Persiste no LocalStorage
                     this.renderListaCategorias();
                 } else {
                     alert('Este item já existe!');
@@ -901,14 +933,17 @@
             },
 
             removerCategoria(nome) {
-                if (activeCatTab === 'obras') {
-                    localCategoriasObras = localCategoriasObras.filter(c => c !== nome);
-                } else if (activeCatTab === 'servicos') {
-                    localCategoriasServicos = localCategoriasServicos.filter(c => c !== nome);
-                } else {
-                    localUnidadesMedida = localUnidadesMedida.filter(u => u !== nome);
+                if (confirm(`Deseja remover "${nome}" da lista?`)) {
+                    if (activeCatTab === 'obras') {
+                        localCategoriasObras = localCategoriasObras.filter(c => c !== nome);
+                    } else if (activeCatTab === 'servicos') {
+                        localCategoriasServicos = localCategoriasServicos.filter(c => c !== nome);
+                    } else {
+                        localUnidadesMedida = localUnidadesMedida.filter(u => u !== nome);
+                    }
+                    this.saveData(); // Persiste no LocalStorage
+                    this.renderListaCategorias();
                 }
-                this.renderListaCategorias();
             },
 
             renderListaCategorias() {
@@ -977,9 +1012,13 @@
             },
 
             removerServico(servicoId) {
-                if (confirm('Deseja realmente excluir este serviço e seu histórico?')) {
+                const servico = localServicosPorObra[this.currentObra.id].find(s => s.id === servicoId);
+                const nomeServico = servico ? servico.name : 'este serviço';
+
+                if (confirm(`⚠️ Confirma a exclusão do serviço:\n"${nomeServico}" e todo seu histórico?`)) {
                     localServicosPorObra[this.currentObra.id] = localServicosPorObra[this.currentObra.id].filter(s => s.id !== servicoId);
                     delete localHistorico[servicoId];
+                    this.saveData(); // Persiste no LocalStorage
                     this.renderServicos(localServicosPorObra[this.currentObra.id]);
                     this.recalcularProgressoEContagemDias(this.currentObra.id);
                 }
@@ -1018,6 +1057,7 @@
                 };
 
                 localServicosPorObra[this.currentObra.id].push(novoServico);
+                this.saveData(); // Persiste no LocalStorage
                 this.renderServicos(localServicosPorObra[this.currentObra.id]);
                 this.recalcularProgressoEContagemDias(this.currentObra.id);
                 this.closeNovoServicoModal();
@@ -1051,6 +1091,7 @@
                 localObras.unshift(novaObra);
                 localServicosPorObra[novaObra.id] = [];
                 
+                this.saveData(); // Persiste no LocalStorage
                 this.renderObras(localObras);
                 document.getElementById('nova-obra-nome').value = '';
                 this.closeNovaObraModal();
@@ -1186,6 +1227,7 @@
                     justificativa: extrapolou ? justificativa : null
                 });
 
+                this.saveData(); // Persiste no LocalStorage
                 alert('✅ Medição registrada com sucesso!');
                 this.closeMedicaoModal();
                 this.renderServicos(servicos);
