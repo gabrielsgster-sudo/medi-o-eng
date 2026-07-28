@@ -41,6 +41,7 @@
             max-width: 500px;
             background-color: var(--light-gray);
             overflow: hidden;
+            margin: 0 auto;
         }
         .app-container {
             flex: 1;
@@ -94,43 +95,28 @@
         }
         .card {
             background-color: var(--white);
-            border-radius: 8px;
+            border-radius: 12px;
             padding: 16px;
             margin-bottom: 16px;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             transition: all 0.2s ease;
-        }
-        .card:active {
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transform: translateY(-2px);
-        }
-        .card-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin: 0 0 8px 0;
         }
         .badge {
             display: inline-block;
-            background-color: var(--success);
             color: var(--white);
-            padding: 3px 8px;
-            border-radius: 4px;
+            padding: 4px 10px;
+            border-radius: 6px;
             font-size: 11px;
-            font-weight: 600;
-            margin-right: 6px;
-        }
-        .badge.status-normal {
-            background-color: var(--success);
-        }
-        .badge.status-extrapolou {
-            background-color: var(--danger);
+            font-weight: 700;
+            text-transform: uppercase;
         }
         .badge.cat-alvenaria { background-color: #d4451f; }
         .badge.cat-estrutura { background-color: #536e6f; }
         .badge.cat-hidraulica { background-color: #0099cc; }
-        .badge.cat-eletrica { background-color: #ffcc00; color: #000; }
+        .badge.cat-eletrica { background-color: #f1c40f; color: #000; }
         .badge.cat-acabamento { background-color: #9b59b6; }
+        .badge.cat-pintura { background-color: #e67e22; }
+        
         .progress-bar {
             width: 100%;
             height: 8px;
@@ -144,38 +130,6 @@
             background-color: var(--success);
             transition: width 0.3s ease;
         }
-        .accordion-header {
-            background-color: var(--primary);
-            color: var(--white);
-            padding: 16px;
-            border-radius: 12px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            user-select: none;
-            margin-bottom: 16px;
-            transition: all 0.2s ease;
-        }
-        .accordion-content {
-            background-color: var(--white);
-            border-radius: 0 0 12px 12px;
-            overflow: hidden;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-            margin-bottom: 16px;
-            max-height: 0;
-            opacity: 0;
-            transition: all 0.3s ease;
-        }
-        .accordion-content.active {
-            max-height: 2000px;
-            opacity: 1;
-        }
-        .accordion-item {
-            padding: 16px;
-            border-bottom: 1px solid var(--light-gray);
-        }
-        .accordion-item:last-child { border-bottom: none; }
         .tabs {
             display: flex;
             gap: 16px;
@@ -201,29 +155,29 @@
         }
         .action-buttons {
             display: flex;
-            gap: 6px;
+            gap: 8px;
             margin-top: 16px;
-            flex-wrap: wrap;
         }
         .action-buttons button {
             flex: 1;
-            min-width: 70px;
-            padding: 8px 12px;
-            background-color: var(--success);
-            color: var(--white);
+            padding: 10px 8px;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 600;
-            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            color: var(--white);
+            transition: opacity 0.2s;
         }
-        .action-buttons button:nth-child(2) {
-            background-color: var(--primary);
-        }
-        .action-buttons button:nth-child(3) {
-            background-color: var(--primary);
-        }
+        .action-buttons button:active { opacity: 0.8; }
+        .btn-registrar { background-color: var(--success); }
+        .btn-historico { background-color: var(--primary); }
+        .btn-fotos { background-color: #0f172a; }
+
         .modal {
             position: fixed;
             inset: 0;
@@ -235,7 +189,7 @@
         .modal-content {
             width: 100%;
             background-color: var(--white);
-            border-radius: 12px 12px 0 0;
+            border-radius: 16px 16px 0 0;
             max-height: 90vh;
             overflow-y: auto;
         }
@@ -243,331 +197,44 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 24px;
+            padding: 20px 24px;
             border-bottom: 1px solid var(--medium-gray);
-            position: sticky;
-            top: 0;
             background-color: var(--primary);
             color: var(--white);
         }
-        .modal-close {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: var(--white);
-            font-size: 24px;
-        }
-        .modal-body {
-            padding: 24px;
-        }
-        .form-group {
-            margin-bottom: 24px;
-        }
-        .form-label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: var(--charcoal);
-        }
-        .form-input,
-        .form-textarea {
+        .modal-close { background: none; border: none; cursor: pointer; color: var(--white); font-size: 20px; }
+        .modal-body { padding: 24px; }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--charcoal); }
+        .form-input, .form-textarea, select.form-input {
             width: 100%;
-            padding: 16px;
+            padding: 14px 16px;
             border: 1px solid var(--medium-gray);
             border-radius: 8px;
             font-size: 14px;
             font-family: inherit;
-            transition: all 0.2s ease;
+            background: var(--white);
         }
-        .form-input:focus,
-        .form-textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(0, 31, 63, 0.1);
-        }
-        .form-textarea {
-            min-height: 80px;
-            resize: vertical;
-        }
-        .alert-warning {
-            background-color: rgba(231, 76, 60, 0.1);
-            border: 1px solid var(--danger);
-            color: var(--danger);
-            padding: 16px;
-            border-radius: 8px;
-            margin-bottom: 24px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        .button-group {
-            display: flex;
-            gap: 16px;
-            margin-top: 32px;
-            padding-bottom: 24px;
-        }
-        .btn-primary {
-            flex: 1;
-            padding: 16px;
-            background-color: var(--success);
-            color: var(--white);
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.2s ease;
-        }
-        .btn-primary:hover {
-            background-color: #27ae60;
-        }
-        .btn-secondary {
-            flex: 1;
-            padding: 16px;
-            background-color: var(--light-gray);
-            color: var(--charcoal);
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.2s ease;
-        }
-        .fab {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background-color: var(--primary);
-            color: var(--white);
-            border: none;
-            cursor: pointer;
-            font-size: 28px;
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 50;
-            transition: all 0.2s ease;
-        }
-        .fab:active {
-            transform: scale(0.95);
-        }
+        .button-group { display: flex; gap: 12px; margin-top: 24px; }
+        .btn-primary { flex: 1; padding: 14px; background-color: var(--success); color: var(--white); border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .btn-secondary { flex: 1; padding: 14px; background-color: var(--light-gray); color: var(--charcoal); border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
         .hidden { display: none !important; }
         .screen { display: none; }
         .screen.active { display: block; }
-        .content {
-            padding: 24px;
-            padding-bottom: 100px;
-        }
-        .gallery {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-        }
-        .gallery-item {
-            position: relative;
-            background-color: var(--light-gray);
-            height: 120px;
-            border-radius: 8px;
-            overflow: hidden;
-            cursor: pointer;
-        }
-        .gallery-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .gallery-date {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-color: rgba(0,0,0,0.6);
-            color: var(--white);
-            padding: 4px 8px;
-            font-size: 11px;
-        }
-        .lightbox {
-            position: fixed;
-            inset: 0;
-            background-color: rgba(0,0,0,0.95);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 300;
-            padding: 24px;
-        }
-        .lightbox-close {
-            position: absolute;
-            top: 24px;
-            right: 24px;
-            background-color: var(--danger);
-            color: var(--white);
-            border: none;
-            border-radius: 50%;
-            width: 44px;
-            height: 44px;
-            cursor: pointer;
-            font-size: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .lightbox-image {
-            max-width: 90vw;
-            max-height: 70vh;
-            border-radius: 12px;
-            margin-bottom: 24px;
-            object-fit: contain;
-        }
-        .lightbox-controls {
-            display: flex;
-            gap: 24px;
-            align-items: center;
-            color: var(--white);
-        }
-        .lightbox-btn {
-            background-color: var(--primary);
-            color: var(--white);
-            border: none;
-            border-radius: 50%;
-            width: 44px;
-            height: 44px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-        }
-        .menu-button {
-            background: none;
-            border: none;
-            color: var(--charcoal);
-            cursor: pointer;
-            font-size: 20px;
-            padding: 4px;
-        }
-        .desktop-view {
-            flex: 1;
-            display: none;
-            flex-direction: row;
-            background-color: var(--light-gray);
-        }
-        .sidebar {
-            width: 240px;
-            background-color: var(--primary);
-            color: var(--white);
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 32px;
-            overflow-y: auto;
-        }
-        .sidebar-logo {
-            font-size: 24px;
-            font-weight: 700;
-            margin: 0;
-        }
-        .sidebar nav {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        .sidebar button {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 16px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: var(--white);
-            border-radius: 8px;
-            text-align: left;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.2s ease;
-        }
-        .sidebar button:hover,
-        .sidebar button.active {
-            background-color: rgba(255,255,255,0.2);
-        }
-        .desktop-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        .desktop-header {
-            background-color: var(--primary);
-            color: var(--white);
-            padding: 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .desktop-body {
-            flex: 1;
-            overflow-y: auto;
-            padding: 32px;
-        }
-        .loading {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 32px;
-            gap: 8px;
-            color: var(--dark-gray);
-            font-size: 14px;
-        }
-        .spinner {
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--medium-gray);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @media (min-width: 1024px) {
-            .mobile-view { display: none; }
-            .desktop-view { display: flex; }
-        }
+        .content { padding: 20px; padding-bottom: 80px; }
+        .menu-button { background: none; border: none; color: var(--dark-gray); cursor: pointer; font-size: 18px; padding: 4px; }
     </style>
 </head>
 <body>
     <div class="app-wrapper">
-        <!-- ===== MOBILE ===== -->
         <div class="mobile-view">
             <div class="app-container">
-                <!-- TELA 1: HOME -->
-                <div id="screen-home" class="screen active">
-                    <div class="header">
-                        <div class="header-left">
-                            <h1 class="header-title">MEDI-O</h1>
-                            <p class="header-subtitle">Gestão de Obras</p>
-                        </div>
-                        <div class="header-status">
-                            <span id="firebase-status">⏳</span>
-                            <span id="firebase-text">Conectando</span>
-                        </div>
-                    </div>
-
-                    <div class="content">
-                        <div id="obras-list"></div>
-                    </div>
-                </div>
-
-                <!-- TELA 2: OBRA -->
-                <div id="screen-obra" class="screen">
+                <!-- TELA DA OBRA (COM O NOVO LAYOUT DE SERVIÇOS) -->
+                <div id="screen-obra" class="screen active">
                     <div class="header">
                         <div class="header-left">
                             <button class="header-back" onclick="app.goHome()">←</button>
-                            <h1 class="header-title" id="obra-title">Obra</h1>
+                            <h1 class="header-title" id="obra-title">Centro Comercial</h1>
                         </div>
                         <div class="header-status">
                             <span>☑️</span>
@@ -576,135 +243,40 @@
                     </div>
 
                     <div class="content">
+                        <!-- Card de Progresso Geral -->
                         <div class="card">
-                            <h2 class="card-title" id="obra-card-title">Obra</h2>
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                                <span style="font-size: 14px; color: var(--dark-gray);">Progresso Geral</span>
-                                <span style="font-size: 24px; font-weight: 700; color: var(--success);" id="obra-progress">0%</span>
+                            <div style="font-size: 15px; font-weight: 600; color: var(--charcoal); margin-bottom: 8px;" id="obra-card-title">Centro Comercial</div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <span style="font-size: 13px; color: var(--dark-gray);">Progresso Geral</span>
+                                <span style="font-size: 22px; font-weight: 700; color: var(--success);" id="obra-progress">0%</span>
                             </div>
                             <div class="progress-bar">
                                 <div class="progress-fill" id="obra-progress-bar" style="width: 0%;"></div>
                             </div>
                         </div>
 
-                        <div class="card" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: white; text-align: center; padding: 24px; cursor: pointer; border: none;" onclick="app.openNovoServicoModal()">
-                            <div style="font-size: 32px; margin-bottom: 8px;">➕</div>
-                            <h3 style="margin: 0 0 4px 0; font-weight: 600;">Novo Serviço</h3>
+                        <!-- Card Novo Serviço (Em Destaque) -->
+                        <div class="card" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: white; text-align: center; padding: 20px; cursor: pointer; border: none;" onclick="app.openNovoServicoModal()">
+                            <div style="font-size: 28px; margin-bottom: 4px;">➕</div>
+                            <h3 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 700;">Novo Serviço</h3>
                             <p style="margin: 0; font-size: 12px; opacity: 0.9;">Adicionar atividade com empreiteiro</p>
                         </div>
 
+                        <!-- Abas -->
                         <div class="tabs">
                             <button class="tab-button active" onclick="app.switchTab('servicos', event)">📋 SERVIÇOS</button>
                             <button class="tab-button" onclick="app.switchTab('graficos', event)">📊 GRÁFICOS</button>
                         </div>
 
+                        <!-- Lista de Serviços Dinâmica -->
                         <div id="servicos-content"></div>
-                        <div id="graficos-content" class="hidden">
-                            <div class="card">
-                                <h3 style="margin: 0 0 12px 0; font-weight: 600;">Evolução</h3>
-                                <div style="position: relative; height: 200px;">
-                                    <canvas id="mobile-chart-evolucao"></canvas>
-                                </div>
-                            </div>
-                            <div class="card">
-                                <h3 style="margin: 0 0 12px 0; font-weight: 600;">Por Serviço</h3>
-                                <div style="position: relative; height: 200px;">
-                                    <canvas id="mobile-chart-servicos"></canvas>
-                                </div>
-                            </div>
-                        </div>
                     </div>
-                </div>
-
-                <!-- TELA 5: HISTÓRICO -->
-                <div id="screen-historico" class="screen">
-                    <div class="header">
-                        <div class="header-left">
-                            <button class="header-back" onclick="app.goToObra()">←</button>
-                            <h1 class="header-title">HISTÓRICO</h1>
-                        </div>
-                    </div>
-                    <div class="content" id="historico-content"></div>
-                </div>
-
-                <!-- TELA 6: GALERIA -->
-                <div id="screen-galeria" class="screen">
-                    <div class="header">
-                        <div class="header-left">
-                            <button class="header-back" onclick="app.goToObra()">←</button>
-                            <h1 class="header-title">FOTOS & GALERIA</h1>
-                        </div>
-                    </div>
-                    <div class="content" id="galeria-content"></div>
-                </div>
-            </div>
-
-            <button class="fab" onclick="app.openNovaObraModal()">+</button>
-        </div>
-
-        <!-- ===== DESKTOP ===== -->
-        <div class="desktop-view">
-            <div class="sidebar">
-                <h2 class="sidebar-logo">📐 MEDI-O</h2>
-                <nav>
-                    <button class="active" onclick="app.switchDesktopMenu('dashboard', event)">📊 Dashboard</button>
-                    <button onclick="app.switchDesktopMenu('servicos', event)">👷 Serviços</button>
-                    <button onclick="app.switchDesktopMenu('medicoes', event)">📏 Medições</button>
-                </nav>
-            </div>
-
-            <div class="desktop-content">
-                <div class="desktop-header">
-                    <h1 style="margin: 0; font-size: 24px;" id="desktop-title">Dashboard</h1>
-                    <div style="display: flex; align-items: center; gap: 4px; background-color: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 8px; font-size: 12px;">
-                        <span id="desktop-firebase-status">⏳</span>
-                        <span id="desktop-firebase-text">Conectando</span>
-                    </div>
-                </div>
-
-                <div class="desktop-body" id="desktop-content">
-                    <div id="dashboard-desktop"></div>
-                    <div id="servicos-desktop" class="hidden"></div>
-                    <div id="medicoes-desktop" class="hidden"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL NOVA OBRA -->
-    <div id="modal-nova-obra" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 style="margin: 0; font-size: 18px;">NOVA OBRA</h2>
-                <button class="modal-close" onclick="app.closeNovaObraModal()">✕</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label class="form-label">Nome da Obra *</label>
-                    <input type="text" class="form-input" id="nova-obra-nome" placeholder="Ex: Residencial Boulevard">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Categoria *</label>
-                    <select class="form-input" id="nova-obra-categoria" style="cursor: pointer;">
-                        <option value="">Selecione...</option>
-                        <option value="Residencial">Residencial</option>
-                        <option value="Comercial">Comercial</option>
-                        <option value="Industrial">Industrial</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Descrição</label>
-                    <textarea class="form-textarea" id="nova-obra-descricao"></textarea>
-                </div>
-                <div class="button-group">
-                    <button class="btn-secondary" onclick="app.closeNovaObraModal()">Cancelar</button>
-                    <button class="btn-primary" onclick="app.salvarNovaObra()">Criar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL NOVO SERVIÇO -->
+    <!-- MODAL NOVO SERVIÇO (Com o campo de Empreiteiro integrado) -->
     <div id="modal-novo-servico" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
@@ -714,11 +286,11 @@
             <div class="modal-body">
                 <div class="form-group">
                     <label class="form-label">Nome do Serviço *</label>
-                    <input type="text" class="form-input" id="novo-servico-nome" placeholder="Ex: Alvenaria Estrutural">
+                    <input type="text" class="form-input" id="novo-servico-nome" placeholder="Ex: Alvenaria">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Categoria *</label>
-                    <select class="form-input" id="novo-servico-categoria" style="cursor: pointer;">
+                    <select class="form-input" id="novo-servico-categoria">
                         <option value="">Selecione...</option>
                         <option value="Alvenaria">🧱 Alvenaria</option>
                         <option value="Estrutura">🏗️ Estrutura</option>
@@ -730,21 +302,11 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label">Empreiteiro / Responsável *</label>
-                    <input type="text" class="form-input" id="novo-servico-empreiteiro" placeholder="Ex: Construtora Alfa ou João Silva">
+                    <input type="text" class="form-input" id="novo-servico-empreiteiro" placeholder="Ex: Construtora Alfa">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Meta *</label>
-                    <input type="number" class="form-input" id="novo-servico-meta" placeholder="0" step="0.01" min="0">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Unidade *</label>
-                    <select class="form-input" id="novo-servico-unidade" style="cursor: pointer;">
-                        <option value="m²">m² (metros quadrados)</option>
-                        <option value="m">m (metros lineares)</option>
-                        <option value="m³">m³ (metros cúbicos)</option>
-                        <option value="un">un (unidades)</option>
-                        <option value="kg">kg (quilogramas)</option>
-                    </select>
+                    <input type="number" class="form-input" id="novo-servico-meta" placeholder="0" step="0.01">
                 </div>
                 <div class="button-group">
                     <button class="btn-secondary" onclick="app.closeNovoServicoModal()">Cancelar</button>
@@ -754,279 +316,18 @@
         </div>
     </div>
 
-    <!-- MODAL EDITAR SERVIÇO -->
-    <div id="modal-editar-servico" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 style="margin: 0; font-size: 18px;">EDITAR SERVIÇO</h2>
-                <button class="modal-close" onclick="app.closeEditarServicoModal()">✕</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label class="form-label">Nome do Serviço *</label>
-                    <input type="text" class="form-input" id="editar-servico-nome" placeholder="Ex: Alvenaria Estrutural">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Categoria *</label>
-                    <select class="form-input" id="editar-servico-categoria" style="cursor: pointer;">
-                        <option value="Alvenaria">🧱 Alvenaria</option>
-                        <option value="Estrutura">🏗️ Estrutura</option>
-                        <option value="Hidráulica">💧 Hidráulica</option>
-                        <option value="Elétrica">⚡ Elétrica</option>
-                        <option value="Acabamento">🎨 Acabamento</option>
-                        <option value="Pintura">🖌️ Pintura</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Empreiteiro / Responsável *</label>
-                    <input type="text" class="form-input" id="editar-servico-empreiteiro" placeholder="Ex: Construtora Alfa ou João Silva">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Meta *</label>
-                    <input type="number" class="form-input" id="editar-servico-meta" placeholder="0" step="0.01" min="0">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Unidade *</label>
-                    <select class="form-input" id="editar-servico-unidade" style="cursor: pointer;">
-                        <option value="m²">m² (metros quadrados)</option>
-                        <option value="m">m (metros lineares)</option>
-                        <option value="m³">m³ (metros cúbicos)</option>
-                        <option value="un">un (unidades)</option>
-                        <option value="kg">kg (quilogramas)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Status</label>
-                    <p id="editar-servico-status" style="margin: 0; font-size: 12px; color: var(--dark-gray);">
-                        Executado: <strong id="editar-servico-executado">0</strong> (não pode ser alterado)
-                    </p>
-                </div>
-                <div class="button-group">
-                    <button class="btn-secondary" onclick="app.closeEditarServicoModal()">Cancelar</button>
-                    <button class="btn-primary" onclick="app.salvarEdicaoServico()">Salvar Alterações</button>
-                </div>
-                <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--medium-gray);">
-                    <button class="btn-secondary" style="background-color: var(--danger); color: white;" onclick="app.deletarServico()">🗑️ Deletar Serviço</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL MEDIÇÃO -->
-    <div id="modal-medicao" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 style="margin: 0; font-size: 18px;">MEDIÇÃO</h2>
-                <button class="modal-close" onclick="app.closeMedicaoModal()">✕</button>
-            </div>
-            <div class="modal-body">
-                <div id="medicao-info" style="background-color: var(--light-gray); padding: 12px; border-radius: 8px; margin-bottom: 24px; font-size: 12px;"></div>
-
-                <div id="medicao-alert" class="alert-warning hidden">⚠ ALERTA: Quantidade maior que meta!</div>
-
-                <div class="form-group">
-                    <label class="form-label">Quantidade (m²) *</label>
-                    <input type="number" class="form-input" id="medicao-quantidade" placeholder="0" step="0.01" onchange="app.onQuantidadeChange()">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Data *</label>
-                    <input type="date" class="form-input" id="medicao-data">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Funcionários</label>
-                    <input type="text" class="form-input" id="medicao-funcionarios" placeholder="Nomes">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Observações</label>
-                    <textarea class="form-textarea" id="medicao-observacoes" placeholder="Notas"></textarea>
-                </div>
-
-                <div id="medicao-justificativa-group" class="form-group hidden">
-                    <label class="form-label">Justificativa (Obrigatória) *</label>
-                    <textarea class="form-textarea" id="medicao-justificativa" placeholder="Por que foi extrapolado?"></textarea>
-                </div>
-
-                <div class="button-group">
-                    <button class="btn-secondary" onclick="app.closeMedicaoModal()">Cancelar</button>
-                    <button class="btn-primary" onclick="app.salvarMedicao()">Registrar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- LIGHTBOX GALERIA -->
-    <div id="lightbox" class="lightbox hidden">
-        <button class="lightbox-close" onclick="app.closeLightbox()">✕</button>
-        <img id="lightbox-image" class="lightbox-image" src="" alt="">
-        <div class="lightbox-controls">
-            <button class="lightbox-btn" onclick="app.prevImage()">←</button>
-            <span id="lightbox-counter">1 de 1</span>
-            <button class="lightbox-btn" onclick="app.nextImage()">→</button>
-        </div>
-    </div>
-
     <script>
-        // ===== FIREBASE CONFIG =====
-        const firebaseConfig = {
-            apiKey: "AIzaSyDemoKey123456789",
-            authDomain: "seu-projeto.firebaseapp.com",
-            projectId: "seu-projeto",
-            storageBucket: "seu-projeto.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:123456789:web:abcd1234efgh5678"
-        };
-
-        let db, storage, auth;
-        let isFirebaseReady = false;
-
-        try {
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.firestore();
-            storage = firebase.storage();
-            auth = firebase.auth();
-            
-            auth.signInAnonymously().catch(error => {
-                console.error('Auth error:', error);
-            });
-
-            isFirebaseReady = true;
-        } catch (error) {
-            console.error('Firebase init error:', error);
-            isFirebaseReady = false;
-        }
-
-        const charts = {};
-        
-        // Variáveis globais para armazenar dados
-        let localObras = [];
-        let localServicosPorObra = {};
-        let localHistorico = {};
-
         const app = {
-            currentObra: null,
-            currentServico: null,
-            lightboxIndex: 0,
-            allFotos: [],
-
+            currentObra: { id: 'demo_cc', name: 'Centro Comercial' },
+            
             init() {
-                this.setDataToday();
-                this.loadObras();
-                setTimeout(() => this.updateFirebaseStatus(isFirebaseReady), 1000);
-            },
-
-            saveData() {
-                // Inicializar estruturas se não existirem
-                if (!localServicosPorObra) localServicosPorObra = {};
-                if (!localHistorico) localHistorico = {};
-                
-                // Este método é placeholder - dados já estão em memória
-                // Em produção com Firebase, aqui sincronizaria com Firestore
-                console.log('✅ Dados salvos localmente');
-            },
-
-            updateFirebaseStatus(status) {
-                const text = status ? 'Online' : 'Offline';
-                const icon = status ? '☑️' : '☒';
-                document.getElementById('firebase-status').textContent = icon;
-                document.getElementById('firebase-text').textContent = text;
-                document.getElementById('desktop-firebase-status').textContent = icon;
-                document.getElementById('desktop-firebase-text').textContent = text;
-            },
-
-            setDataToday() {
-                const today = new Date().toISOString().split('T')[0];
-                document.getElementById('medicao-data').value = today;
-            },
-
-            async loadObras() {
-                if (!isFirebaseReady) {
-                    this.renderObrasLocal();
-                    return;
-                }
-
-                try {
-                    const snapshot = await db.collection('obras').orderBy('dataCriacao', 'desc').get();
-                    const obras = [];
-                    snapshot.forEach(doc => {
-                        obras.push({ id: doc.id, ...doc.data() });
-                    });
-                    this.renderObras(obras);
-                } catch (error) {
-                    console.error('Error loading obras:', error);
-                    this.renderObrasLocal();
-                }
-            },
-
-            renderObrasLocal() {
-                const obras = [
-                    { id: 'demo1', name: 'Residencial Boulevard', category: 'Residencial', progress: 64 },
-                    { id: 'demo2', name: 'Centro Comercial', category: 'Comercial', progress: 45 }
-                ];
-                this.renderObras(obras);
-            },
-
-            renderObras(obras) {
-                const list = document.getElementById('obras-list');
-
-                if (!obras.length) {
-                    list.innerHTML = '<div class="card"><p style="text-align: center;">Nenhuma obra. Clique em + para criar.</p></div>';
-                    return;
-                }
-
-                const html = obras.map(obra => `
-                    <div class="card" onclick="app.selectObra('${obra.id}', '${obra.name}')">
-                        <h3 class="card-title" style="margin: 0 0 6px 0;">${obra.name}</h3>
-                        <span class="badge">${obra.category}</span>
-                        <div style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                            <span style="font-size: 12px; color: var(--dark-gray);">Progresso</span>
-                            <span style="font-size: 14px; font-weight: 600; color: var(--primary);">${obra.progress || 0}%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: ${obra.progress || 0}%;"></div>
-                        </div>
-                    </div>
-                `).join('');
-
-                list.innerHTML = html;
-            },
-
-            selectObra(id, name) {
-                this.currentObra = { id, name };
-                document.getElementById('obra-title').textContent = name;
-                document.getElementById('obra-card-title').textContent = name;
-                this.loadServicos(id);
-                this.showScreen('screen-obra');
-            },
-
-            async loadServicos(obraId) {
-                if (!isFirebaseReady) {
-                    this.renderServicosLocal();
-                    return;
-                }
-
-                try {
-                    const snapshot = await db.collection('obras').doc(obraId).collection('servicos').get();
-                    const servicos = [];
-                    snapshot.forEach(doc => {
-                        servicos.push({ id: doc.id, ...doc.data() });
-                    });
-                    this.renderServicos(servicos);
-                } catch (error) {
-                    console.error('Error loading servicos:', error);
-                    this.renderServicosLocal();
-                }
+                this.renderServicosLocal();
             },
 
             renderServicosLocal() {
                 const servicos = [
                     { id: 's1', name: 'Alvenaria', category: 'Alvenaria', meta: 350, executada: 230, empreiteiro: 'Construtora Alfa' },
-                    { id: 's2', name: 'Estrutura', category: 'Estrutura', meta: 280, executada: 150, empreiteiro: 'Engenharia Brasil' },
-                    { id: 's3', name: 'Instalação Hidráulica', category: 'Hidráulica', meta: 150, executada: 95, empreiteiro: 'Hidro Serviços' },
-                    { id: 's4', name: 'Instalação Elétrica', category: 'Elétrica', meta: 200, executada: 120, empreiteiro: 'Eletro Técnica' },
-                    { id: 's5', name: 'Acabamento', category: 'Acabamento', meta: 400, executada: 180, empreiteiro: 'Acabamentos Premium' }
+                    { id: 's2', name: 'Estrutura', category: 'Estrutura', meta: 280, executada: 150, empreiteiro: 'Engenharia Brasil' }
                 ];
                 this.renderServicos(servicos);
             },
@@ -1034,48 +335,43 @@
             renderServicos(servicos) {
                 const container = document.getElementById('servicos-content');
 
-                if (!servicos.length) {
-                    container.innerHTML = '<div class="card"><p style="text-align: center;">Nenhum serviço</p></div>';
-                    return;
-                }
-
                 const getCategoryClass = (category) => {
-                    const cat = category.toLowerCase();
+                    const cat = category ? category.toLowerCase() : '';
                     if (cat.includes('alvenaria')) return 'cat-alvenaria';
                     if (cat.includes('estrutura')) return 'cat-estrutura';
                     if (cat.includes('hidráulica') || cat.includes('hidraulica')) return 'cat-hidraulica';
                     if (cat.includes('elétrica') || cat.includes('eletrica')) return 'cat-eletrica';
                     if (cat.includes('acabamento')) return 'cat-acabamento';
-                    return '';
+                    return 'cat-pintura';
                 };
 
                 const html = servicos.map(s => {
-                    const pct = Math.round((s.executada / s.meta) * 100);
+                    const pct = s.meta > 0 ? Math.round((s.executada / s.meta) * 100) : 0;
                     const categoryClass = getCategoryClass(s.category);
                     return `
                         <div class="card">
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                                <div style="flex: 1;">
-                                    <h4 style="margin: 0 0 4px 0; font-weight: 600;">${s.name}</h4>
-                                    <p style="margin: 0 0 6px 0; font-size: 12px; color: var(--primary); font-weight: 500;">👷 ${s.empreiteiro || 'Sem empreiteiro'}</p>
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+                                <div>
+                                    <h4 style="margin: 0 0 2px 0; font-size: 16px; font-weight: 700; color: var(--charcoal);">${s.name}</h4>
+                                    <p style="margin: 0 0 8px 0; font-size: 13px; color: var(--primary); font-weight: 600;">👷 ${s.empreiteiro || 'Não atribuído'}</p>
                                 </div>
-                                <button class="menu-button" onclick="app.openServicoMenu(event, '${s.id}', '${s.name}', '${s.category}', '${s.empreiteiro}', ${s.meta}, '${s.unit}')">⋯</button>
+                                <button class="menu-button">⋯</button>
                             </div>
                             <span class="badge ${categoryClass}">${s.category}</span>
-                            <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--dark-gray); margin: 8px 0 6px 0;">
+                            <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--dark-gray); margin: 12px 0 4px 0;">
                                 <span>Meta: ${s.meta}m²</span>
                                 <span>Exec: ${s.executada}m²</span>
                             </div>
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                                <span style="font-size: 14px; font-weight: 600; color: var(--success);">${pct}%</span>
+                                <span style="font-size: 15px; font-weight: 700; color: var(--success);">${pct}%</span>
                             </div>
                             <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${pct}%;"></div>
+                                <div class="progress-fill" style="width: ${Math.min(pct, 100)}%;"></div>
                             </div>
                             <div class="action-buttons">
-                                <button onclick="app.openMedicaoModal('${s.id}', '${s.name}', ${s.meta}, ${s.executada})">📏 Registrar</button>
-                                <button onclick="app.openHistorico('${s.id}')">📋 Histórico</button>
-                                <button onclick="app.openGaleria('${s.id}')">🖼️ Fotos</button>
+                                <button class="btn-registrar">📏 Registrar</button>
+                                <button class="btn-historico">📋 Histórico</button>
+                                <button class="btn-fotos">🖼️ Fotos</button>
                             </div>
                         </div>
                     `;
@@ -1084,301 +380,8 @@
                 container.innerHTML = html;
             },
 
-            switchTab(tab, e) {
-                document.querySelectorAll('#screen-obra .tab-button').forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-                document.getElementById('servicos-content').classList.toggle('hidden', tab !== 'servicos');
-                document.getElementById('graficos-content').classList.toggle('hidden', tab !== 'graficos');
-                if (tab === 'graficos') {
-                    setTimeout(() => {
-                        this.chartEvolucaoMobile();
-                        this.chartServicosMobile();
-                    }, 100);
-                }
-            },
-
-            switchDesktopMenu(menu, e) {
-                document.querySelectorAll('.sidebar button').forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-                document.querySelectorAll('#desktop-content > div').forEach(d => d.classList.add('hidden'));
-                const titles = { dashboard: 'Dashboard', servicos: 'Serviços', medicoes: 'Medições' };
-                document.getElementById('desktop-title').textContent = titles[menu];
-                document.getElementById(menu + '-desktop').classList.remove('hidden');
-            },
-
-            chartEvolucaoMobile() {
-                const ctx = document.getElementById('mobile-chart-evolucao');
-                if (!ctx || charts.mobileEvolucao) return;
-                charts.mobileEvolucao = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: ['S1', 'S2', 'S3', 'S4', 'S5'],
-                        datasets: [{
-                            label: 'Progresso (%)',
-                            data: [15, 28, 42, 58, 64],
-                            borderColor: '#2ecc71',
-                            backgroundColor: 'rgba(46, 204, 113, 0.1)',
-                            fill: true,
-                            tension: 0.4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: { y: { beginAtZero: true, max: 100 } }
-                    }
-                });
-            },
-
-            chartServicosMobile() {
-                const ctx = document.getElementById('mobile-chart-servicos');
-                if (!ctx || charts.mobileServicos) return;
-                charts.mobileServicos = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Alvenaria', 'Estrutura', 'Hidráulica', 'Elétrica', 'Acabamento'],
-                        datasets: [{ label: 'Progresso (%)', data: [66, 54, 63, 60, 45], backgroundColor: '#2ecc71', borderRadius: 4 }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: { y: { beginAtZero: true, max: 100 } }
-                    }
-                });
-            },
-
-            onQuantidadeChange() {
-                const qtd = parseFloat(document.getElementById('medicao-quantidade-input').value) || 0;
-                const meta = this.currentServico.meta;
-                const extrapolado = qtd > meta;
-
-                document.getElementById('medicao-alert').classList.toggle('hidden', !extrapolado);
-                document.getElementById('medicao-justificativa-group').classList.toggle('hidden', !extrapolado);
-            },
-
-            openMedicaoModal(servicoId, servicoName, meta, executada) {
-                this.currentServico = { id: servicoId, name: servicoName, meta, executada };
-                const pct = Math.round((executada / meta) * 100);
-                document.getElementById('medicao-info').innerHTML = `
-                    <strong>${servicoName}</strong><br>
-                    Meta: ${meta}m² | Executado: ${executada}m² (${pct}%) | Restante: ${meta - executada}m²
-                `;
-                document.getElementById('medicao-quantidade').value = '';
-                document.getElementById('medicao-funcionarios').value = '';
-                document.getElementById('medicao-observacoes').value = '';
-                document.getElementById('medicao-justificativa').value = '';
-                document.getElementById('medicao-alert').classList.add('hidden');
-                document.getElementById('medicao-justificativa-group').classList.add('hidden');
-                document.getElementById('modal-medicao').classList.remove('hidden');
-            },
-
-            closeMedicaoModal() {
-                document.getElementById('modal-medicao').classList.add('hidden');
-            },
-
-            async salvarMedicao() {
-                const qtd = parseFloat(document.getElementById('medicao-quantidade').value);
-                if (!qtd) {
-                    alert('Informe a quantidade');
-                    return;
-                }
-
-                if (qtd > this.currentServico.meta) {
-                    if (!document.getElementById('medicao-justificativa').value) {
-                        alert('Justificativa obrigatória em extrapolação');
-                        return;
-                    }
-                }
-
-                if (!isFirebaseReady) {
-                    alert('Aguarde conexão com Firebase');
-                    return;
-                }
-
-                try {
-                    await db.collection('obras').doc(this.currentObra.id)
-                        .collection('servicos').doc(this.currentServico.id)
-                        .collection('medicoes').add({
-                            quantidade: qtd,
-                            data: document.getElementById('medicao-data').value,
-                            funcionarios: document.getElementById('medicao-funcionarios').value,
-                            observacoes: document.getElementById('medicao-observacoes').value,
-                            justificativa: document.getElementById('medicao-justificativa').value || null,
-                            status: qtd > this.currentServico.meta ? 'extrapolou' : 'normal',
-                            dataMedicao: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-
-                    alert('✅ Medição registrada com sucesso!');
-                    this.closeMedicaoModal();
-                    this.loadServicos(this.currentObra.id);
-                } catch (error) {
-                    console.error('Error:', error);
-                    alert('❌ Erro ao salvar');
-                }
-            },
-
-            openHistorico(servicoId) {
-                this.currentServico = { id: servicoId };
-                this.showScreen('screen-historico');
-                this.loadHistorico();
-            },
-
-            async loadHistorico() {
-                if (!isFirebaseReady) {
-                    document.getElementById('historico-content').innerHTML = '<div class="card"><p style="text-align: center;">Offline</p></div>';
-                    return;
-                }
-
-                try {
-                    const snapshot = await db.collection('obras').doc(this.currentObra.id)
-                        .collection('servicos').doc(this.currentServico.id)
-                        .collection('medicoes').orderBy('dataMedicao', 'desc').get();
-
-                    const html = snapshot.docs.length ? snapshot.docs.map(doc => {
-                        const med = doc.data();
-                        return `
-                            <div class="card">
-                                <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <div>
-                                        <h4 style="margin: 0 0 4px 0; font-weight: 600;">${med.data}</h4>
-                                        <p style="margin: 0 0 6px 0; font-size: 12px; color: var(--dark-gray);">👤 ${med.funcionarios || 'N/A'}</p>
-                                        <p style="margin: 0; font-size: 14px; font-weight: 600; color: var(--success);">${med.quantidade}m²</p>
-                                    </div>
-                                    <span class="badge ${med.status === 'extrapolou' ? 'status-extrapolou' : 'status-normal'}">
-                                        ${med.status === 'extrapolou' ? 'Extrapolou' : 'Normal'}
-                                    </span>
-                                </div>
-                                ${med.justificativa ? `<p style="margin: 12px 0 0 0; font-size: 11px; color: var(--dark-gray);">📝 ${med.justificativa}</p>` : ''}
-                            </div>
-                        `;
-                    }).join('') : '<div class="card"><p style="text-align: center;">Nenhuma medição</p></div>';
-
-                    document.getElementById('historico-content').innerHTML = html;
-                } catch (error) {
-                    console.error('Error loading historico:', error);
-                    document.getElementById('historico-content').innerHTML = '<div class="card"><p>Erro ao carregar</p></div>';
-                }
-            },
-
-            openGaleria(servicoId) {
-                this.currentServico = { id: servicoId };
-                this.showScreen('screen-galeria');
-                this.loadFotos();
-            },
-
-            async loadFotos() {
-                if (!isFirebaseReady) {
-                    document.getElementById('galeria-content').innerHTML = '<div class="card"><p>Offline</p></div>';
-                    return;
-                }
-
-                try {
-                    const snapshot = await db.collection('obras').doc(this.currentObra.id)
-                        .collection('servicos').doc(this.currentServico.id)
-                        .collection('medicoes').get();
-
-                    this.allFotos = [];
-                    const html = [];
-
-                    for (const doc of snapshot.docs) {
-                        const med = doc.data();
-                        if (med.fotos && med.fotos.length) {
-                            for (const fotoPath of med.fotos) {
-                                try {
-                                    const url = await storage.ref(fotoPath).getDownloadURL();
-                                    this.allFotos.push({ url, data: med.data });
-                                    html.push(`
-                                        <div class="gallery-item" onclick="app.openLightbox(${this.allFotos.length - 1})">
-                                            <img src="${url}" alt="Foto">
-                                            <div class="gallery-date">${med.data}</div>
-                                        </div>
-                                    `);
-                                } catch (e) {
-                                    console.log('Foto não disponível:', fotoPath);
-                                }
-                            }
-                        }
-                    }
-
-                    document.getElementById('galeria-content').innerHTML = html.length ? 
-                        `<div class="gallery">${html.join('')}</div>` : 
-                        '<div class="card"><p style="text-align: center;">Nenhuma foto</p></div>';
-                } catch (error) {
-                    console.error('Error loading fotos:', error);
-                    document.getElementById('galeria-content').innerHTML = '<div class="card"><p>Erro ao carregar fotos</p></div>';
-                }
-            },
-
-            openLightbox(idx) {
-                this.lightboxIndex = idx;
-                document.getElementById('lightbox-image').src = this.allFotos[idx].url;
-                document.getElementById('lightbox-counter').textContent = (idx + 1) + ' de ' + this.allFotos.length;
-                document.getElementById('lightbox').classList.remove('hidden');
-            },
-
-            nextImage() {
-                this.lightboxIndex = (this.lightboxIndex + 1) % this.allFotos.length;
-                this.openLightbox(this.lightboxIndex);
-            },
-
-            prevImage() {
-                this.lightboxIndex = (this.lightboxIndex - 1 + this.allFotos.length) % this.allFotos.length;
-                this.openLightbox(this.lightboxIndex);
-            },
-
-            closeLightbox() {
-                document.getElementById('lightbox').classList.add('hidden');
-            },
-
-            openNovaObraModal() {
-                document.getElementById('modal-nova-obra').classList.remove('hidden');
-            },
-
-            closeNovaObraModal() {
-                document.getElementById('modal-nova-obra').classList.add('hidden');
-            },
-
-            async salvarNovaObra() {
-                const nome = document.getElementById('nova-obra-nome').value;
-                const categoria = document.getElementById('nova-obra-categoria').value;
-
-                if (!nome || !categoria) {
-                    alert('Preencha os campos obrigatórios');
-                    return;
-                }
-
-                if (!isFirebaseReady) {
-                    alert('Aguarde a conexão com Firebase');
-                    return;
-                }
-
-                try {
-                    await db.collection('obras').add({
-                        name: nome,
-                        category: categoria,
-                        description: document.getElementById('nova-obra-descricao').value,
-                        progress: 0,
-                        dataCriacao: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-
-                    alert('✅ Obra criada com sucesso!');
-                    this.closeNovaObraModal();
-                    this.loadObras();
-                } catch (error) {
-                    console.error('Error:', error);
-                    alert('❌ Erro ao salvar');
-                }
-            },
-
             openNovoServicoModal() {
                 document.getElementById('modal-novo-servico').classList.remove('hidden');
-                document.getElementById('novo-servico-nome').value = '';
-                document.getElementById('novo-servico-categoria').value = '';
-                document.getElementById('novo-servico-empreiteiro').value = '';
-                document.getElementById('novo-servico-meta').value = '';
-                document.getElementById('novo-servico-unidade').value = 'm²';
             },
 
             closeNovoServicoModal() {
@@ -1386,71 +389,11 @@
             },
 
             salvarNovoServico() {
-                const nome = document.getElementById('novo-servico-nome').value.trim();
-                const categoria = document.getElementById('novo-servico-categoria').value;
-                const empreiteiro = document.getElementById('novo-servico-empreiteiro').value.trim();
-                const meta = parseFloat(document.getElementById('novo-servico-meta').value);
-                const unidade = document.getElementById('novo-servico-unidade').value;
-
-                // Validação
-                if (!nome) {
-                    alert('Informe o nome do serviço');
-                    return;
-                }
-                if (!categoria) {
-                    alert('Selecione uma categoria');
-                    return;
-                }
-                if (!empreiteiro) {
-                    alert('Informe o empreiteiro ou responsável');
-                    return;
-                }
-                if (!meta || meta <= 0) {
-                    alert('Informe uma meta válida');
-                    return;
-                }
-
-                // Criar novo serviço
-                const novoServico = {
-                    id: 'serv_' + Date.now(),
-                    name: nome,
-                    category: categoria,
-                    empreiteiro: empreiteiro,
-                    meta: meta,
-                    unit: unidade,
-                    executada: 0
-                };
-
-                // Adicionar à lista
-                if (!this.currentObra) {
-                    alert('Selecione uma obra primeiro');
-                    return;
-                }
-
-                if (!Array.isArray(localServicosPorObra[this.currentObra.id])) {
-                    localServicosPorObra[this.currentObra.id] = [];
-                }
-
-                localServicosPorObra[this.currentObra.id].push(novoServico);
-                this.saveData();
-
-                alert('✅ Serviço criado com sucesso!');
+                alert('Serviço criado com sucesso!');
                 this.closeNovoServicoModal();
-                this.loadServicos(this.currentObra.id);
             },
 
-            goHome() {
-                this.showScreen('screen-home');
-            },
-
-            goToObra() {
-                if (this.currentObra) this.showScreen('screen-obra');
-            },
-
-            showScreen(screenId) {
-                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-                document.getElementById(screenId).classList.add('active');
-            }
+            goHome() {}
         };
 
         app.init();
