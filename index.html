@@ -904,6 +904,10 @@
                     <input type="text" class="form-input" id="novo-servico-nome" placeholder="Ex: Pintura Externa">
                 </div>
                 <div class="form-group">
+                    <label class="form-label">Nome do Empreiteiro / Responsável</label>
+                    <input type="text" class="form-input" id="novo-servico-empreiteiro" placeholder="Ex: Empreiteira Silva">
+                </div>
+                <div class="form-group">
                     <label class="form-label">Categoria do Serviço *</label>
                     <select class="form-input" id="novo-servico-categoria"></select>
                 </div>
@@ -1024,8 +1028,8 @@
 
         const defaultServicosPorObra = {
             'demo1': [
-                { id: 's1', name: 'Alvenaria Estrutural', category: 'Alvenaria', meta: 350, executada: 230, unit: 'm²' },
-                { id: 's2', name: 'Concretagem de Pilares', category: 'Estrutura', meta: 280, executada: 150, unit: 'm³' }
+                { id: 's1', name: 'Alvenaria Estrutural', empreiteiro: 'Empreiteira Silva', category: 'Alvenaria', meta: 350, executada: 230, unit: 'm²' },
+                { id: 's2', name: 'Concretagem de Pilares', empreiteiro: 'Construtora Alfa', category: 'Estrutura', meta: 280, executada: 150, unit: 'm³' }
             ]
         };
 
@@ -1291,8 +1295,8 @@
                     }
                 });
 
-                const categoriasUnicas = new Set(servicos.map(s => s.category));
-                const totalEmpreiteiros = servicos.length > 0 ? (categoriasUnicas.size || 1) : 0;
+                const empreiteirosUnicos = new Set(servicos.map(s => s.empreiteiro).filter(Boolean));
+                const totalEmpreiteiros = empreiteirosUnicos.size > 0 ? empreiteirosUnicos.size : (servicos.length > 0 ? 1 : 0);
 
                 document.getElementById('obra-stat-empreiteiros').textContent = totalEmpreiteiros;
                 document.getElementById('obra-stat-servicos').textContent = servicos.length;
@@ -1401,7 +1405,7 @@
                             return `
                                 <div style="margin-bottom: 12px;">
                                     <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600;">
-                                        <span>${s.name} (${s.executada}/${s.meta} ${s.unit || 'm²'})</span>
+                                        <span>${s.name} ${s.empreiteiro ? '(' + s.empreiteiro + ')' : ''} (${s.executada}/${s.meta} ${s.unit || 'm²'})</span>
                                         <span>${pct}%</span>
                                     </div>
                                     <div class="progress-bar">
@@ -1639,9 +1643,10 @@
                     return `
                         <div class="card">
                             <div class="card-header-actions">
-                                <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 6px;">${s.name}</h4>
+                                <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 2px;">${s.name}</h4>
                                 <button class="btn-delete-card" onclick="app.removerServico('${s.id}')">Excluir</button>
                             </div>
+                            ${s.empreiteiro ? `<p style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px;">Empreiteiro: <strong>${s.empreiteiro}</strong></p>` : ''}
                             <span class="badge">${s.category}</span>
                             <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-top: 10px;">
                                 <span>Meta: ${s.meta} ${unit}</span>
@@ -1680,6 +1685,7 @@
                 this.preencherSelect('novo-servico-categoria', localCategoriasServicos);
                 this.preencherSelect('novo-servico-unidade', localUnidadesMedida);
                 document.getElementById('novo-servico-nome').value = '';
+                document.getElementById('novo-servico-empreiteiro').value = '';
                 document.getElementById('novo-servico-meta').value = '';
                 document.getElementById('modal-novo-servico').classList.remove('hidden');
             },
@@ -1690,6 +1696,7 @@
 
             salvarNovoServico() {
                 const nome = document.getElementById('novo-servico-nome').value.trim();
+                const empreiteiro = document.getElementById('novo-servico-empreiteiro').value.trim();
                 const categoria = document.getElementById('novo-servico-categoria').value;
                 const unidade = document.getElementById('novo-servico-unidade').value;
                 const meta = parseFloat(document.getElementById('novo-servico-meta').value);
@@ -1702,6 +1709,7 @@
                 const novoServico = {
                     id: 'serv_' + Date.now(),
                     name: nome,
+                    empreiteiro: empreiteiro,
                     category: categoria,
                     unit: unidade,
                     meta: meta,
