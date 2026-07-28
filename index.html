@@ -50,7 +50,7 @@
             flex: 1;
             overflow-y: auto;
             position: relative;
-            padding-bottom: 70px; /* Espaço para a barra inferior fixa */
+            padding-bottom: 70px;
         }
 
         /* HEADER FIXO */
@@ -113,30 +113,6 @@
             display: flex;
             align-items: center;
             gap: 16px;
-        }
-
-        .icon-btn {
-            background: none;
-            border: none;
-            color: #FFFFFF;
-            cursor: pointer;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .icon-btn svg { width: 20px; height: 20px; fill: currentColor; }
-
-        .notification-dot {
-            position: absolute;
-            top: 1px;
-            right: 1px;
-            width: 7px;
-            height: 7px;
-            background-color: var(--danger);
-            border-radius: 50%;
-            border: 1px solid var(--primary);
         }
 
         /* CARD FLUTUANTE DE PROGRESSO DA OBRA */
@@ -420,6 +396,34 @@
             gap: 4px;
         }
 
+        /* CARD DE EMPREITEIRO (CONTAINER PAI) */
+        .empreiteiro-section {
+            background-color: #FFFFFF;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .empreiteiro-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #F1F5F9;
+            padding-bottom: 10px;
+            margin-bottom: 12px;
+        }
+
+        .empreiteiro-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
         /* MODAIS */
         .modal {
             position: fixed;
@@ -553,7 +557,6 @@
         .dash-kpi-title { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
         .dash-kpi-value { font-size: 20px; font-weight: 700; color: var(--primary); margin-top: 4px; }
 
-        /* ESTILOS DA NOVA TELA INICIAL (SPLIT / LANDING) */
         .welcome-screen-container {
             display: flex;
             flex-direction: column;
@@ -565,19 +568,6 @@
             position: relative;
             overflow: hidden;
             text-align: center;
-        }
-
-        .welcome-screen-container::before {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 100%;
-            height: 40%;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 300" opacity="0.05"><path d="M450,150 L350,150 L350,80 L330,80 L330,150 L250,150 L230,100 L210,150 L50,150 L50,170 L450,170 Z" fill="%23000"/></svg>');
-            background-repeat: no-repeat;
-            background-position: bottom right;
-            pointer-events: none;
         }
 
         .welcome-top {
@@ -657,11 +647,10 @@
         <div class="mobile-view">
             <div class="app-container">
 
-                <!-- TELA 0: NOVA PELA INICIAL (LANDING / BEM-VINDO) -->
+                <!-- TELA 0: BEM-VINDO -->
                 <div id="screen-welcome" class="screen active">
                     <div class="welcome-screen-container">
                         <div class="welcome-top">
-                            <!-- Logotipo idêntico ao modelo da imagem enviada -->
                             <svg class="welcome-logo-icon" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M100 20L170 60V140L100 180L30 140V60L100 20Z" fill="#0b1c30" stroke="#0b1c30" stroke-width="4"/>
                                 <path d="M70 110V130" stroke="white" stroke-width="10" stroke-linecap="round"/>
@@ -671,14 +660,9 @@
                             </svg>
                             <div class="welcome-logo-text">Medi<span>-Eng</span></div>
                             <div class="welcome-logo-tagline">Gestão Inteligente de Obras</div>
-
                             <div class="welcome-divider"></div>
-
-                            <p class="welcome-description">
-                                Controle medições, acompanhe o progresso, registre fotos e gerencie suas obras em um único lugar.
-                            </p>
+                            <p class="welcome-description">Controle medições, acompanhe o progresso, registre fotos e gerencie suas obras em um único lugar.</p>
                         </div>
-
                         <div class="welcome-bottom">
                             <button class="btn-primary" style="background-color: #0b1c30;" onclick="app.entrarApp()">Entrar</button>
                             <button class="btn-secondary" onclick="app.entrarApp()">Criar Conta</button>
@@ -687,7 +671,7 @@
                     </div>
                 </div>
 
-                <!-- HEADER SUPERIOR PRINCIPAL (Exibido nas telas internas) -->
+                <!-- HEADER SUPERIOR PRINCIPAL -->
                 <div class="header-bg hidden" id="main-header-bar">
                     <div class="header-top">
                         <div class="header-left">
@@ -707,9 +691,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="header-actions">
-                            <!-- Ações extras, se necessário, ou mantidas vazias conforme solicitado -->
-                        </div>
+                        <div class="header-actions"></div>
                     </div>
                 </div>
 
@@ -723,15 +705,12 @@
                 <!-- TELA 2: DASHBOARD -->
                 <div id="screen-dashboard" class="screen">
                     <div class="content" style="padding-top: 16px;">
-                        
-                        <!-- SELETOR DE ESCOPO DA DASHBOARD -->
                         <div class="card" style="padding: 12px 16px; margin-bottom: 16px; background-color: #F1F5F9;">
                             <label class="form-label" for="dash-obra-filtro" style="margin-bottom: 4px; font-size: 11px;">FILTRAR ANÁLISE DA DASHBOARD:</label>
                             <select id="dash-obra-filtro" class="form-input" onchange="app.onDashFiltroChange()">
                                 <option value="todas">🌐 Visão Geral (Todas as Obras)</option>
                             </select>
                         </div>
-
                         <div class="dash-grid">
                             <div class="dash-kpi">
                                 <div class="dash-kpi-title" id="kpi-card-title-1">Obras Ativas</div>
@@ -742,23 +721,18 @@
                                 <div class="dash-kpi-value" id="kpi-progresso-medio">0%</div>
                             </div>
                         </div>
-
-                        <!-- GRÁFICO 1: PROGRESSO DAS OBRAS / SERVIÇOS -->
                         <div class="card">
                             <h3 id="chart-title-1" style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">Progresso por Obra</h3>
                             <div style="position: relative; height: 200px; width: 100%;">
                                 <canvas id="chartProgressoObras"></canvas>
                             </div>
                         </div>
-
-                        <!-- GRÁFICO 2: DISTRIBUIÇÃO DE CATEGORIAS -->
                         <div class="card">
                             <h3 id="chart-title-2" style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">Distribuição por Categoria</h3>
                             <div style="position: relative; height: 200px; width: 100%;">
                                 <canvas id="chartCategoriasObras"></canvas>
                             </div>
                         </div>
-
                         <div class="card">
                             <h3 id="resumo-card-title" style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">Resumo do Portfólio</h3>
                             <div id="dash-obras-resumo"></div>
@@ -775,12 +749,10 @@
                                 <button class="tab-button" id="tab-cat-servicos" onclick="app.switchCatTab('servicos')">TIPOS DE SERVIÇO</button>
                                 <button class="tab-button" id="tab-cat-unidades" onclick="app.switchCatTab('unidades')">UNIDADES DE MEDIDA</button>
                             </div>
-
                             <div class="form-group" style="display: flex; gap: 8px;">
                                 <input type="text" class="form-input" id="nova-categoria-nome" placeholder="Novo item...">
                                 <button class="btn-primary" style="flex: 0 0 80px;" onclick="app.salvarCategoria()">Criar</button>
                             </div>
-
                             <h4 style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;" id="cat-lista-titulo">Lista de Itens:</h4>
                             <div id="lista-categorias-gerenciar" style="border: 1px solid var(--border); border-radius: 6px; max-height: 300px; overflow-y: auto;"></div>
                         </div>
@@ -794,7 +766,6 @@
 
                 <!-- TELA DETALHES DA OBRA -->
                 <div id="screen-obra-detalhe" class="screen">
-                    <!-- CARD CORPORATIVO DE RESUMO DE PROGRESSO -->
                     <div class="obra-summary-card">
                         <div class="obra-summary-left">
                             <div class="summary-title">PROGRESSO GERAL</div>
@@ -805,7 +776,7 @@
                             <div class="summary-dates">
                                 <div class="summary-date-item">
                                     <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
-                                    <span id="obra-data-inicio">Início: 10/01/2026</span>
+                                    <span id="obra-data-inicio">Início: --/--/----</span>
                                 </div>
                                 <div class="summary-date-item">
                                     <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
@@ -813,7 +784,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="obra-summary-right">
                             <div class="stat-row">
                                 <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
@@ -829,7 +799,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="content" style="padding-top: 0;">
                         <div id="servicos-content"></div>
                     </div>
@@ -845,7 +814,7 @@
             <!-- BOTÃO FLUTUANTE (FAB) -->
             <button class="fab hidden" id="fab-add" onclick="app.handleFabClick()">+</button>
 
-            <!-- BOTTOM NAVIGATION BAR (FIXA E OCULTA NA TELA DE BEM-VINDO) -->
+            <!-- BOTTOM NAVIGATION BAR -->
             <div class="bottom-nav hidden" id="main-bottom-nav">
                 <button class="nav-item active" id="nav-obras" onclick="app.switchNav('obras')">
                     <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2zM5 5v14h14V5H5zm2 2h4v4H7V7zm6 0h4v4h-4V7zm-6 6h4v4H7v-4zm6 0h4v4h-4v-4z"/></svg>
@@ -891,21 +860,37 @@
         </div>
     </div>
 
+    <!-- MODAL NOVO EMPREITEIRO -->
+    <div id="modal-novo-empreiteiro" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="margin: 0; font-size: 15px; font-weight: 600;">Adicionar Empreiteiro</h2>
+                <button class="modal-close" onclick="app.closeNovoEmpreiteiroModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Nome do Empreiteiro / Responsável *</label>
+                    <input type="text" class="form-input" id="novo-empreiteiro-nome" placeholder="Ex: Hydro Power">
+                </div>
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="app.closeNovoEmpreiteiroModal()">Cancelar</button>
+                    <button class="btn-primary" onclick="app.salvarNovoEmpreiteiro()">Salvar Empreiteiro</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL NOVO SERVIÇO -->
     <div id="modal-novo-servico" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 style="margin: 0; font-size: 15px; font-weight: 600;">Novo Serviço</h2>
+                <h2 style="margin: 0; font-size: 15px; font-weight: 600;" id="modal-servico-titulo">Novo Serviço</h2>
                 <button class="modal-close" onclick="app.closeNovoServicoModal()">✕</button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
                     <label class="form-label">Nome do Serviço *</label>
-                    <input type="text" class="form-input" id="novo-servico-nome" placeholder="Ex: Pintura Externa">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Nome do Empreiteiro / Responsável</label>
-                    <input type="text" class="form-input" id="novo-servico-empreiteiro" placeholder="Ex: Empreiteira Silva">
+                    <input type="text" class="form-input" id="novo-servico-nome" placeholder="Ex: Assentamento">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Categoria do Serviço *</label>
@@ -960,7 +945,6 @@
                     <label class="form-label">Evidências / Fotos de Campo</label>
                     <input type="file" id="input-camera" accept="image/*" capture="environment" class="hidden" onchange="app.handleFotoUpload(event)">
                     <input type="file" id="input-galeria" accept="image/*" multiple class="hidden" onchange="app.handleFotoUpload(event)">
-
                     <div class="photo-upload-container" id="photo-container"></div>
                 </div>
 
@@ -1023,19 +1007,24 @@
         const defaultUnidadesMedida = ['m²', 'm', 'm³', 'km', 'un', 'kg', 'vb'];
 
         const defaultObras = [
-            { id: 'demo1', name: 'Residencial Boulevard', category: 'Residencial', progress: 60 }
+            { id: 'demo1', name: 'Residencial Boulevard', category: 'Residencial', progress: 0 }
         ];
 
-        const defaultServicosPorObra = {
+        // Nova estrutura: Empreiteiros e seus respectivos serviços aninhados
+        const defaultEmpreiteirosPorObra = {
             'demo1': [
-                { id: 's1', name: 'Alvenaria Estrutural', empreiteiro: 'Empreiteira Silva', category: 'Alvenaria', meta: 350, executada: 230, unit: 'm²' },
-                { id: 's2', name: 'Concretagem de Pilares', empreiteiro: 'Construtora Alfa', category: 'Estrutura', meta: 280, executada: 150, unit: 'm³' }
+                {
+                    id: 'emp_1',
+                    nome: 'Hydro Power',
+                    servicos: [
+                        { id: 's1', name: 'Assentamento', category: 'Alvenaria', meta: 100, executada: 0, unit: 'm²' }
+                    ]
+                }
             ]
         };
 
         const defaultHistorico = {
-            's1': [{ id: 'm1', obraNome: 'Residencial Boulevard', servicoNome: 'Alvenaria Estrutural', unit: 'm²', data: '2026-01-10', quantidade: 100, status: 'normal' }],
-            's2': [{ id: 'm2', obraNome: 'Residencial Boulevard', servicoNome: 'Concretagem de Pilares', unit: 'm³', data: '2026-01-15', quantidade: 50, status: 'normal' }]
+            's1': []
         };
 
         let localCategoriasObras = JSON.parse(localStorage.getItem('medio_cat_obras')) || defaultCategoriasObras;
@@ -1044,7 +1033,7 @@
         let activeCatTab = 'obras';
 
         let localObras = JSON.parse(localStorage.getItem('medio_obras')) || defaultObras;
-        let localServicosPorObra = JSON.parse(localStorage.getItem('medio_servicos')) || defaultServicosPorObra;
+        let localEmpreiteirosPorObra = JSON.parse(localStorage.getItem('medio_empreiteiros')) || defaultEmpreiteirosPorObra;
         let localHistorico = JSON.parse(localStorage.getItem('medio_historico')) || defaultHistorico;
 
         let tempFotos = [];
@@ -1054,6 +1043,7 @@
         const app = {
             currentNav: 'welcome',
             currentObra: null,
+            currentEmpreiteiroId: null,
             currentServico: null,
             editingMedicao: null,
 
@@ -1068,7 +1058,7 @@
                 localStorage.setItem('medio_cat_servicos', JSON.stringify(localCategoriasServicos));
                 localStorage.setItem('medio_unidades', JSON.stringify(localUnidadesMedida));
                 localStorage.setItem('medio_obras', JSON.stringify(localObras));
-                localStorage.setItem('medio_servicos', JSON.stringify(localServicosPorObra));
+                localStorage.setItem('medio_empreiteiros', JSON.stringify(localEmpreiteirosPorObra));
                 localStorage.setItem('medio_historico', JSON.stringify(localHistorico));
             },
 
@@ -1146,7 +1136,7 @@
                 if (this.currentNav === 'obras') {
                     this.openNovaObraModal();
                 } else if (this.currentObra && document.getElementById('screen-obra-detalhe').classList.contains('active')) {
-                    this.openNovoServicoModal();
+                    this.openNovoEmpreiteiroModal();
                 } else {
                     this.openNovaObraModal();
                 }
@@ -1191,9 +1181,18 @@
                 }
 
                 list.innerHTML = obras.map(obra => {
-                    const servicos = localServicosPorObra[obra.id] || [];
-                    const categoriasServicos = Array.from(new Set(servicos.map(s => s.category)));
+                    const empreiteiros = localEmpreiteirosPorObra[obra.id] || [];
+                    let totalServicosCount = 0;
+                    const categoriasServicosSet = new Set();
 
+                    empreiteiros.forEach(emp => {
+                        (emp.servicos || []).forEach(serv => {
+                            totalServicosCount++;
+                            categoriasServicosSet.add(serv.category);
+                        });
+                    });
+
+                    const categoriasServicos = Array.from(categoriasServicosSet);
                     const servicosBadgesHtml = categoriasServicos.length > 0
                         ? categoriasServicos.map(cat => `<span class="badge">${cat}</span>`).join('')
                         : `<span style="font-size: 11px; color: var(--text-muted); font-style: italic;">Nenhum serviço cadastrado</span>`;
@@ -1233,11 +1232,11 @@
                 document.getElementById('main-header-subtitle').textContent = "Detalhamento da Obra";
                 document.getElementById('header-back-btn').classList.remove('hidden');
 
-                if (!localServicosPorObra[id]) {
-                    localServicosPorObra[id] = [];
+                if (!localEmpreiteirosPorObra[id]) {
+                    localEmpreiteirosPorObra[id] = [];
                 }
 
-                this.renderServicos(localServicosPorObra[id]);
+                this.renderEmpreiteirosEServicos(localEmpreiteirosPorObra[id]);
                 this.recalcularProgressoEContagemDias(id);
                 this.showScreen('screen-obra-detalhe');
             },
@@ -1247,14 +1246,16 @@
                 const obra = localObras.find(o => o.id === id);
                 if (!obra) return;
 
-                const confirmacao = confirm(`CONFIRMAÇÃO DE EXCLUSÃO\n\nTem certeza de que deseja excluir permanentemente a obra:\n"${obra.name}"?\n\nEsta ação removerá todos os serviços e histórico de medições vinculados.`);
+                const confirmacao = confirm(`CONFIRMAÇÃO DE EXCLUSÃO\n\nTem certeza de que deseja excluir permanentemente a obra:\n"${obra.name}"?\n\nEsta ação removerá todos os empreiteiros, serviços e histórico de medições vinculados.`);
                 
                 if (confirmacao) {
-                    if (localServicosPorObra[id]) {
-                        localServicosPorObra[id].forEach(serv => {
-                            delete localHistorico[serv.id];
+                    if (localEmpreiteirosPorObra[id]) {
+                        localEmpreiteirosPorObra[id].forEach(emp => {
+                            (emp.servicos || []).forEach(serv => {
+                                delete localHistorico[serv.id];
+                            });
                         });
-                        delete localServicosPorObra[id];
+                        delete localEmpreiteirosPorObra[id];
                     }
 
                     localObras = localObras.filter(o => o.id !== id);
@@ -1265,12 +1266,17 @@
             },
 
             recalcularProgressoEContagemDias(obraId) {
-                const servicos = localServicosPorObra[obraId] || [];
+                const empreiteiros = localEmpreiteirosPorObra[obraId] || [];
+                let todosServicos = [];
+                empreiteiros.forEach(emp => {
+                    if (emp.servicos) todosServicos = todosServicos.concat(emp.servicos);
+                });
+
                 let percentualGeral = 0;
 
-                if (servicos.length > 0) {
-                    const totalMeta = servicos.reduce((acc, s) => acc + (s.meta || 0), 0);
-                    const totalExecutado = servicos.reduce((acc, s) => acc + (s.executada || 0), 0);
+                if (todosServicos.length > 0) {
+                    const totalMeta = todosServicos.reduce((acc, s) => acc + (s.meta || 0), 0);
+                    const totalExecutado = todosServicos.reduce((acc, s) => acc + (s.executada || 0), 0);
                     percentualGeral = totalMeta > 0 ? Math.min(100, Math.round((totalExecutado / totalMeta) * 100)) : 0;
                 }
 
@@ -1286,7 +1292,7 @@
                 let todasMedicoesObra = [];
                 let totalFotosCount = 0;
 
-                servicos.forEach(s => {
+                todosServicos.forEach(s => {
                     if (localHistorico[s.id]) {
                         todasMedicoesObra = todasMedicoesObra.concat(localHistorico[s.id]);
                         localHistorico[s.id].forEach(m => {
@@ -1295,11 +1301,8 @@
                     }
                 });
 
-                const empreiteirosUnicos = new Set(servicos.map(s => s.empreiteiro).filter(Boolean));
-                const totalEmpreiteiros = empreiteirosUnicos.size > 0 ? empreiteirosUnicos.size : (servicos.length > 0 ? 1 : 0);
-
-                document.getElementById('obra-stat-empreiteiros').textContent = totalEmpreiteiros;
-                document.getElementById('obra-stat-servicos').textContent = servicos.length;
+                document.getElementById('obra-stat-empreiteiros').textContent = empreiteiros.length;
+                document.getElementById('obra-stat-servicos').textContent = todosServicos.length;
                 document.getElementById('obra-stat-fotos').textContent = totalFotosCount;
 
                 const elInicio = document.getElementById('obra-data-inicio');
@@ -1381,7 +1384,11 @@
 
                 } else {
                     const obraRef = localObras.find(o => o.id === obraIdSelecionada);
-                    const servicos = localServicosPorObra[obraIdSelecionada] || [];
+                    const empreiteiros = localEmpreiteirosPorObra[obraIdSelecionada] || [];
+                    let servicos = [];
+                    empreiteiros.forEach(emp => {
+                        if (emp.servicos) servicos = servicos.concat(emp.servicos);
+                    });
 
                     kpiTitle1.textContent = 'Serviços Cadastrados';
                     document.getElementById('kpi-obras-total').textContent = servicos.length;
@@ -1405,7 +1412,7 @@
                             return `
                                 <div style="margin-bottom: 12px;">
                                     <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600;">
-                                        <span>${s.name} ${s.empreiteiro ? '(' + s.empreiteiro + ')' : ''} (${s.executada}/${s.meta} ${s.unit || 'm²'})</span>
+                                        <span>${s.name} (${s.executada}/${s.meta} ${s.unit || 'm²'})</span>
                                         <span>${pct}%</span>
                                     </div>
                                     <div class="progress-bar">
@@ -1425,9 +1432,7 @@
                 const progressosObras = localObras.map(o => o.progress || 0);
 
                 const ctxProgresso = document.getElementById('chartProgressoObras').getContext('2d');
-                if (chartProgressoInstance) {
-                    chartProgressoInstance.destroy();
-                }
+                if (chartProgressoInstance) chartProgressoInstance.destroy();
                 chartProgressoInstance = new Chart(ctxProgresso, {
                     type: 'bar',
                     data: {
@@ -1442,15 +1447,8 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                max: 100
-                            }
-                        }
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true, max: 100 } }
                     }
                 });
 
@@ -1463,9 +1461,7 @@
                 const dadosCategorias = Object.values(contagemCategorias);
 
                 const ctxCategorias = document.getElementById('chartCategoriasObras').getContext('2d');
-                if (chartCategoriasInstance) {
-                    chartCategoriasInstance.destroy();
-                }
+                if (chartCategoriasInstance) chartCategoriasInstance.destroy();
                 chartCategoriasInstance = new Chart(ctxCategorias, {
                     type: 'doughnut',
                     data: {
@@ -1478,12 +1474,7 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: { boxWidth: 12, font: { size: 10 } }
-                            }
-                        }
+                        plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } }
                     }
                 });
             },
@@ -1493,9 +1484,7 @@
                 const percentuaisServicos = servicos.map(s => s.meta > 0 ? Math.min(100, Math.round((s.executada / s.meta) * 100)) : 0);
 
                 const ctxProgresso = document.getElementById('chartProgressoObras').getContext('2d');
-                if (chartProgressoInstance) {
-                    chartProgressoInstance.destroy();
-                }
+                if (chartProgressoInstance) chartProgressoInstance.destroy();
                 chartProgressoInstance = new Chart(ctxProgresso, {
                     type: 'bar',
                     data: {
@@ -1510,15 +1499,8 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                max: 100
-                            }
-                        }
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true, max: 100 } }
                     }
                 });
 
@@ -1531,9 +1513,7 @@
                 const dadosCatServ = Object.values(contagemCatServicos);
 
                 const ctxCategorias = document.getElementById('chartCategoriasObras').getContext('2d');
-                if (chartCategoriasInstance) {
-                    chartCategoriasInstance.destroy();
-                }
+                if (chartCategoriasInstance) chartCategoriasInstance.destroy();
                 chartCategoriasInstance = new Chart(ctxCategorias, {
                     type: 'doughnut',
                     data: {
@@ -1546,12 +1526,7 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: { boxWidth: 12, font: { size: 10 } }
-                            }
-                        }
+                        plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } }
                     }
                 });
             },
@@ -1568,7 +1543,6 @@
                     unidades: 'Unidades de Medida Disponíveis:'
                 };
                 document.getElementById('cat-lista-titulo').textContent = titleMap[tab];
-                
                 this.renderListaCategorias();
             },
 
@@ -1624,79 +1598,138 @@
                 select.innerHTML = lista.map(c => `<option value="${c}">${c}</option>`).join('');
             },
 
-            renderServicos(servicos) {
+            /* RENDERIZAÇÃO HIERÁRQUICA: EMPREITEIRO -> SERVIÇOS */
+            renderEmpreiteirosEServicos(empreiteiros) {
                 const container = document.getElementById('servicos-content');
                 
-                if (!servicos || servicos.length === 0) {
+                if (!empreiteiros || empreiteiros.length === 0) {
                     container.innerHTML = `
                         <div class="card" style="text-align: center; padding: 24px 16px;">
-                            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px;">Nenhum serviço cadastrado nesta obra.</p>
-                            <button class="btn-primary" style="padding: 8px 16px; font-size: 12px;" onclick="app.openNovoServicoModal()">+ Adicionar Serviço</button>
+                            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px;">Nenhum empreiteiro cadastrado nesta obra.</p>
+                            <button class="btn-primary" style="padding: 8px 16px; font-size: 12px;" onclick="app.openNovoEmpreiteiroModal()">+ Adicionar Empreiteiro</button>
                         </div>
                     `;
                     return;
                 }
 
-                const htmlServicos = servicos.map(s => {
-                    const unit = s.unit || 'm²';
-                    const pct = s.meta > 0 ? Math.min(100, Math.round((s.executada / s.meta) * 100)) : 0;
+                let htmlContent = empreiteiros.map(emp => {
+                    const servicos = emp.servicos || [];
+                    const servicosHtml = servicos.length === 0 
+                        ? `<p style="font-size: 11px; color: var(--text-muted); font-style: italic; margin-bottom: 10px;">Nenhum serviço cadastrado para este empreiteiro.</p>`
+                        : servicos.map(s => {
+                            const unit = s.unit || 'm²';
+                            const pct = s.meta > 0 ? Math.min(100, Math.round((s.executada / s.meta) * 100)) : 0;
+                            return `
+                                <div class="card" style="margin-bottom: 10px; background-color: #FAFAFA;">
+                                    <div class="card-header-actions">
+                                        <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 2px;">${s.name}</h4>
+                                        <button class="btn-delete-card" onclick="app.removerServico('${emp.id}', '${s.id}')">Excluir</button>
+                                    </div>
+                                    <span class="badge">${s.category}</span>
+                                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-top: 10px;">
+                                        <span>Meta: ${s.meta} ${unit}</span>
+                                        <span>Executado: ${s.executada} ${unit}</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: ${pct}%;"></div>
+                                    </div>
+                                    <div class="action-buttons">
+                                        <button onclick="app.openMedicaoModal('${s.id}', '${s.name}', ${s.meta}, ${s.executada}, '${unit}')">Medir</button>
+                                        <button onclick="app.openHistoricoServico('${s.id}')">Histórico</button>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+
                     return `
-                        <div class="card">
-                            <div class="card-header-actions">
-                                <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 2px;">${s.name}</h4>
-                                <button class="btn-delete-card" onclick="app.removerServico('${s.id}')">Excluir</button>
+                        <div class="empreiteiro-section">
+                            <div class="empreiteiro-header">
+                                <div class="empreiteiro-title">
+                                    📁 Empreiteiro: ${emp.nome}
+                                </div>
+                                <button class="btn-delete-card" onclick="app.removerEmpreiteiro('${emp.id}')">Excluir Empreiteiro</button>
                             </div>
-                            ${s.empreiteiro ? `<p style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px;">Empreiteiro: <strong>${s.empreiteiro}</strong></p>` : ''}
-                            <span class="badge">${s.category}</span>
-                            <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-top: 10px;">
-                                <span>Meta: ${s.meta} ${unit}</span>
-                                <span>Executado: ${s.executada} ${unit}</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${pct}%;"></div>
-                            </div>
-                            <div class="action-buttons">
-                                <button onclick="app.openMedicaoModal('${s.id}', '${s.name}', ${s.meta}, ${s.executada}, '${unit}')">Medir</button>
-                                <button onclick="app.openHistoricoServico('${s.id}')">Histórico</button>
-                            </div>
+                            
+                            ${servicosHtml}
+
+                            <button class="btn-secondary" style="width: 100%; margin-top: 4px; font-size: 12px;" onclick="app.openNovoServicoModal('${emp.id}', '${emp.nome}')">+ Adicionar Serviço para este Empreiteiro</button>
                         </div>
                     `;
                 }).join('');
 
-                container.innerHTML = htmlServicos + `
-                    <button class="btn-secondary" style="width: 100%; margin-top: 8px;" onclick="app.openNovoServicoModal()">+ Adicionar Outro Serviço</button>
+                container.innerHTML = htmlContent + `
+                    <button class="btn-primary" style="width: 100%; margin-top: 8px;" onclick="app.openNovoEmpreiteiroModal()">+ Adicionar Outro Empreiteiro</button>
                 `;
             },
 
-            removerServico(servicoId) {
-                const servico = localServicosPorObra[this.currentObra.id].find(s => s.id === servicoId);
-                const nomeServico = servico ? servico.name : 'este serviço';
+            openNovoEmpreiteiroModal() {
+                document.getElementById('novo-empreiteiro-nome').value = '';
+                document.getElementById('modal-novo-empreiteiro').classList.remove('hidden');
+            },
 
-                if (confirm(`Confirma a exclusão do serviço:\n"${nomeServico}" e todo seu histórico?`)) {
-                    localServicosPorObra[this.currentObra.id] = localServicosPorObra[this.currentObra.id].filter(s => s.id !== servicoId);
-                    delete localHistorico[servicoId];
+            closeNovoEmpreiteiroModal() {
+                document.getElementById('modal-novo-empreiteiro').classList.add('hidden');
+            },
+
+            salvarNovoEmpreiteiro() {
+                const nome = document.getElementById('novo-empreiteiro-nome').value.trim();
+                if (!nome) {
+                    alert('Informe o nome do empreiteiro.');
+                    return;
+                }
+
+                if (!localEmpreiteirosPorObra[this.currentObra.id]) {
+                    localEmpreiteirosPorObra[this.currentObra.id] = [];
+                }
+
+                const novoEmpreiteiro = {
+                    id: 'emp_' + Date.now(),
+                    nome: nome,
+                    servicos: []
+                };
+
+                localEmpreiteirosPorObra[this.currentObra.id].push(novoEmpreiteiro);
+                this.saveData();
+                this.renderEmpreiteirosEServicos(localEmpreiteirosPorObra[this.currentObra.id]);
+                this.recalcularProgressoEContagemDias(this.currentObra.id);
+                this.closeNovoEmpreiteiroModal();
+            },
+
+            removerEmpreiteiro(empreiteiroId) {
+                const empreiteiros = localEmpreiteirosPorObra[this.currentObra.id];
+                const emp = empreiteiros.find(e => e.id === empreiteiroId);
+                const nomeEmp = emp ? emp.nome : 'este empreiteiro';
+
+                if (confirm(`Confirma a exclusão do empreiteiro:\n"${nomeEmp}" e todos os seus serviços vinculados?`)) {
+                    if (emp && emp.servicos) {
+                        emp.servicos.forEach(s => {
+                            delete localHistorico[s.id];
+                        });
+                    }
+                    localEmpreiteirosPorObra[this.currentObra.id] = empreiteiros.filter(e => e.id !== empreiteiroId);
                     this.saveData();
-                    this.renderServicos(localServicosPorObra[this.currentObra.id]);
+                    this.renderEmpreiteirosEServicos(localEmpreiteirosPorObra[this.currentObra.id]);
                     this.recalcularProgressoEContagemDias(this.currentObra.id);
                 }
             },
 
-            openNovoServicoModal() {
+            openNovoServicoModal(empreiteiroId, empreiteiroNome) {
+                this.currentEmpreiteiroId = empreiteiroId;
+                document.getElementById('modal-servico-titulo').textContent = `Novo Serviço para: ${empreiteiroNome}`;
                 this.preencherSelect('novo-servico-categoria', localCategoriasServicos);
                 this.preencherSelect('novo-servico-unidade', localUnidadesMedida);
                 document.getElementById('novo-servico-nome').value = '';
-                document.getElementById('novo-servico-empreiteiro').value = '';
                 document.getElementById('novo-servico-meta').value = '';
                 document.getElementById('modal-novo-servico').classList.remove('hidden');
             },
 
             closeNovoServicoModal() {
                 document.getElementById('modal-novo-servico').classList.add('hidden');
+                this.currentEmpreiteiroId = null;
             },
 
             salvarNovoServico() {
                 const nome = document.getElementById('novo-servico-nome').value.trim();
-                const empreiteiro = document.getElementById('novo-servico-empreiteiro').value.trim();
                 const categoria = document.getElementById('novo-servico-categoria').value;
                 const unidade = document.getElementById('novo-servico-unidade').value;
                 const meta = parseFloat(document.getElementById('novo-servico-meta').value);
@@ -1709,18 +1742,40 @@
                 const novoServico = {
                     id: 'serv_' + Date.now(),
                     name: nome,
-                    empreiteiro: empreiteiro,
                     category: categoria,
                     unit: unidade,
                     meta: meta,
                     executada: 0
                 };
 
-                localServicosPorObra[this.currentObra.id].push(novoServico);
+                const empreiteiros = localEmpreiteirosPorObra[this.currentObra.id];
+                const emp = empreiteiros.find(e => e.id === this.currentEmpreiteiroId);
+                if (emp) {
+                    if (!emp.servicos) emp.servicos = [];
+                    emp.servicos.push(novoServico);
+                }
+
                 this.saveData();
-                this.renderServicos(localServicosPorObra[this.currentObra.id]);
+                this.renderEmpreiteirosEServicos(empreiteiros);
                 this.recalcularProgressoEContagemDias(this.currentObra.id);
                 this.closeNovoServicoModal();
+            },
+
+            removerServico(empreiteiroId, servicoId) {
+                const empreiteiros = localEmpreiteirosPorObra[this.currentObra.id];
+                const emp = empreiteiros.find(e => e.id === empreiteiroId);
+                if (!emp) return;
+
+                const servico = (emp.servicos || []).find(s => s.id === servicoId);
+                const nomeServico = servico ? servico.name : 'este serviço';
+
+                if (confirm(`Confirma a exclusão do serviço:\n"${nomeServico}" e todo seu histórico?`)) {
+                    emp.servicos = emp.servicos.filter(s => s.id !== servicoId);
+                    delete localHistorico[servicoId];
+                    this.saveData();
+                    this.renderEmpreiteirosEServicos(empreiteiros);
+                    this.recalcularProgressoEContagemDias(this.currentObra.id);
+                }
             },
 
             openNovaObraModal() {
@@ -1749,7 +1804,7 @@
                 };
 
                 localObras.unshift(novaObra);
-                localServicosPorObra[novaObra.id] = [];
+                localEmpreiteirosPorObra[novaObra.id] = [];
                 
                 this.saveData();
                 this.renderObras(localObras);
@@ -1864,11 +1919,16 @@
                     return;
                 }
 
-                const servicos = localServicosPorObra[this.currentObra.id];
-                const s = servicos.find(item => item.id === this.currentServico.id);
-                if (s) {
-                    s.executada += qtd;
-                }
+                const empreiteiros = localEmpreiteirosPorObra[this.currentObra.id];
+                let sRef = null;
+                empreiteiros.forEach(emp => {
+                    (emp.servicos || []).forEach(s => {
+                        if (s.id === this.currentServico.id) {
+                            s.executada += qtd;
+                            sRef = s;
+                        }
+                    });
+                });
 
                 if (!localHistorico[this.currentServico.id]) {
                     localHistorico[this.currentServico.id] = [];
@@ -1890,7 +1950,7 @@
                 this.saveData();
                 alert('Medição registrada com sucesso!');
                 this.closeMedicaoModal();
-                this.renderServicos(servicos);
+                this.renderEmpreiteirosEServicos(empreiteiros);
                 this.recalcularProgressoEContagemDias(this.currentObra.id);
             },
 
@@ -1919,13 +1979,15 @@
                 let servicoRef = null;
                 let obraRefId = null;
 
-                for (const oId in localServicosPorObra) {
-                    const found = localServicosPorObra[oId].find(s => s.id === targetServicoId);
-                    if (found) {
-                        servicoRef = found;
-                        obraRefId = oId;
-                        break;
-                    }
+                for (const oId in localEmpreiteirosPorObra) {
+                    localEmpreiteirosPorObra[oId].forEach(emp => {
+                        (emp.servicos || []).forEach(s => {
+                            if (s.id === targetServicoId) {
+                                servicoRef = s;
+                                obraRefId = oId;
+                            }
+                        });
+                    });
                 }
 
                 this.editingMedicao = {
@@ -2036,7 +2098,7 @@
                 } else if (document.getElementById('screen-historico-geral').classList.contains('active')) {
                     this.renderHistoricoGeral();
                 } else if (document.getElementById('screen-obra-detalhe').classList.contains('active')) {
-                    this.renderServicos(localServicosPorObra[obraRefId] || []);
+                    this.renderEmpreiteirosEServicos(localEmpreiteirosPorObra[obraRefId] || []);
                 }
             },
 
@@ -2081,10 +2143,8 @@
 
             buildCardHistorico(med, showContext = false, servicoId = null) {
                 const unit = med.unit || 'm²';
-                
                 const [ano, mes, dia] = med.data.split('-');
                 const dataFmt = `${dia}/${mes}/${ano}`;
-
                 const sId = servicoId || this.currentServico?.id || '';
 
                 return `
