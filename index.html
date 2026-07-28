@@ -102,6 +102,28 @@
             padding: 16px;
             margin-bottom: 12px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+            position: relative;
+        }
+
+        .card-header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .btn-delete-card {
+            background: none;
+            border: none;
+            color: var(--danger);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .btn-delete-card:hover {
+            background-color: #FEF2F2;
         }
 
         .card-title {
@@ -333,7 +355,6 @@
 
         .category-item:last-child { border-bottom: none; }
 
-        /* Estilos para Upload/Preview de Fotos */
         .photo-upload-container {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -519,7 +540,7 @@
         </div>
     </div>
 
-    <!-- MODAL MEDIÇÃO (ENTRADAS SEPARADAS PARA CÂMERA E GALERIA) -->
+    <!-- MODAL MEDIÇÃO -->
     <div id="modal-medicao" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
@@ -546,19 +567,12 @@
                     </div>
                 </div>
 
-                <!-- CAMPO DE ANEXO DE FOTOS (CÂMERA + GALERIA SEPARADOS) -->
                 <div class="form-group">
                     <label class="form-label">Evidências / Fotos de Campo</label>
-
-                    <!-- Input 1: Força a Abertura Direta da Câmera -->
                     <input type="file" id="input-camera" accept="image/*" capture="environment" class="hidden" onchange="app.handleFotoUpload(event)">
-                    
-                    <!-- Input 2: Abre a Galeria / Arquivos do Celular -->
                     <input type="file" id="input-galeria" accept="image/*" multiple class="hidden" onchange="app.handleFotoUpload(event)">
 
-                    <div class="photo-upload-container" id="photo-container">
-                        <!-- Os botões 'Tirar Foto' e 'Galeria' são gerados dinamicamente via JS -->
-                    </div>
+                    <div class="photo-upload-container" id="photo-container"></div>
                 </div>
 
                 <div id="medicao-justificativa-group" class="form-group hidden">
@@ -689,7 +703,10 @@
 
                 list.innerHTML = obras.map(obra => `
                     <div class="card" onclick="app.selectObra('${obra.id}', '${obra.name}')" style="cursor: pointer;">
-                        <h3 class="card-title">${obra.name}</h3>
+                        <div class="card-header-actions">
+                            <h3 class="card-title">${obra.name}</h3>
+                            <button class="btn-delete-card" onclick="app.removerObra('${obra.id}', event)">🗑 Excluir</button>
+                        </div>
                         <span class="badge">${obra.category}</span>
                         <div style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center;">
                             <span style="font-size: 11px; color: var(--text-muted);">Progresso Geral</span>
@@ -700,6 +717,19 @@
                         </div>
                     </div>
                 `).join('');
+            },
+
+            removerObra(id, event) {
+                if (event) event.stopPropagation(); // Evita abrir a obra ao clicar no botão de excluir
+
+                const obra = localObras.find(o => o.id === id);
+                if (!obra) return;
+
+                if (confirm(`Tem certeza que deseja excluir a obra "${obra.name}"? Esta ação removerá todos os serviços vinculados.`)) {
+                    localObras = localObras.filter(o => o.id !== id);
+                    delete localServicosPorObra[id];
+                    this.renderObras(localObras);
+                }
             },
 
             selectObra(id, name) {
@@ -734,7 +764,10 @@
                     const pct = s.meta > 0 ? Math.min(100, Math.round((s.executada / s.meta) * 100)) : 0;
                     return `
                         <div class="card">
-                            <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 6px;">${s.name}</h4>
+                            <div class="card-header-actions">
+                                <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 6px;">${s.name}</h4>
+                                <button class="btn-delete-card" onclick="app.removerServico('${s.id}')">🗑 Excluir</button>
+                            </div>
                             <span class="badge">${s.category}</span>
                             <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-top: 10px;">
                                 <span>Meta: ${s.meta} m²</span>
@@ -754,6 +787,15 @@
                 container.innerHTML = htmlServicos + `
                     <button class="btn-secondary" style="width: 100%; margin-top: 8px;" onclick="app.openNovoServicoModal()">+ Adicionar Outro Serviço</button>
                 `;
+            },
+
+            removerServico(servicoId) {
+                if (confirm('Deseja realmente excluir este serviço e seu histórico?')) {
+                    localServicosPorObra[this.currentObra.id] = localServicosPorObra[this.currentObra.id].filter(s => s.id !== servicoId);
+                    delete localHistorico[servicoId];
+                    this.renderServicos(localServicosPorObra[this.currentObra.id]);
+                    this.recalcularProgressoObra(this.currentObra.id);
+                }
             },
 
             openNovoServicoModal() {
@@ -857,14 +899,12 @@
                     reader.readAsDataURL(file);
                 });
                 
-                // Reseta o input para permitir selecionar/capturar a mesma foto novamente se necessário
                 event.target.value = '';
             },
 
             renderFotosPreview() {
                 const container = document.getElementById('photo-container');
                 
-                // Renderização dinâmica dos botões de 'Tirar Foto' e 'Galeria'
                 const addBtnsHtml = `
                     <div class="photo-add-btn" onclick="document.getElementById('input-camera').click()">
                         <span style="font-size: 20px;">📸</span>
