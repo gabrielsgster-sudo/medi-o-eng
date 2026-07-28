@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MEDI-O ENG v2.1 - Gestão e Medição de Obras</title>
+    <title>MEDI-O ENG v2.2 - Gestão e Medição de Obras</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -95,6 +95,27 @@
             padding-bottom: 90px;
         }
 
+        /* PAINEL FIXO DE PROGRESSO E DIAS (STICKY) */
+        .sticky-progress-panel {
+            position: sticky;
+            top: 57px;
+            z-index: 90;
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .progress-meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
         /* BOTTOM NAVIGATION BAR */
         .bottom-nav {
             position: fixed;
@@ -128,13 +149,8 @@
             transition: color 0.2s ease;
         }
 
-        .nav-item .icon {
-            font-size: 18px;
-        }
-
-        .nav-item.active {
-            color: var(--primary);
-        }
+        .nav-item .icon { font-size: 18px; }
+        .nav-item.active { color: var(--primary); }
 
         /* CARDS & COMPONENTS */
         .card {
@@ -192,7 +208,7 @@
             background-color: #E2E8F0;
             border-radius: 3px;
             overflow: hidden;
-            margin-top: 8px;
+            margin-top: 6px;
         }
 
         .progress-fill {
@@ -289,7 +305,6 @@
         }
 
         .modal-body { padding: 20px; }
-
         .form-group { margin-bottom: 16px; }
 
         .form-label {
@@ -462,18 +477,22 @@
 
                 <!-- TELA DETALHES DA OBRA -->
                 <div id="screen-obra-detalhe" class="screen">
-                    <div class="content">
-                        <div class="card">
-                            <h2 class="card-title" id="obra-card-title">Obra</h2>
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                <span style="font-size: 12px; color: var(--text-muted);">Progresso Geral</span>
-                                <span style="font-size: 18px; font-weight: 700; color: var(--primary);" id="obra-progress">0%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" id="obra-progress-bar" style="width: 0%;"></div>
-                            </div>
+                    <!-- PAINEL FIXO DO PROGRESSO GERAL DA OBRA (STICKY) -->
+                    <div class="sticky-progress-panel">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 13px; font-weight: 700; color: var(--primary);">PROGRESSO GERAL</span>
+                            <span style="font-size: 18px; font-weight: 800; color: var(--primary);" id="obra-progress">0%</span>
                         </div>
+                        <div class="progress-bar" style="height: 8px; margin-top: 8px;">
+                            <div class="progress-fill" id="obra-progress-bar" style="width: 0%;"></div>
+                        </div>
+                        <div class="progress-meta-row">
+                            <span id="obra-data-inicio">⏱️ Início: --/--/----</span>
+                            <span id="obra-dias-decorridos" style="color: var(--primary); font-weight: 700;">Aguardando 1ª medição</span>
+                        </div>
+                    </div>
 
+                    <div class="content" style="padding-top: 12px;">
                         <div id="servicos-content"></div>
                     </div>
                 </div>
@@ -623,7 +642,7 @@
         let activeCatTab = 'obras';
 
         let localObras = [
-            { id: 'demo1', name: 'Residencial Boulevard', category: 'Residencial', progress: 64 }
+            { id: 'demo1', name: 'Residencial Boulevard', category: 'Residencial', progress: 60 }
         ];
 
         let localServicosPorObra = {
@@ -633,7 +652,12 @@
             ]
         };
 
-        let localHistorico = {};
+        // Dados de teste com histórico para inicializar datas
+        let localHistorico = {
+            's1': [{ obraNome: 'Residencial Boulevard', servicoNome: 'Alvenaria Estrutural', unit: 'm²', data: '2026-01-10', quantidade: 100, status: 'normal' }],
+            's2': [{ obraNome: 'Residencial Boulevard', servicoNome: 'Concretagem de Pilares', unit: 'm³', data: '2026-01-15', quantidade: 50, status: 'normal' }]
+        };
+
         let tempFotos = [];
 
         const app = {
@@ -740,14 +764,12 @@
                 document.getElementById('main-header-subtitle').textContent = "Detalhamento da Obra";
                 document.getElementById('header-back-btn').classList.remove('hidden');
 
-                document.getElementById('obra-card-title').textContent = name;
-
                 if (!localServicosPorObra[id]) {
                     localServicosPorObra[id] = [];
                 }
 
                 this.renderServicos(localServicosPorObra[id]);
-                this.recalcularProgressoObra(id);
+                this.recalcularProgressoEContagemDias(id);
                 this.showScreen('screen-obra-detalhe');
             },
 
@@ -760,6 +782,61 @@
                     localObras = localObras.filter(o => o.id !== id);
                     delete localServicosPorObra[id];
                     this.renderObras(localObras);
+                }
+            },
+
+            // --- CÁLCULO DE PROGRESSO E DIAS CORRIDOS ---
+            recalcularProgressoEContagemDias(obraId) {
+                const servicos = localServicosPorObra[obraId] || [];
+                let percentualGeral = 0;
+
+                if (servicos.length > 0) {
+                    const totalMeta = servicos.reduce((acc, s) => acc + (s.meta || 0), 0);
+                    const totalExecutado = servicos.reduce((acc, s) => acc + (s.executada || 0), 0);
+                    percentualGeral = totalMeta > 0 ? Math.min(100, Math.round((totalExecutado / totalMeta) * 100)) : 0;
+                }
+
+                document.getElementById('obra-progress').textContent = percentualGeral + '%';
+                document.getElementById('obra-progress-bar').style.width = percentualGeral + '%';
+
+                const obra = localObras.find(o => o.id === obraId);
+                if (obra) obra.progress = percentualGeral;
+
+                // Buscar todas as medições dos serviços desta obra específica
+                let todasMedicoesObra = [];
+                servicos.forEach(s => {
+                    if (localHistorico[s.id]) {
+                        todasMedicoesObra = todasMedicoesObra.concat(localHistorico[s.id]);
+                    }
+                });
+
+                const elInicio = document.getElementById('obra-data-inicio');
+                const elDias = document.getElementById('obra-dias-decorridos');
+
+                if (todasMedicoesObra.length === 0) {
+                    elInicio.textContent = '⏱️ Início: --/--/----';
+                    elDias.textContent = 'Aguardando 1ª medição';
+                    return;
+                }
+
+                // Ordena por data (mais antiga para mais recente)
+                todasMedicoesObra.sort((a, b) => new Date(a.data) - new Date(b.data));
+                
+                const primeiraMedicao = new Date(todasMedicoesObra[0].data + 'T00:00:00');
+                const dataFormatada = primeiraMedicao.toLocaleDateString('pt-BR');
+                
+                elInicio.textContent = `⏱️ Início: ${dataFormatada}`;
+
+                if (percentualGeral >= 100) {
+                    const ultimaMedicao = new Date(todasMedicoesObra[todasMedicoesObra.length - 1].data + 'T00:00:00');
+                    const diffTime = Math.abs(ultimaMedicao - primeiraMedicao);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                    elDias.textContent = `🎉 Obra concluída em ${diffDays} dias!`;
+                } else {
+                    const hoje = new Date();
+                    const diffTime = Math.abs(hoje - primeiraMedicao);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    elDias.textContent = `📅 ${diffDays} dias em andamento`;
                 }
             },
 
@@ -904,7 +981,7 @@
                     localServicosPorObra[this.currentObra.id] = localServicosPorObra[this.currentObra.id].filter(s => s.id !== servicoId);
                     delete localHistorico[servicoId];
                     this.renderServicos(localServicosPorObra[this.currentObra.id]);
-                    this.recalcularProgressoObra(this.currentObra.id);
+                    this.recalcularProgressoEContagemDias(this.currentObra.id);
                 }
             },
 
@@ -942,7 +1019,7 @@
 
                 localServicosPorObra[this.currentObra.id].push(novoServico);
                 this.renderServicos(localServicosPorObra[this.currentObra.id]);
-                this.recalcularProgressoObra(this.currentObra.id);
+                this.recalcularProgressoEContagemDias(this.currentObra.id);
                 this.closeNovoServicoModal();
             },
 
@@ -978,23 +1055,6 @@
                 document.getElementById('nova-obra-nome').value = '';
                 this.closeNovaObraModal();
                 this.selectObra(novaObra.id, novaObra.name);
-            },
-
-            recalcularProgressoObra(obraId) {
-                const servicos = localServicosPorObra[obraId] || [];
-                let percentualGeral = 0;
-
-                if (servicos.length > 0) {
-                    const totalMeta = servicos.reduce((acc, s) => acc + (s.meta || 0), 0);
-                    const totalExecutado = servicos.reduce((acc, s) => acc + (s.executada || 0), 0);
-                    percentualGeral = totalMeta > 0 ? Math.min(100, Math.round((totalExecutado / totalMeta) * 100)) : 0;
-                }
-
-                document.getElementById('obra-progress').textContent = percentualGeral + '%';
-                document.getElementById('obra-progress-bar').style.width = percentualGeral + '%';
-
-                const obra = localObras.find(o => o.id === obraId);
-                if (obra) obra.progress = percentualGeral;
             },
 
             // --- MEDIÇÃO ---
@@ -1129,7 +1189,7 @@
                 alert('✅ Medição registrada com sucesso!');
                 this.closeMedicaoModal();
                 this.renderServicos(servicos);
-                this.recalcularProgressoObra(this.currentObra.id);
+                this.recalcularProgressoEContagemDias(this.currentObra.id);
             },
 
             // --- HISTÓRICOS ---
