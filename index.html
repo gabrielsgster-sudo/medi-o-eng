@@ -422,6 +422,33 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .empreiteiro-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-toggle-empreiteiro {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .btn-toggle-empreiteiro:hover {
+            background-color: #F1F5F9;
+            color: var(--primary);
+        }
+
+        .empreiteiro-body.minimized {
+            display: none;
         }
 
         /* MODAIS */
@@ -1010,12 +1037,12 @@
             { id: 'demo1', name: 'Residencial Boulevard', category: 'Residencial', progress: 0 }
         ];
 
-        // Nova estrutura: Empreiteiros e seus respectivos serviços aninhados
         const defaultEmpreiteirosPorObra = {
             'demo1': [
                 {
                     id: 'emp_1',
                     nome: 'Hydro Power',
+                    minimized: false,
                     servicos: [
                         { id: 's1', name: 'Assentamento', category: 'Alvenaria', meta: 100, executada: 0, unit: 'm²' }
                     ]
@@ -1598,7 +1625,7 @@
                 select.innerHTML = lista.map(c => `<option value="${c}">${c}</option>`).join('');
             },
 
-            /* RENDERIZAÇÃO HIERÁRQUICA: EMPREITEIRO -> SERVIÇOS */
+            /* RENDERIZAÇÃO HIERÁRQUICA COM SUPORTE A MINIMIZAÇÃO */
             renderEmpreiteirosEServicos(empreiteiros) {
                 const container = document.getElementById('servicos-content');
                 
@@ -1614,6 +1641,10 @@
 
                 let htmlContent = empreiteiros.map(emp => {
                     const servicos = emp.servicos || [];
+                    const isMinimized = emp.minimized || false;
+                    const toggleIcon = isMinimized ? '➕' : '➖';
+                    const toggleTitle = isMinimized ? 'Expandir' : 'Minimizar';
+
                     const servicosHtml = servicos.length === 0 
                         ? `<p style="font-size: 11px; color: var(--text-muted); font-style: italic; margin-bottom: 10px;">Nenhum serviço cadastrado para este empreiteiro.</p>`
                         : servicos.map(s => {
@@ -1644,15 +1675,19 @@
                     return `
                         <div class="empreiteiro-section">
                             <div class="empreiteiro-header">
-                                <div class="empreiteiro-title">
-                                    📁 Empreiteiro: ${emp.nome}
+                                <div class="empreiteiro-title" onclick="app.toggleMinimizarEmpreiteiro('${emp.id}')">
+                                    <span>${toggleIcon}</span> 📁 Empreiteiro: ${emp.nome} <span style="font-size: 11px; color: var(--text-muted); font-weight: normal; margin-left: 6px;">(${servicos.length} serviço${servicos.length === 1 ? '' : 's'})</span>
                                 </div>
-                                <button class="btn-delete-card" onclick="app.removerEmpreiteiro('${emp.id}')">Excluir Empreiteiro</button>
+                                <div class="empreiteiro-actions">
+                                    <button class="btn-toggle-empreiteiro" title="${toggleTitle}" onclick="app.toggleMinimizarEmpreiteiro('${emp.id}')">${isMinimized ? 'Expandir' : 'Minimizar'}</button>
+                                    <button class="btn-delete-card" onclick="app.removerEmpreiteiro('${emp.id}')">Excluir</button>
+                                </div>
                             </div>
                             
-                            ${servicosHtml}
-
-                            <button class="btn-secondary" style="width: 100%; margin-top: 4px; font-size: 12px;" onclick="app.openNovoServicoModal('${emp.id}', '${emp.nome}')">+ Adicionar Serviço para este Empreiteiro</button>
+                            <div class="empreiteiro-body ${isMinimized ? 'minimized' : ''}">
+                                ${servicosHtml}
+                                <button class="btn-secondary" style="width: 100%; margin-top: 4px; font-size: 12px;" onclick="app.openNovoServicoModal('${emp.id}', '${emp.nome}')">+ Adicionar Serviço para este Empreiteiro</button>
+                            </div>
                         </div>
                     `;
                 }).join('');
@@ -1660,6 +1695,18 @@
                 container.innerHTML = htmlContent + `
                     <button class="btn-primary" style="width: 100%; margin-top: 8px;" onclick="app.openNovoEmpreiteiroModal()">+ Adicionar Outro Empreiteiro</button>
                 `;
+            },
+
+            toggleMinimizarEmpreiteiro(empreiteiroId) {
+                const empreiteiros = localEmpreiteirosPorObra[this.currentObra.id];
+                if (!empreiteiros) return;
+
+                const emp = empreiteiros.find(e => e.id === empreiteiroId);
+                if (emp) {
+                    emp.minimized = !emp.minimized;
+                    this.saveData();
+                    this.renderEmpreiteirosEServicos(empreiteiros);
+                }
             },
 
             openNovoEmpreiteiroModal() {
@@ -1685,6 +1732,7 @@
                 const novoEmpreiteiro = {
                     id: 'emp_' + Date.now(),
                     nome: nome,
+                    minimized: false,
                     servicos: []
                 };
 
