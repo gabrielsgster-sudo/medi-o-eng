@@ -519,7 +519,7 @@
         </div>
     </div>
 
-    <!-- MODAL MEDIÇÃO (AJUSTADO PARA ABRIR CÂMERA E GALERIA) -->
+    <!-- MODAL MEDIÇÃO (ENTRADAS SEPARADAS PARA CÂMERA E GALERIA) -->
     <div id="modal-medicao" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
@@ -546,16 +546,18 @@
                     </div>
                 </div>
 
-                <!-- CAMPO DE ANEXO DE FOTOS (CÂMERA + GALERIA) -->
+                <!-- CAMPO DE ANEXO DE FOTOS (CÂMERA + GALERIA SEPARADOS) -->
                 <div class="form-group">
                     <label class="form-label">Evidências / Fotos de Campo</label>
-                    <input type="file" id="input-fotos" accept="image/*" multiple class="hidden" onchange="app.handleFotoUpload(event)">
+
+                    <!-- Input 1: Força a Abertura Direta da Câmera -->
+                    <input type="file" id="input-camera" accept="image/*" capture="environment" class="hidden" onchange="app.handleFotoUpload(event)">
                     
+                    <!-- Input 2: Abre a Galeria / Arquivos do Celular -->
+                    <input type="file" id="input-galeria" accept="image/*" multiple class="hidden" onchange="app.handleFotoUpload(event)">
+
                     <div class="photo-upload-container" id="photo-container">
-                        <div class="photo-add-btn" onclick="document.getElementById('input-fotos').click()">
-                            <span style="font-size: 20px;">📷</span>
-                            <span>Anexar Foto</span>
-                        </div>
+                        <!-- Os botões 'Tirar Foto' e 'Galeria' são gerados dinamicamente via JS -->
                     </div>
                 </div>
 
@@ -854,14 +856,23 @@
                     };
                     reader.readAsDataURL(file);
                 });
+                
+                // Reseta o input para permitir selecionar/capturar a mesma foto novamente se necessário
+                event.target.value = '';
             },
 
             renderFotosPreview() {
                 const container = document.getElementById('photo-container');
-                const addBtnHtml = `
-                    <div class="photo-add-btn" onclick="document.getElementById('input-fotos').click()">
-                        <span style="font-size: 20px;">📷</span>
-                        <span>Anexar Foto</span>
+                
+                // Renderização dinâmica dos botões de 'Tirar Foto' e 'Galeria'
+                const addBtnsHtml = `
+                    <div class="photo-add-btn" onclick="document.getElementById('input-camera').click()">
+                        <span style="font-size: 20px;">📸</span>
+                        <span>Tirar Foto</span>
+                    </div>
+                    <div class="photo-add-btn" onclick="document.getElementById('input-galeria').click()">
+                        <span style="font-size: 20px;">🖼️</span>
+                        <span>Galeria</span>
                     </div>
                 `;
 
@@ -872,7 +883,7 @@
                     </div>
                 `).join('');
 
-                container.innerHTML = addBtnHtml + photosHtml;
+                container.innerHTML = addBtnsHtml + photosHtml;
             },
 
             removerFoto(index) {
